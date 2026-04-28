@@ -7,12 +7,22 @@ export async function createServerClient() {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !anonKey) {
-    console.error('Supabase environment variables are missing!');
+    console.warn('Middleware/Server: Supabase environment variables are missing!');
+    return createSSRServerClient(
+      'https://placeholder.supabase.co',
+      'placeholder',
+      {
+        cookies: {
+          getAll() { return []; },
+          setAll() { },
+        },
+      }
+    );
   }
 
   return createSSRServerClient(
-    url || '',
-    anonKey || '',
+    url,
+    anonKey,
     {
       cookies: {
         getAll() {

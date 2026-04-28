@@ -8,7 +8,7 @@ export default async function LandingPage() {
   try {
     const supabase = await createServerClient();
     const { data } = await supabase.auth.getUser();
-    user = data.user;
+    user = data?.user || null;
   } catch (err) {
     console.error('Failed to fetch user:', err);
   }

@@ -270,9 +270,8 @@ async function fetchRecentActivity(
 
 export default async function DashboardPage() {
   const supabase = await createServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
 
   const today = todayString();
   const userId = user?.id ?? '';
