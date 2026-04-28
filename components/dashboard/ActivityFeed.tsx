@@ -18,6 +18,23 @@ export interface ActivityItem {
 
 interface ActivityFeedProps {
   items: ActivityItem[];
+  loading?: boolean;
+}
+
+function ActivitySkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="shimmer" style={{ width: 26, height: 26, borderRadius: 7, flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div className="shimmer" style={{ height: 12, width: '60%', borderRadius: 4, marginBottom: 6 }} />
+            <div className="shimmer" style={{ height: 10, width: '30%', borderRadius: 4 }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function DynamicIcon({ name, size = 14, color }: { name: string; size?: number; color: string }) {
@@ -47,7 +64,9 @@ export default function ActivityFeed({ items }: ActivityFeedProps) {
         <span className="eyebrow" style={{ letterSpacing: '0.12em' }}>Recent activity</span>
       </div>
 
-      {items.length === 0 ? (
+      {loading ? (
+        <ActivitySkeleton />
+      ) : items.length === 0 ? (
         <EmptyState
           emoji="✅"
           title="No activity yet"

@@ -111,8 +111,14 @@ export default function HabitList({
     return <EmptyStateWrapper onAdd={onAddHabit} />;
   }
 
-  const pending = habits.filter((h) => !(h.todayEntry?.is_completed ?? false));
-  const completed = habits.filter((h) => h.todayEntry?.is_completed ?? false);
+  const pending = React.useMemo(
+    () => habits.filter((h) => !(h.todayEntry?.is_completed ?? false)),
+    [habits]
+  );
+  const completed = React.useMemo(
+    () => habits.filter((h) => h.todayEntry?.is_completed ?? false),
+    [habits]
+  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

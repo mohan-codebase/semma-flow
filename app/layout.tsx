@@ -1,7 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter, Outfit, IBM_Plex_Mono } from 'next/font/google';
 import "./globals.css";
 import AppProviders from "@/components/ui/AppProviders";
 import ServiceWorkerRegistrar from "@/components/ui/ServiceWorkerRegistrar";
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
+
+const plexMono = IBM_Plex_Mono({
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  variable: '--font-plex-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: "HabitForge — Your Personal Performance OS",
@@ -12,12 +32,19 @@ export const metadata: Metadata = {
     description: "Your Personal Performance OS",
     type: "website",
   },
-  // PWA / mobile meta
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "HabitForge",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#10E5B0",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -26,17 +53,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${inter.variable} ${outfit.variable} ${plexMono.variable} h-full`}
+      suppressHydrationWarning
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-        {/* PWA */}
-        <meta name="theme-color" content="#10E5B0" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-
         <script
           // Prevent flash of wrong theme — runs before paint.
           dangerouslySetInnerHTML={{
@@ -46,7 +68,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <AppProviders>{children}</AppProviders>
-        {/* Registers /sw.js — safe no-op in browsers that don't support SW */}
         <ServiceWorkerRegistrar />
       </body>
     </html>

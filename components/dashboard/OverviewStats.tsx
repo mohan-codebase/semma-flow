@@ -38,12 +38,20 @@ function SkeletonCard() {
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: '18px 20px',
-        minHeight: 120,
+        minHeight: 124,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       }}
     >
-      <div className="shimmer" style={{ height: 10, width: '40%', borderRadius: 4, marginBottom: 18 }} />
-      <div className="shimmer" style={{ height: 30, width: '55%', borderRadius: 6, marginBottom: 10 }} />
-      <div className="shimmer" style={{ height: 10, width: '60%', borderRadius: 4 }} />
+      <div>
+        <div className="shimmer" style={{ height: 10, width: '45%', borderRadius: 4, marginBottom: 20 }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="shimmer" style={{ height: 40, width: 40, borderRadius: 'var(--r-md)', flexShrink: 0 }} />
+          <div className="shimmer" style={{ height: 32, width: '40%', borderRadius: 8 }} />
+        </div>
+      </div>
+      <div className="shimmer" style={{ height: 12, width: '60%', borderRadius: 4, marginTop: 12 }} />
     </div>
   );
 }
@@ -207,29 +215,63 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
         <p style={subStyle}>7-day completion</p>
       </StatCard>
 
-      {/* Total Completions */}
-      <StatCard delay={0.15} label="All Time">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--r-md)',
-              background: 'var(--indigo-glow)',
-              border: '1px solid rgba(139,127,232,0.22)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <CheckCircle2 size={18} color="var(--indigo)" strokeWidth={2} />
+      {/* Level & Mastery (Replaces All Time) */}
+      <StatCard delay={0.15} label="Level & Rank">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 38,
+                height: 38,
+                borderRadius: 'var(--r-md)',
+                background: 'var(--indigo-glow)',
+                border: '1px solid rgba(139,127,232,0.22)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                fontSize: 18,
+                fontWeight: 800,
+                color: 'var(--indigo)',
+                fontFamily: "'Outfit'",
+              }}
+            >
+              {Math.floor(stats.totalCompletions / 50) + 1}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <p
+                style={{
+                  fontSize: 16,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  fontFamily: "'Outfit'",
+                  letterSpacing: '-0.02em',
+                  margin: 0,
+                }}
+              >
+                {stats.totalCompletions >= 500
+                  ? 'Master'
+                  : stats.totalCompletions >= 250
+                  ? 'Elite'
+                  : stats.totalCompletions >= 100
+                  ? 'Pro'
+                  : stats.totalCompletions >= 50
+                  ? 'Adept'
+                  : 'Novice'}
+              </p>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                {stats.totalCompletions} XP
+              </p>
+            </div>
           </div>
-          <div>
-            <p style={numStyle}>
-              <AnimatedNumber value={stats.totalCompletions} />
-            </p>
-            <p style={subStyle}>total check-ins</p>
+          {/* Progress bar to next level */}
+          <div style={{ width: '100%', height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${(stats.totalCompletions % 50) * 2}%` }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              style={{ height: '100%', background: 'var(--indigo)', borderRadius: 2 }}
+            />
           </div>
         </div>
       </StatCard>

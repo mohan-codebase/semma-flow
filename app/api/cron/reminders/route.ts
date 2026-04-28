@@ -1,15 +1,9 @@
-/**
- * POST /api/cron/reminders
- *
- * Sends push notifications for habits whose reminder_time falls within the
- * current 5-minute window AND haven't been completed today.
- *
- * Call this endpoint every 5 minutes via:
- *   - Vercel Cron:  vercel.json → { "crons": [{ "path": "/api/cron/reminders", "schedule": "*/5 * * * *" }] }
- *   - Upstash QStash, GitHub Actions, or any external cron service
- *
- * Protected by CRON_SECRET env var (set it, then pass as Authorization header).
- */
+// POST /api/cron/reminders
+// Sends push notifications for habits whose reminder_time falls within the
+// current 5-minute window AND have not been completed today.
+//
+// Schedule: every 5 minutes via Vercel Cron (vercel.json) or any external cron.
+// Auth: pass Authorization: Bearer <CRON_SECRET> header.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

@@ -43,8 +43,31 @@ const levelColor: Record<0 | 1 | 2 | 3 | 4, string> = {
 
 const HOVER_DEFAULT = 'Hover a day to see details';
 
+function HeatmapSkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="shimmer" style={{ height: 16, width: 140, borderRadius: 4 }} />
+        <div className="shimmer" style={{ height: 12, width: 180, borderRadius: 4 }} />
+      </div>
+      <div style={{ overflow: 'hidden' }}>
+        <div
+          className="shimmer"
+          style={{
+            height: 110,
+            width: '100%',
+            borderRadius: 8,
+            opacity: 0.25,
+            background: 'linear-gradient(90deg, transparent 0%, var(--bg-tertiary) 50%, transparent 100%)',
+            backgroundSize: '200% 100%',
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps) {
-  // Use a ref for readout — avoids re-rendering 365 cells on every hover
   const readoutRef = useRef<HTMLDivElement>(null);
 
   const grid = useMemo(() => {
@@ -76,7 +99,6 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
     return weeks;
   }, [data, totalDays]);
 
-  // DOM-direct handlers — zero React re-renders on hover
   const handleEnter = useCallback((hoverStr: string) => {
     if (readoutRef.current) readoutRef.current.textContent = hoverStr;
   }, []);
@@ -108,177 +130,188 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
 
   return (
     <section
+      className="hf-heatmap-container"
       style={{
         background: 'var(--bg-card)',
         backdropFilter: 'blur(16px) saturate(160%)',
         WebkitBackdropFilter: 'blur(16px) saturate(160%)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
-        padding: 'var(--space-5) var(--space-5) var(--space-4)',
-        position: 'relative',
-        overflow: 'hidden',
+        padding: 'var(--space-5)',
         boxShadow: 'var(--glass-highlight), var(--shadow-xs)',
       }}
     >
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 'var(--space-4)', gap: 12, flexWrap: 'wrap' }}>
-        <div>
-          <span className="eyebrow">Consistency</span>
-          <h3
-            style={{
-              fontSize: 16,
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              fontFamily: "'Outfit'",
-              letterSpacing: '-0.02em',
-              marginTop: 4,
-            }}
-          >
-            {total.toLocaleString()} check-ins · {activeDays} active days
-          </h3>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-muted)' }}>
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((l) => (
-            <span
-              key={l}
-              style={{
-                width: CELL,
-                height: CELL,
-                borderRadius: RADIUS,
-                background: levelColor[l as 0 | 1 | 2 | 3 | 4],
-                border: '1px solid var(--border-subtle)',
-              }}
-            />
-          ))}
-          <span>More</span>
-        </div>
-      </div>
-
-      {/* Grid — horizontally scrollable on small screens */}
-      <div
-        className="hf-heatmap-scroll"
-        style={{ overflowX: 'auto', overflowY: 'hidden', paddingBottom: 6, WebkitOverflowScrolling: 'touch' }}
-      >
-        <div style={{ display: 'inline-flex', gap: GAP, alignItems: 'flex-start', paddingLeft: 28 }}>
-          {/* Day labels column */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: GAP,
-              marginRight: 4,
-              marginTop: 14,
-              marginLeft: -28,
-              width: 24,
-            }}
-          >
-            {[0, 1, 2, 3, 4, 5, 6].map((d) => (
-              <span
-                key={d}
+      {data.length === 0 ? (
+        <HeatmapSkeleton />
+      ) : (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <span className="eyebrow" style={{ letterSpacing: '0.12em', display: 'block', marginBottom: 4 }}>Consistency</span>
+              <h3
                 style={{
-                  height: CELL,
-                  fontSize: 9.5,
-                  color: 'var(--text-dimmed)',
-                  fontFamily: "'IBM Plex Mono', monospace",
-                  letterSpacing: '0.04em',
-                  lineHeight: `${CELL}px`,
-                  visibility: dayLabels.includes(['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]) ? 'visible' : 'hidden',
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  fontFamily: "'Outfit'",
+                  letterSpacing: '-0.02em',
+                  margin: 0,
                 }}
               >
-                {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d]}
-              </span>
-            ))}
+                Year in Review
+              </h3>
+            </div>
+            <div
+              ref={readoutRef}
+              className="hf-heatmap-readout"
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+                fontFamily: "'IBM Plex Mono', monospace",
+                letterSpacing: '-0.01em',
+                background: 'var(--bg-tertiary)',
+                padding: '4px 10px',
+                borderRadius: 6,
+                border: '1px solid var(--border-subtle)',
+              }}
+            >
+              {HOVER_DEFAULT}
+            </div>
           </div>
 
-          {/* Month row + week columns */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <div style={{ display: 'flex', gap: GAP, height: 12, marginBottom: 2 }}>
-              {grid.map((_, wi) => {
-                const lbl = monthLabels.find((l) => l.index === wi);
-                return (
-                  <div key={wi} style={{ width: CELL, position: 'relative' }}>
-                    {lbl && (
-                      <span
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+            <h3
+              style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                fontFamily: "'Outfit'",
+                letterSpacing: '-0.02em',
+                margin: 0,
+              }}
+            >
+              {total.toLocaleString()} check-ins · {activeDays} active days
+            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-muted)' }}>
+              <span>Less</span>
+              {[0, 1, 2, 3, 4].map((l) => (
+                <span
+                  key={l}
+                  style={{
+                    width: CELL,
+                    height: CELL,
+                    borderRadius: RADIUS,
+                    background: levelColor[l as 0 | 1 | 2 | 3 | 4],
+                    border: '1px solid var(--border-subtle)',
+                  }}
+                />
+              ))}
+              <span>More</span>
+            </div>
+          </div>
+
+          <div
+            className="hf-heatmap-scroll"
+            style={{ overflowX: 'auto', overflowY: 'hidden', paddingBottom: 6, WebkitOverflowScrolling: 'touch' }}
+          >
+            <div style={{ display: 'inline-flex', gap: GAP, alignItems: 'flex-start', paddingLeft: 28 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: GAP,
+                  marginRight: 4,
+                  marginTop: 14,
+                  marginLeft: -28,
+                  width: 24,
+                }}
+              >
+                {[0, 1, 2, 3, 4, 5, 6].map((d) => (
+                  <span
+                    key={d}
+                    style={{
+                      height: CELL,
+                      fontSize: 9.5,
+                      color: 'var(--text-dimmed)',
+                      fontFamily: "'IBM Plex Mono', monospace",
+                      letterSpacing: '0.04em',
+                      lineHeight: `${CELL}px`,
+                      visibility: dayLabels.includes(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]) ? 'visible' : 'hidden',
+                    }}
+                  >
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d]}
+                  </span>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: GAP }}>
+                {grid.map((week, wi) => {
+                  const label = monthLabels.find((l) => l.index === wi);
+                  return (
+                    <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+                      <div
                         style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          fontSize: 9.5,
-                          color: 'var(--text-muted)',
+                          height: 14,
+                          fontSize: 10,
+                          color: 'var(--text-dimmed)',
                           fontFamily: "'IBM Plex Mono', monospace",
-                          letterSpacing: '0.04em',
+                          position: 'relative',
                         }}
                       >
-                        {lbl.label}
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        {label && (
+                          <span style={{ position: 'absolute', top: 0, left: 0, whiteSpace: 'nowrap' }}>
+                            {label.label}
+                          </span>
+                        )}
+                      </div>
 
-            <div style={{ display: 'flex', gap: GAP }}>
-              {grid.map((week, wi) => (
-                <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
-                  {week.map((day, di) => {
-                    if (!day) {
-                      return (
-                        <div
-                          key={di}
-                          style={{ width: CELL, height: CELL, borderRadius: RADIUS, background: 'transparent' }}
-                        />
-                      );
-                    }
-                    const lvl = levelFor(day.count, max);
-                    return (
-                      <div
-                        key={di}
-                        className="hf-hm-cell"
-                        onMouseEnter={() => handleEnter(day.hoverStr)}
-                        onMouseLeave={handleLeave}
-                        style={{
-                          width: CELL,
-                          height: CELL,
-                          borderRadius: RADIUS,
-                          background: levelColor[lvl],
-                          border: '1px solid var(--border-subtle)',
-                          cursor: 'default',
-                        }}
-                        title={day.titleStr}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
+                      {week.map((day, di) =>
+                        day ? (
+                          <div
+                            key={di}
+                            className="hf-hm-cell"
+                            onMouseEnter={() => handleEnter(day.hoverStr)}
+                            onMouseLeave={handleLeave}
+                            style={{
+                              width: CELL,
+                              height: CELL,
+                              borderRadius: RADIUS,
+                              background: levelColor[levelFor(day.count, max)],
+                              border: '1px solid var(--border-subtle)',
+                              cursor: 'pointer',
+                              transition: 'transform 0.1s ease',
+                            }}
+                            title={day.titleStr}
+                          />
+                        ) : (
+                          <div key={di} style={{ width: CELL, height: CELL }} />
+                        )
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Hover readout — updated via DOM ref, no re-render */}
-      <div
-        ref={readoutRef}
-        style={{
-          marginTop: 'var(--space-3)',
-          fontSize: 11.5,
-          color: 'var(--text-muted)',
-          fontFamily: "'IBM Plex Mono', monospace",
-          letterSpacing: '-0.005em',
-          height: 16,
-        }}
-      >
-        {HOVER_DEFAULT}
-      </div>
+          <div
+            className="hf-heatmap-hint"
+            style={{
+              fontSize: 11,
+              color: 'var(--text-muted)',
+              marginTop: 10,
+              textAlign: 'center',
+              display: 'none',
+              fontStyle: 'italic',
+            }}
+          >
+            ← Scroll to see full year
+          </div>
 
-      {/* Scroll hint — only visible on touch devices */}
-      <p className="hf-heatmap-hint" style={{ display: 'none', fontSize: 11, color: 'var(--text-dimmed)', marginTop: 8, textAlign: 'right' }}>
-        ← Scroll to see full year
-      </p>
-
-      {/* CSS hover outline — no React state needed */}
-      <style>{`.hf-hm-cell:hover { outline: 1px solid var(--accent-light); outline-offset: 1px; }
-@media (max-width: 1023px) { .hf-heatmap-hint { display: block !important; } }`}</style>
+          <style>{`.hf-hm-cell:hover { outline: 1px solid var(--accent-light); outline-offset: 1px; }
+ @media (max-width: 1023px) { .hf-heatmap-hint { display: block !important; } }`}</style>
+        </>
+      )}
     </section>
   );
 }

@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import IconPicker from '@/components/ui/IconPicker';
 import { habitSchema, type HabitFormValues } from '@/lib/validations/habit';
 import type { Habit, Category } from '@/types/habit';
 
@@ -329,16 +330,24 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
             </div>
 
             {/* Icon */}
-            <div style={{ ...fieldStyle, flex: 1, minWidth: 140 }}>
-              <Input
-                label="Icon"
-                placeholder="circle-check"
-                error={errors.icon?.message}
-                {...register('icon')}
+            <div style={{ ...fieldStyle, flex: 1.5, minWidth: 260 }}>
+              <label style={labelStyle}>Icon</label>
+              <Controller
+                name="icon"
+                control={control}
+                render={({ field }) => (
+                  <IconPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    color={watchColor}
+                  />
+                )}
               />
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                Lucide icon name
-              </span>
+              {errors.icon && (
+                <span style={{ fontSize: 12, color: 'var(--danger)', marginTop: 4 }}>
+                  {errors.icon.message}
+                </span>
+              )}
             </div>
           </div>
 

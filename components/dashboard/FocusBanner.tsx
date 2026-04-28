@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Target, ArrowRight, Check, Flame, Clock } from 'lucide-react';
@@ -30,6 +30,7 @@ function formatCountdown(ms: number): string {
 
 export default function FocusBanner({ habits }: FocusBannerProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [tick, setTick] = useState(msUntilMidnight());
   const [ready, setReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -53,7 +54,9 @@ export default function FocusBanner({ habits }: FocusBannerProps) {
           is_completed: true,
         }),
       });
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } finally {
       setSubmitting(false);
     }

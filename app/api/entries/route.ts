@@ -94,11 +94,6 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) return err(safeErrorMessage(error, 'Failed to save entry'), 500);
-
-    // Recalculate streak and total_completions
-    const { data: profile } = await supabase.from('profiles').select('timezone').eq('id', user.id).maybeSingle();
-    await recalculateHabitStats(supabase, habit_id, user.id, profile?.timezone);
-
     return ok(entry);
   } catch (e) {
     return err(safeErrorMessage(e, 'Failed to save entry'), 500);
@@ -107,73 +102,3 @@ export async function PATCH(req: NextRequest) {
 
 // POST /api/entries — same as PATCH (alias)
 export const POST = PATCH;
-
-async function recalculateHabitStats(
-  supabase: Awaited<ReturnType<typeof createServerClient>>,
-  habitId: string,
-  userId: string,
-  timezone?: string
-) {
-  try {
-    // Count total completions
-    const { count: totalCompletions } = await supabase
-      .from('habit_entries')
-      .select('*', { count: 'exact', head: true })
-      .eq('habit_id', habitId)
-      .eq('user_id', userId)
-      .eq('is_completed', true);
-
-    // Calculate current streak (consecutive days back from today)
-    const { data: entries } = await supabase
-      .from('habit_entries')
-      .select('entry_date, is_completed')
-      .eq('habit_id', habitId)
-      .eq('user_id', userId)
-      .eq('is_completed', true)
-      .order('entry_date', { ascending: false })
-      .limit(400);
-
-    const completedDates = new Set((entries ?? []).map((e) => e.entry_date));
-
-    const userTz = timezone || 'Asia/Kolkata';
-    let streak = 0;
-    const today = new Date();
-    // Check today first; if not completed, check yesterday (allow today to be in progress)
-    let checkDate = new Date(today);
-    const todayStr = formatInTimeZone(today, userTz, 'yyyy-MM-dd');
-    if (!completedDates.has(todayStr)) {
-      checkDate.setDate(checkDate.getDate() - 1);
-    }
-    while (true) {
-      const dateStr = formatInTimeZone(checkDate, userTz, 'yyyy-MM-dd');
-      if (completedDates.has(dateStr)) {
-        streak++;
-        checkDate.setDate(checkDate.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-
-    // Get current longest streak
-    const { data: habitRow } = await supabase
-      .from('habits')
-      .select('longest_streak')
-      .eq('id', habitId)
-      .single();
-
-    const longestStreak = Math.max(habitRow?.longest_streak ?? 0, streak);
-
-    await supabase
-      .from('habits')
-      .update({
-        total_completions: totalCompletions ?? 0,
-        current_streak: streak,
-        longest_streak: longestStreak,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', habitId)
-      .eq('user_id', userId);
-  } catch {
-    // Non-fatal
-  }
-}

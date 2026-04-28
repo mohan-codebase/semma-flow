@@ -75,7 +75,7 @@ function MenuItem({ icon, label, onClick, danger = false }: { icon: React.ReactN
   );
 }
 
-export default function HabitCard({ habit, onToggle, onEdit, onArchive, onDelete }: HabitCardProps) {
+const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: HabitCardProps) => {
   const [checked,  setChecked]  = useState(habit.todayEntry?.is_completed ?? false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -258,4 +258,7 @@ export default function HabitCard({ habit, onToggle, onEdit, onArchive, onDelete
       </motion.div>
     </motion.div>
   );
-}
+});
+
+HabitCard.displayName = 'HabitCard';
+export default HabitCard;

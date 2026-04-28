@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useTransition } from 'react';
 import { Plus, CalendarClock } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -39,6 +39,7 @@ interface BackfillRow {
 
 export default function TodayHabits({ habits: initialHabits, loading }: TodayHabitsProps) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [habits, setHabits] = useState<HabitWithEntry[]>(initialHabits);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -95,7 +96,10 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       setHabits((prev) =>
         prev.map((h) => (h.id === entry.habit_id ? { ...h, todayEntry: entry } : h))
       );
-      router.refresh();
+      // Background refresh to update stats cards
+      startTransition(() => {
+        router.refresh();
+      });
     },
   });
 
@@ -203,8 +207,10 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
         setHabits((prev) =>
           prev.map((h) => (h.id === habitId ? { ...h, todayEntry: updated } : h))
         );
-        // Refresh server components so KPI cards (Today's Progress, Best Streak) resync
-        router.refresh();
+        // Background refresh to update dashboard stats/charts
+        startTransition(() => {
+          router.refresh();
+        });
       }
     } catch {
       // Revert on network error
@@ -321,7 +327,9 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       }
       setBackfillOpen(false);
       window.dispatchEvent(new Event('habitforge:habit-mutated'));
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch {
       toast('Failed to save backfill', 'error');
     } finally {
@@ -337,7 +345,9 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       body: JSON.stringify({ is_archived: true }),
     });
     window.dispatchEvent(new Event('habitforge:habit-mutated'));
-    router.refresh();
+    startTransition(() => {
+      router.refresh();
+    });
   }, [router]);
 
   const handleDelete = useCallback((habitId: string) => {
@@ -352,7 +362,9 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       if (res.ok) {
         setHabits((prev) => prev.filter((h) => h.id !== deleteTarget));
         window.dispatchEvent(new Event('habitforge:habit-mutated'));
-        router.refresh();
+        startTransition(() => {
+          router.refresh();
+        });
       }
     } catch {
       /* silently ignore */
@@ -378,7 +390,9 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
     setFormOpen(false);
     setEditingHabit(null);
     window.dispatchEvent(new Event('habitforge:habit-mutated'));
-    router.refresh();
+    startTransition(() => {
+      router.refresh();
+    });
   };
 
   // ── Onboarding handlers ──────────────────────────────────────

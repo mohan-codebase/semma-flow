@@ -63,6 +63,31 @@ function DeltaPill({ value, positive }: { value: number; positive: boolean }) {
     </span>
   );
 }
+function ChartSkeleton() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div className="shimmer" style={{ height: 12, width: 120, borderRadius: 4, marginBottom: 12 }} />
+          <div className="shimmer" style={{ height: 32, width: 200, borderRadius: 8, marginBottom: 8 }} />
+          <div className="shimmer" style={{ height: 14, width: 150, borderRadius: 4 }} />
+        </div>
+        <div className="shimmer" style={{ height: 32, width: 100, borderRadius: 8 }} />
+      </div>
+      <div
+        className="shimmer"
+        style={{
+          height: 200,
+          width: '100%',
+          borderRadius: 12,
+          opacity: 0.4,
+          background: 'linear-gradient(90deg, transparent 0%, var(--bg-tertiary) 50%, transparent 100%)',
+          backgroundSize: '200% 100%',
+        }}
+      />
+    </div>
+  );
+}
 
 export default function ProgressChart({ data, habitCount }: ProgressChartProps) {
   const [range, setRange] = useState<Range>('30d');
@@ -224,39 +249,39 @@ export default function ProgressChart({ data, habitCount }: ProgressChartProps) 
         {/* Range tabs */}
         <div
           style={{
-            display: 'inline-flex',
-            padding: 3,
-            borderRadius: 'var(--r-md)',
+            display: 'flex',
             background: 'var(--bg-tertiary)',
-            border: '1px solid var(--border-default)',
-            gap: 2,
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '10px',
+            padding: '3px',
+            gap: '2px',
           }}
-          role="tablist"
         >
-          {(['7d', '30d', '90d'] as Range[]).map((r) => (
-            <button
-              key={r}
-              role="tab"
-              aria-selected={range === r}
-              onClick={() => setRange(r)}
-              style={{
-                padding: '5px 12px',
-                borderRadius: 7,
-                border: 'none',
-                background: range === r ? 'var(--bg-elevated)' : 'transparent',
-                color: range === r ? 'var(--text-primary)' : 'var(--text-muted)',
-                fontSize: 11.5,
-                fontWeight: 600,
-                fontFamily: "'IBM Plex Mono', monospace",
-                letterSpacing: '-0.01em',
-                cursor: 'pointer',
-                transition: 'background 0.15s, color 0.15s',
-                boxShadow: range === r ? 'var(--shadow-xs)' : 'none',
-              }}
-            >
-              {r}
-            </button>
-          ))}
+          {(['7d', '30d', '90d'] as Range[]).map((r) => {
+            const active = range === r;
+            return (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRange(r)}
+                style={{
+                  padding: '5px 12px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  background: active ? 'var(--bg-secondary)' : 'transparent',
+                  color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontSize: 12.5,
+                  fontWeight: active ? 600 : 400,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  boxShadow: active ? 'var(--shadow-sm)' : 'none',
+                  minWidth: 48,
+                }}
+              >
+                {r.toUpperCase()}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -287,7 +312,9 @@ export default function ProgressChart({ data, habitCount }: ProgressChartProps) 
       {/* Chart */}
       <div ref={wrapRef} style={{ width: '100%', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
       {/* Don't render SVG until measured to avoid width:0 artifacts */}
-      {size.w > 0 && (
+      {size.w === 0 ? (
+        <ChartSkeleton />
+      ) : (
         <>
           <svg
             ref={svgRef}
