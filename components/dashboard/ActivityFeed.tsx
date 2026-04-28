@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { format, formatDistanceToNow, parseISO } from 'date-fns';
 import { Activity, CheckCircle2 } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
+import EmptyState from '@/components/ui/EmptyState';
 
 export interface ActivityItem {
   entry_id:   string;
@@ -47,9 +48,13 @@ export default function ActivityFeed({ items }: ActivityFeedProps) {
       </div>
 
       {items.length === 0 ? (
-        <p style={{ fontSize: 12.5, color: 'var(--text-muted)', padding: '12px 2px' }}>
-          No check-ins yet. Complete a habit to see activity here.
-        </p>
+        <EmptyState
+          emoji="✅"
+          title="No activity yet"
+          description="Complete a habit today and it'll show up here. Your journey is just beginning."
+          accentColor="var(--accent-primary)"
+          compact
+        />
       ) : (
         <ol style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 2, position: 'relative' }}>
           {/* Vertical rail */}

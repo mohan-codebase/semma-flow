@@ -11,6 +11,7 @@ import Button from '@/components/ui/Button';
 import Skeleton from '@/components/ui/Skeleton';
 import { todayString } from '@/lib/utils/dates';
 import { useToast } from '@/components/ui/Toast';
+import EmptyState from '@/components/ui/EmptyState';
 
 // -----------------------------------------------------------------------
 // Types
@@ -54,86 +55,53 @@ function HabitSkeletonCard() {
 // Empty state
 // -----------------------------------------------------------------------
 
-function EmptyState({
+function PageEmptyState({
   filter,
   onAdd,
 }: {
   filter: FilterTab;
   onAdd: () => void;
 }) {
-  const messages: Record<FilterTab, { title: string; body: string }> = {
+  const CONFIGS: Record<FilterTab, { emoji: string; title: string; body: string; accent: string; showCta: boolean }> = {
     all: {
+      emoji: '🎯',
       title: 'No habits yet',
-      body: "You haven't created any habits. Add your first one to start building positive routines.",
+      body: "You haven't built your routine yet. Add your first habit and start stacking wins — one day at a time.",
+      accent: 'var(--accent-primary)',
+      showCta: true,
     },
     active: {
+      emoji: '⚡',
       title: 'No active habits',
-      body: 'All habits are archived, or you haven\'t created any yet.',
+      body: 'All your habits are archived, or you haven\'t created any yet. Add one to get started.',
+      accent: 'var(--accent-primary)',
+      showCta: true,
     },
     archived: {
+      emoji: '🗂️',
       title: 'Nothing archived',
-      body: "You haven't archived any habits.",
+      body: "You haven't archived any habits. Archived habits are kept for your records but removed from your daily list.",
+      accent: 'var(--text-muted)',
+      showCta: false,
     },
   };
 
-  const { title, body } = messages[filter];
+  const { emoji, title, body, accent, showCta } = CONFIGS[filter];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' as const }}
-      style={{
-        gridColumn: '1 / -1',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '16px',
-        padding: '64px 24px',
-        background: 'var(--bg-glass)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '16px',
-        textAlign: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '16px',
-          background: 'var(--accent-glow)',
-          border: '1px solid rgba(16,185,129,0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 0 24px var(--accent-glow)',
-        }}
-      >
-        <Plus size={28} color="var(--accent-primary)" />
-      </div>
-      <div>
-        <h3
-          style={{
-            margin: '0 0 6px',
-            fontSize: '18px',
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-            fontFamily: "'Outfit', sans-serif",
-          }}
-        >
-          {title}
-        </h3>
-        <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)', maxWidth: '280px', lineHeight: 1.6 }}>
-          {body}
-        </p>
-      </div>
-      {filter !== 'archived' && (
-        <Button variant="primary" icon={<Plus size={15} />} onClick={onAdd}>
-          New Habit
-        </Button>
-      )}
-    </motion.div>
+    <EmptyState
+      emoji={emoji}
+      title={title}
+      description={body}
+      accentColor={accent}
+      cta={
+        showCta ? (
+          <Button variant="primary" icon={<Plus size={15} />} onClick={onAdd}>
+            New Habit
+          </Button>
+        ) : undefined
+      }
+    />
   );
 }
 
@@ -527,7 +495,9 @@ export default function HabitsPage() {
         </div>
       ) : visibleHabits.length === 0 ? (
         <div style={gridStyle}>
-          <EmptyState filter={filter} onAdd={openNewHabitForm} />
+          <div style={{ gridColumn: '1 / -1', background: 'var(--bg-glass)', border: '1px solid var(--border-subtle)', borderRadius: 16 }}>
+            <PageEmptyState filter={filter} onAdd={openNewHabitForm} />
+          </div>
         </div>
       ) : (
         <motion.div

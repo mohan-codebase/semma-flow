@@ -2,11 +2,12 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Sparkles } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import type { HabitWithEntry } from '@/types/habit';
 import HabitCard from '@/components/habits/HabitCard';
 import Skeleton from '@/components/ui/Skeleton';
 import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
 
 interface HabitListProps {
   habits: HabitWithEntry[];
@@ -68,72 +69,22 @@ function SkeletonCard() {
   );
 }
 
-function EmptyState({ onAdd }: { onAdd?: () => void }) {
+function EmptyStateWrapper({ onAdd }: { onAdd?: () => void }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 16,
-        padding: '48px 24px',
-        textAlign: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: 72,
-          height: 72,
-          borderRadius: 20,
-          background: 'var(--accent-glow)',
-          border: '1px solid rgba(16,185,129,0.25)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 0 32px var(--accent-glow)',
-        }}
-      >
-        <Sparkles size={32} color="var(--accent-primary)" />
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <h3
-          style={{
-            margin: 0,
-            fontSize: 18,
-            fontWeight: 600,
-            color: 'var(--text-primary)',
-          }}
-        >
-          No habits yet
-        </h3>
-        <p
-          style={{
-            margin: 0,
-            fontSize: 14,
-            color: 'var(--text-muted)',
-            maxWidth: 260,
-            lineHeight: 1.6,
-          }}
-        >
-          Start building positive routines. Add your first habit to begin tracking your progress.
-        </p>
-      </div>
-
-      {onAdd && (
-        <Button
-          variant="primary"
-          icon={<Plus size={16} />}
-          onClick={onAdd}
-        >
-          Add your first habit
-        </Button>
-      )}
-    </motion.div>
+    <EmptyState
+      emoji="🎯"
+      title="No habits yet"
+      description="Your journey starts with one habit. Add something small — consistency beats intensity every time."
+      accentColor="var(--accent-primary)"
+      cta={
+        onAdd ? (
+          <Button variant="primary" icon={<Plus size={15} />} onClick={onAdd}>
+            Add your first habit
+          </Button>
+        ) : undefined
+      }
+      hint="You can track health, fitness, learning, mindfulness, and more."
+    />
   );
 }
 
@@ -157,7 +108,7 @@ export default function HabitList({
   }
 
   if (habits.length === 0) {
-    return <EmptyState onAdd={onAddHabit} />;
+    return <EmptyStateWrapper onAdd={onAddHabit} />;
   }
 
   const pending = habits.filter((h) => !(h.todayEntry?.is_completed ?? false));

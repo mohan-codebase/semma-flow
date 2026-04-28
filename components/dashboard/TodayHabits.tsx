@@ -14,6 +14,7 @@ import { todayString } from '@/lib/utils/dates';
 import { useRealtimeEntries } from '@/lib/hooks/useRealtimeEntries';
 import { createClient } from '@/lib/supabase/client';
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+import EmptyState from '@/components/ui/EmptyState';
 
 const ONBOARDING_KEY = 'hf_onboarding_done';
 
@@ -494,45 +495,30 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
 
       {/* Habit list */}
       {!loading && habits.length === 0 ? (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '48px 24px',
-            background: 'var(--bg-glass)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '16px',
-            gap: '12px',
-          }}
-        >
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              background: 'var(--accent-glow)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Plus size={24} color="var(--accent-primary)" />
-          </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px', textAlign: 'center', margin: 0 }}>
-            No habits yet. Add your first habit to get started!
-          </p>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              setEditingHabit(null);
-              setFormOpen(true);
-            }}
-          >
-            Create first habit
-          </Button>
+        <div style={{
+          background: 'var(--bg-glass)',
+          border: '1px solid var(--border-subtle)',
+          borderRadius: 16,
+        }}>
+          <EmptyState
+            emoji="⚡"
+            title="No habits tracked today"
+            description="You don't have any habits set up yet. Build your first routine — even one habit changes everything."
+            accentColor="var(--accent-primary)"
+            cta={
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setEditingHabit(null);
+                  setFormOpen(true);
+                }}
+              >
+                Create first habit
+              </Button>
+            }
+            hint="Tip: Start small. A 5-minute habit is infinitely better than no habit."
+          />
         </div>
       ) : (
         <HabitList

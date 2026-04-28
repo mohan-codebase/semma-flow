@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AchievementCard from './AchievementCard';
 import type { AchievementDef } from '@/types/achievement';
+import EmptyState from '@/components/ui/EmptyState';
 
 interface AchievementCardData extends AchievementDef {
   unlocked: boolean;
@@ -114,15 +115,18 @@ export default function AchievementGrid({ achievements }: Props) {
       </motion.div>
 
       {filtered.length === 0 && (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '48px 24px',
-            color: 'var(--text-muted)',
-            fontSize: 14,
-          }}
-        >
-          {filter === 'unlocked' ? 'No achievements unlocked yet. Keep going!' : 'All achievements unlocked!'}
+        <div style={{ gridColumn: '1 / -1' }}>
+          <EmptyState
+            emoji={filter === 'unlocked' ? '🏆' : '🔓'}
+            title={filter === 'unlocked' ? 'No badges yet' : 'All achievements unlocked!'}
+            description={
+              filter === 'unlocked'
+                ? 'Keep building streaks and completing habits — your first badge is closer than you think.'
+                : 'You\'ve unlocked everything. Absolute legend.'
+            }
+            accentColor="#EAB308"
+            compact
+          />
         </div>
       )}
     </div>
