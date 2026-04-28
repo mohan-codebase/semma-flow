@@ -1,11 +1,8 @@
-import type { Metadata } from 'next';
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/landing/Navbar';
-
-export const metadata: Metadata = {
-  title: 'Privacy Policy — HabitForge',
-  description: 'How HabitForge collects, uses, and protects your personal data.',
-};
 
 const EFFECTIVE_DATE = 'April 28, 2026';
 

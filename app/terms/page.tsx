@@ -1,11 +1,8 @@
-import type { Metadata } from 'next';
+'use client';
+
+import React from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/landing/Navbar';
-
-export const metadata: Metadata = {
-  title: 'Terms of Service — HabitForge',
-  description: 'The terms and conditions governing your use of HabitForge.',
-};
 
 const EFFECTIVE_DATE = 'April 28, 2026';
 
