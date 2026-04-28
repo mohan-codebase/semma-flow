@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Flame, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Flame, CheckCircle2, TrendingUp, TrendingDown, Share2 } from 'lucide-react';
 import ProgressRing from '@/components/ui/ProgressRing';
+import ShareModal from '@/components/dashboard/ShareModal';
 import type { OverviewStats } from '@/types/analytics';
 
 interface OverviewStatsProps {
@@ -144,10 +145,12 @@ function StatCard({
 }
 
 export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
+  const [shareOpen, setShareOpen] = useState(false);
+
   if (loading || !stats) {
     return (
       <div className="hf-stats-grid">
-        {[0,1,2,3].map((i) => <SkeletonCard key={i} />)}
+        {[0, 1, 2, 3].map((i) => <SkeletonCard key={i} />)}
       </div>
     );
   }
@@ -155,126 +158,157 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
   const todayPct = stats.todayTotal > 0 ? Math.round((stats.todayCompleted / stats.todayTotal) * 100) : 0;
 
   return (
-    <div className="hf-stats-grid">
-      {/* Today's Progress */}
-      <StatCard delay={0} label="Today">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <ProgressRing percentage={todayPct} size={56} strokeWidth={4} />
-          <div>
-            <p style={numStyle}>
-              {stats.todayCompleted}
-              <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dimmed)', marginLeft: 2 }}>
-                /{stats.todayTotal}
-              </span>
-            </p>
-            <p style={subStyle}>completed</p>
-          </div>
-        </div>
-      </StatCard>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div /> {/* Spacer */}
+        <button
+          onClick={() => setShareOpen(true)}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 12px',
+            borderRadius: 8,
+            background: 'var(--bg-tertiary)',
+            border: '1px solid var(--border-subtle)',
+            color: 'var(--text-secondary)',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          <Share2 size={13} />
+          Share Stats
+        </button>
+      </div>
 
-      {/* Best Streak */}
-      <StatCard delay={0.05} label="Best Streak">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 'var(--r-md)',
-              background: 'var(--warm-glow)',
-              border: '1px solid rgba(244,183,64,0.22)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            <Flame size={18} color="var(--warm)" strokeWidth={2} />
+      <div className="hf-stats-grid">
+        {/* Today's Progress */}
+        <StatCard delay={0} label="Today">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <ProgressRing percentage={todayPct} size={56} strokeWidth={4} />
+            <div>
+              <p style={numStyle}>
+                {stats.todayCompleted}
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dimmed)', marginLeft: 2 }}>
+                  /{stats.todayTotal}
+                </span>
+              </p>
+              <p style={subStyle}>completed</p>
+            </div>
           </div>
-          <div style={{ minWidth: 0 }}>
-            <p style={numStyle}>
-              {stats.bestStreak}
-              <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-dimmed)', marginLeft: 3 }}>d</span>
-            </p>
-            <p style={{ ...subStyle, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {stats.bestStreakHabitName || 'No habits yet'}
-            </p>
-          </div>
-        </div>
-      </StatCard>
+        </StatCard>
 
-      {/* This Week */}
-      <StatCard
-        delay={0.1}
-        label="This Week"
-        trend={{ value: stats.weekPercentage, positive: stats.weekPercentage >= 50 }}
-      >
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-          <p style={numStyle}>{stats.weekPercentage}</p>
-          <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dimmed)' }}>%</span>
-        </div>
-        <p style={subStyle}>7-day completion</p>
-      </StatCard>
-
-      {/* Level & Mastery (Replaces All Time) */}
-      <StatCard delay={0.15} label="Level & Rank">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Best Streak */}
+        <StatCard delay={0.05} label="Best Streak">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
-                width: 38,
-                height: 38,
+                width: 40,
+                height: 40,
                 borderRadius: 'var(--r-md)',
-                background: 'var(--indigo-glow)',
-                border: '1px solid rgba(139,127,232,0.22)',
+                background: 'var(--warm-glow)',
+                border: '1px solid rgba(244,183,64,0.22)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                fontSize: 18,
-                fontWeight: 800,
-                color: 'var(--indigo)',
-                fontFamily: "'Outfit'",
               }}
             >
-              {Math.floor(stats.totalCompletions / 50) + 1}
+              <Flame size={18} color="var(--warm)" strokeWidth={2} />
             </div>
             <div style={{ minWidth: 0 }}>
-              <p
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  fontFamily: "'Outfit'",
-                  letterSpacing: '-0.02em',
-                  margin: 0,
-                }}
-              >
-                {stats.totalCompletions >= 500
-                  ? 'Master'
-                  : stats.totalCompletions >= 250
-                  ? 'Elite'
-                  : stats.totalCompletions >= 100
-                  ? 'Pro'
-                  : stats.totalCompletions >= 50
-                  ? 'Adept'
-                  : 'Novice'}
+              <p style={numStyle}>
+                {stats.bestStreak}
+                <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-dimmed)', marginLeft: 3 }}>d</span>
               </p>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
-                {stats.totalCompletions} XP
+              <p style={{ ...subStyle, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {stats.bestStreakHabitName || 'No habits yet'}
               </p>
             </div>
           </div>
-          {/* Progress bar to next level */}
-          <div style={{ width: '100%', height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${(stats.totalCompletions % 50) * 2}%` }}
-              transition={{ duration: 1, ease: 'easeOut' }}
-              style={{ height: '100%', background: 'var(--indigo)', borderRadius: 2 }}
-            />
+        </StatCard>
+
+        {/* This Week */}
+        <StatCard
+          delay={0.1}
+          label="This Week"
+          trend={{ value: stats.weekPercentage, positive: stats.weekPercentage >= 50 }}
+        >
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <p style={numStyle}>{stats.weekPercentage}</p>
+            <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-dimmed)' }}>%</span>
           </div>
-        </div>
-      </StatCard>
+          <p style={subStyle}>7-day completion</p>
+        </StatCard>
+
+        {/* Level & Mastery */}
+        <StatCard delay={0.15} label="Level & Rank">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 'var(--r-md)',
+                  background: 'var(--indigo-glow)',
+                  border: '1px solid rgba(139,127,232,0.22)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: 'var(--indigo)',
+                  fontFamily: "'Outfit'",
+                }}
+              >
+                {Math.floor(stats.totalCompletions / 50) + 1}
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <p
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    fontFamily: "'Outfit'",
+                    letterSpacing: '-0.02em',
+                    margin: 0,
+                  }}
+                >
+                  {stats.totalCompletions >= 500
+                    ? 'Master'
+                    : stats.totalCompletions >= 250
+                    ? 'Elite'
+                    : stats.totalCompletions >= 100
+                    ? 'Pro'
+                    : stats.totalCompletions >= 50
+                    ? 'Adept'
+                    : 'Novice'}
+                </p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>
+                  {stats.totalCompletions} XP
+                </p>
+              </div>
+            </div>
+            <div style={{ width: '100%', height: 4, background: 'var(--bg-tertiary)', borderRadius: 2, overflow: 'hidden' }}>
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${(stats.totalCompletions % 50) * 2}%` }}
+                transition={{ duration: 1, ease: 'easeOut' }}
+                style={{ height: '100%', background: 'var(--indigo)', borderRadius: 2 }}
+              />
+            </div>
+          </div>
+        </StatCard>
+      </div>
+
+      <ShareModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        stats={stats}
+      />
     </div>
   );
 }

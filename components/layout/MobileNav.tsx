@@ -1,16 +1,16 @@
-'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2 } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, BarChart2, Settings2, Plus } from 'lucide-react';
 
-const NAV = [
-  { label: 'Home',     href: '/dashboard',              Icon: LayoutDashboard, exact: true },
-  { label: 'Habits',   href: '/dashboard/habits',       Icon: Dumbbell,        exact: false },
-  { label: 'Stats',    href: '/dashboard/analytics',    Icon: BarChart2,       exact: false },
-  { label: 'Awards',   href: '/dashboard/achievements', Icon: Trophy,          exact: false },
-  { label: 'Settings', href: '/dashboard/settings',     Icon: Settings2,       exact: false },
+const NAV_LEFT = [
+  { label: 'Home',     href: '/dashboard',           Icon: LayoutDashboard, exact: true },
+  { label: 'Habits',   href: '/dashboard/habits',    Icon: Dumbbell,        exact: false },
+];
+
+const NAV_RIGHT = [
+  { label: 'Stats',    href: '/dashboard/analytics', Icon: BarChart2,       exact: false },
+  { label: 'Settings', href: '/dashboard/settings',  Icon: Settings2,       exact: false },
 ];
 
 export default function MobileNav() {
@@ -33,58 +33,52 @@ export default function MobileNav() {
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
     >
-      <div style={{ display: 'flex', width: '100%', alignItems: 'center', padding: '6px 8px' }}>
-        {NAV.map(({ label, href, Icon, exact }) => {
+      <div style={{ display: 'flex', width: '100%', alignItems: 'center', padding: '4px 6px', height: 60 }}>
+        {/* Left Side */}
+        {NAV_LEFT.map(({ label, href, Icon, exact }) => {
           const on = active(href, exact);
           return (
             <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
-              <motion.div
-                whileTap={{ scale: 0.88 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 3,
-                  padding: '6px 4px',
-                  borderRadius: 10,
-                  background: on ? 'rgba(16,185,129,0.10)' : 'transparent',
-                  transition: 'background 0.18s ease',
-                  position: 'relative',
-                }}
-              >
-                {on && (
-                  <motion.div
-                    layoutId="mobile-indicator"
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: '20%',
-                      right: '20%',
-                      height: 2,
-                      borderRadius: '0 0 3px 3px',
-                      background: 'var(--accent-primary)',
-                      boxShadow: '0 0 8px rgba(16,185,129,0.5)',
-                    }}
-                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                  />
-                )}
-                <Icon
-                  size={20}
-                  strokeWidth={on ? 2.2 : 1.7}
-                  color={on ? 'var(--accent-light)' : 'var(--text-muted)'}
-                />
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: on ? 700 : 400,
-                    color: on ? 'var(--accent-light)' : 'var(--text-muted)',
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {label}
-                </span>
-              </motion.div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <Icon size={20} color={on ? 'var(--accent-light)' : 'var(--text-muted)'} strokeWidth={on ? 2.5 : 1.8} />
+                <span style={{ fontSize: 10, fontWeight: on ? 700 : 500, color: on ? 'var(--accent-light)' : 'var(--text-muted)' }}>{label}</span>
+              </div>
+            </Link>
+          );
+        })}
+
+        {/* Quick Add Floating Action */}
+        <div style={{ flex: 0.8, display: 'flex', justifyContent: 'center', position: 'relative' }}>
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('habitforge:open-habit-form'))}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--accent-on-primary)',
+              boxShadow: '0 4px 14px rgba(16,229,176,0.4)',
+              transform: 'translateY(-14px)',
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={24} strokeWidth={3} />
+          </button>
+        </div>
+
+        {/* Right Side */}
+        {NAV_RIGHT.map(({ label, href, Icon, exact }) => {
+          const on = active(href, exact);
+          return (
+            <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <Icon size={20} color={on ? 'var(--accent-light)' : 'var(--text-muted)'} strokeWidth={on ? 2.5 : 1.8} />
+                <span style={{ fontSize: 10, fontWeight: on ? 700 : 500, color: on ? 'var(--accent-light)' : 'var(--text-muted)' }}>{label}</span>
+              </div>
             </Link>
           );
         })}
