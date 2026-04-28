@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Bell, Download, LogOut, Save, ChevronRight } from 'lucide-react';
+import { User, Bell, Download, Upload, LogOut, Save, ChevronRight, FileJson } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { createClient } from '@/lib/supabase/client';
@@ -60,6 +60,8 @@ export default function SettingsPage() {
   const [saveError, setSaveError] = useState('');
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [userEmail, setUserEmail] = useState('');
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function load() {
@@ -126,6 +128,40 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      const res = await fetch('/api/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        toast(`Successfully imported ${result.habitsCount} habits and history!`, 'success');
+        router.refresh();
+      } else {
+        toast(result.error || 'Failed to import data', 'error');
+      }
+    } catch (err) {
+      toast('Invalid JSON file format', 'error');
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const inputBase: React.CSSProperties = {
@@ -265,27 +301,45 @@ export default function SettingsPage() {
         </div>
       </SectionCard>
 
-      {/* Data Export */}
-      <SectionCard title="Data Export" icon={<Download size={18} />}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-            Export all your habit data for backup or analysis.
-          </p>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <Button
-              variant="secondary"
-              icon={<Download size={14} />}
-              onClick={handleExportJSON}
-            >
-              Export JSON
-            </Button>
-            <Button
-              variant="secondary"
-              icon={<Download size={14} />}
-              onClick={handleExportCSV}
-            >
-              Export CSV
-            </Button>
+      {/* Data Management */}
+      <SectionCard title="Data Management" icon={<Download size={18} />}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <p style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Export your data for backup or import a previous backup to restore your habits and history.
+            </p>
+            
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Button
+                variant="secondary"
+                icon={<Download size={14} />}
+                onClick={handleExportJSON}
+              >
+                Export JSON
+              </Button>
+              <Button
+                variant="secondary"
+                icon={<Upload size={14} />}
+                onClick={handleImportClick}
+                loading={importing}
+              >
+                Import Backup
+              </Button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept=".json"
+                style={{ display: 'none' }}
+              />
+            </div>
+          </div>
+          
+          <div style={{ padding: '12px', borderRadius: 10, background: 'var(--bg-tertiary)', border: '1px dotted var(--border-subtle)' }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <FileJson size={14} />
+              JSON is the recommended format for full backups.
+            </p>
           </div>
         </div>
       </SectionCard>

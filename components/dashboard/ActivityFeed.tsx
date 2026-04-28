@@ -46,7 +46,7 @@ function DynamicIcon({ name, size = 14, color }: { name: string; size?: number; 
   return Icon ? <Icon size={size} color={color} /> : <CheckCircle2 size={size} color={color} />;
 }
 
-export default function ActivityFeed({ items }: ActivityFeedProps) {
+export default function ActivityFeed({ items, loading }: ActivityFeedProps) {
   return (
     <section
       style={{
