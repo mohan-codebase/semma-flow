@@ -31,7 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (use Vercel's environment variable panel instead)
-.env*
+# .env*
 
 # vercel
 .vercel
