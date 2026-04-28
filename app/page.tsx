@@ -4,8 +4,14 @@ import Hero from '@/components/landing/Hero';
 import Navbar from '@/components/landing/Navbar';
 
 export default async function LandingPage() {
-  const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const supabase = await createServerClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch (err) {
+    console.error('Failed to fetch user:', err);
+  }
 
   // If user is logged in, skip the landing page entirely
   if (user) {

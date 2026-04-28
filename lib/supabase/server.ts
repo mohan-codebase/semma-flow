@@ -3,10 +3,16 @@ import { cookies } from 'next/headers';
 
 export async function createServerClient() {
   const cookieStore = await cookies();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    console.error('Supabase environment variables are missing!');
+  }
 
   return createSSRServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    url || '',
+    anonKey || '',
     {
       cookies: {
         getAll() {
