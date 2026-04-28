@@ -13,6 +13,9 @@ import { useToast } from '@/components/ui/Toast';
 import { todayString } from '@/lib/utils/dates';
 import { useRealtimeEntries } from '@/lib/hooks/useRealtimeEntries';
 import { createClient } from '@/lib/supabase/client';
+import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+
+const ONBOARDING_KEY = 'hf_onboarding_done';
 
 interface TodayHabitsProps {
   habits: HabitWithEntry[];
@@ -44,6 +47,8 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   // Backfill modal state — log/edit habits for a past day
   const [backfillOpen, setBackfillOpen] = useState(false);
@@ -53,11 +58,33 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
   const [backfillSaving, setBackfillSaving] = useState(false);
   const todayStr = todayString();
 
-  // Resolve signed-in user for realtime filter
+  // Resolve signed-in user + check if onboarding should show
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+    supabase.auth.getUser().then(({ data }) => {
+      const user = data.user;
+      setUserId(user?.id ?? null);
+      // Extract display name from metadata
+      const name =
+        user?.user_metadata?.full_name ||
+        user?.user_metadata?.name ||
+        user?.email?.split('@')[0];
+      setUserName(name);
+    });
   }, []);
+
+  // Auto-open onboarding for brand-new users (no habits + flag not set)
+  useEffect(() => {
+    if (loading) return;
+    if (initialHabits.length > 0) return;
+    try {
+      if (localStorage.getItem(ONBOARDING_KEY) !== '1') {
+        setOnboardingOpen(true);
+      }
+    } catch {
+      // localStorage blocked (private mode, etc.) — skip silently
+    }
+  }, [loading, initialHabits.length]);
 
   // Realtime: patch local state when a habit_entry for today changes upstream
   const rtStatus = useRealtimeEntries({
@@ -353,6 +380,24 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
     router.refresh();
   };
 
+  // ── Onboarding handlers ──────────────────────────────────────
+  const dismissOnboarding = () => {
+    try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch { /* ignore */ }
+    setOnboardingOpen(false);
+  };
+
+  const handleOnboardingComplete = (newHabit: Habit) => {
+    try { localStorage.setItem(ONBOARDING_KEY, '1'); } catch { /* ignore */ }
+    setOnboardingOpen(false);
+    // Inject the new habit into local state immediately (no server round-trip wait)
+    setHabits((prev) => [
+      ...prev,
+      { ...newHabit, todayEntry: null, completionRate: 0 },
+    ]);
+    window.dispatchEvent(new Event('habitforge:habit-mutated'));
+    router.refresh();
+  };
+
   const completedCount = habits.filter((h) => h.todayEntry?.is_completed).length;
   const today = format(new Date(), 'EEEE, MMMM d');
 
@@ -360,6 +405,14 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
 
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Onboarding wizard — auto-shows for first-time users */}
+      {onboardingOpen && (
+        <OnboardingWizard
+          userName={userName}
+          onComplete={handleOnboardingComplete}
+          onDismiss={dismissOnboarding}
+        />
+      )}
       {/* Section header */}
       <div
         style={{
