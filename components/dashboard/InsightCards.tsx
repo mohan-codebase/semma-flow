@@ -1,0 +1,214 @@
+'use client';
+
+import React, { useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { Sparkles, TrendingUp, TrendingDown, AlertTriangle, Calendar, Trophy, Minus } from 'lucide-react';
+import type { HabitWithEntry } from '@/types/habit';
+import type { HeatmapDay } from './YearHeatmap';
+
+interface InsightCardsProps {
+  habits:  HabitWithEntry[];
+  heatmap: HeatmapDay[];           // 365 days
+  todayISO: string;
+}
+
+interface Insight {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub:   string;
+  tone:  'good' | 'bad' | 'warn' | 'neutral';
+}
+
+const toneMap: Record<Insight['tone'], { color: string; glow: string; border: string }> = {
+  good:    { color: 'var(--accent-light)', glow: 'var(--accent-glow-md)', border: 'rgba(16,229,176,0.24)' },
+  bad:     { color: 'var(--danger)',       glow: 'var(--danger-glow)',    border: 'rgba(240,114,114,0.24)' },
+  warn:    { color: 'var(--warm)',         glow: 'var(--warm-glow)',      border: 'rgba(244,183,64,0.24)' },
+  neutral: { color: 'var(--indigo)',       glow: 'var(--indigo-glow)',    border: 'rgba(139,127,232,0.24)' },
+};
+
+export default function InsightCards({ habits, heatmap, todayISO }: InsightCardsProps) {
+  const insights: Insight[] = useMemo(() => {
+    const out: Insight[] = [];
+
+    // ── 1. Best weekday ──────────────────────────────────────────────
+    if (heatmap.length > 0) {
+      const dayTotals = [0, 0, 0, 0, 0, 0, 0];
+      const dayCounts = [0, 0, 0, 0, 0, 0, 0];
+      for (const d of heatmap) {
+        const dow = new Date(d.date + 'T00:00').getDay();
+        dayTotals[dow] += d.count;
+        dayCounts[dow] += 1;
+      }
+      let best = -1;
+      for (let i = 0; i < 7; i++) {
+        if (dayTotals[i] === 0) continue;
+        if (best === -1 || dayTotals[i] > dayTotals[best]) best = i;
+      }
+      const names = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+      if (best !== -1) {
+        const avg = dayCounts[best] ? dayTotals[best] / dayCounts[best] : 0;
+        // Show real check-in total so we never render "Avg 0.0" for a weekday
+        // that only has a handful of check-ins across the year.
+        const avgLabel = avg >= 0.1 ? `${avg.toFixed(1)}/day avg` : `${dayTotals[best]} check-ins`;
+        out.push({
+          icon: <Calendar size={15} />,
+          label: 'Strongest day',
+          value: names[best],
+          sub: avgLabel,
+          tone: 'neutral',
+        });
+      }
+    }
+
+    // ── 2. Week-over-week delta ──────────────────────────────────────
+    if (heatmap.length >= 14) {
+      const last14 = heatmap.slice(-14);
+      const prev   = last14.slice(0, 7).reduce((s, d) => s + d.count, 0);
+      const curr   = last14.slice(7).reduce((s, d) => s + d.count, 0);
+      const delta  = curr - prev;
+      const pct    = prev === 0 ? (curr > 0 ? 100 : 0) : Math.round(((curr - prev) / prev) * 100);
+      const tone: Insight['tone'] = delta > 0 ? 'good' : delta < 0 ? 'bad' : 'neutral';
+      out.push({
+        icon: delta > 0 ? <TrendingUp size={15} /> : delta < 0 ? <TrendingDown size={15} /> : <Minus size={15} />,
+        label: 'Momentum',
+        value: `${delta > 0 ? '+' : ''}${pct}%`,
+        sub: `vs last week (${curr} vs ${prev})`,
+        tone,
+      });
+    }
+
+    // ── 3. Streak at risk ────────────────────────────────────────────
+    const atRisk = habits
+      .filter((h) => (h.current_streak ?? 0) >= 3 && !h.todayEntry?.is_completed)
+      .sort((a, b) => (b.current_streak ?? 0) - (a.current_streak ?? 0))[0];
+
+    if (atRisk) {
+      out.push({
+        icon: <AlertTriangle size={15} />,
+        label: 'Streak at risk',
+        value: `${atRisk.current_streak}d · ${atRisk.name}`,
+        sub: 'Check in before midnight',
+        tone: 'warn',
+      });
+    }
+
+    // ── 4. Perfect days (last 30) ────────────────────────────────────
+    if (habits.length > 0 && heatmap.length >= 30) {
+      const active = habits.length;
+      const recent = heatmap.slice(-30);
+      const perfect = recent.filter((d) => d.count >= active).length;
+      if (perfect > 0) {
+        out.push({
+          icon: <Trophy size={15} />,
+          label: 'Perfect days',
+          value: `${perfect}/30`,
+          sub: 'All habits done',
+          tone: 'good',
+        });
+      }
+    }
+
+    // Fallback if nothing derived
+    if (out.length === 0) {
+      out.push({
+        icon: <Sparkles size={15} />,
+        label: 'Get started',
+        value: 'Build a streak',
+        sub: 'Check in today to unlock insights',
+        tone: 'neutral',
+      });
+    }
+
+    return out.slice(0, 4);
+  }, [habits, heatmap, todayISO]);
+
+  return (
+    <section>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-3)' }}>
+        <Sparkles size={13} color="var(--accent-light)" />
+        <span className="eyebrow" style={{ letterSpacing: '0.12em' }}>Insights</span>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 'var(--space-3)',
+        }}
+      >
+        {insights.map((insight, i) => {
+          const t = toneMap[insight.tone];
+          return (
+            <motion.div
+              key={`${insight.label}-${i}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.04 }}
+              style={{
+                background: 'var(--bg-card)',
+                backdropFilter: 'blur(14px) saturate(160%)',
+                WebkitBackdropFilter: 'blur(14px) saturate(160%)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--r-lg)',
+                padding: '14px 16px',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: 'var(--glass-highlight), var(--shadow-xs)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <div
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: 'var(--r-sm)',
+                    background: t.glow,
+                    border: `1px solid ${t.border}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: t.color,
+                    flexShrink: 0,
+                  }}
+                >
+                  {insight.icon}
+                </div>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.02em',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {insight.label}
+                </span>
+              </div>
+
+              <p
+                style={{
+                  fontSize: 17,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  fontFamily: "'Outfit'",
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {insight.value}
+              </p>
+              <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4, letterSpacing: '-0.005em' }}>
+                {insight.sub}
+              </p>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
