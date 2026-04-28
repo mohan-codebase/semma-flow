@@ -519,6 +519,47 @@ h1, h2, h3, h4, h5, h6 {
   .hf-page h1 { font-size: clamp(18px, 5.5vw, 22px) !important; }
 }
 
+/* ─── Landing page layout ────────────────────────────────────────── */
+
+/* Hero: single col on mobile, two-col on lg */
+.hf-hero-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1024px) {
+  .hf-hero-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+/* Stats strip: 3 cols on all, but collapse on small phones */
+@media (max-width: 480px) {
+  .hf-stats-strip {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Footer: 4-col on lg, stack on mobile */
+.hf-footer-grid {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .hf-footer-grid {
+    grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Desktop nav links — hidden on mobile */
+.hf-desktop-nav { display: flex !important; }
+@media (max-width: 767px) {
+  .hf-desktop-nav { display: none !important; }
+}
+
+/* Hamburger button — hidden on desktop */
+.hf-mobile-menu-btn { display: none !important; }
+@media (max-width: 767px) {
+  .hf-mobile-menu-btn { display: flex !important; }
+}
+
 /* ─── Mobile refinements: modal, forms, Recharts (≤1023 too) ─────── */
 @media (max-width: 1023px) {
   /* Modal uses near-full-screen on phones; edge-to-edge with a tiny gutter */
