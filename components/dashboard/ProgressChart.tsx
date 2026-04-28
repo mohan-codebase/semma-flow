@@ -67,7 +67,8 @@ function DeltaPill({ value, positive }: { value: number; positive: boolean }) {
 export default function ProgressChart({ data, habitCount }: ProgressChartProps) {
   const [range, setRange] = useState<Range>('30d');
   const [hoverIdx, setHoverIdx] = useState<number | null>(null);
-  const [size, setSize] = useState({ w: 300, h: 160 });
+  // Start at 0×0 — ResizeObserver sets the real size before first paint
+  const [size, setSize] = useState({ w: 0, h: 160 });
   const svgRef = useRef<SVGSVGElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -284,147 +285,152 @@ export default function ProgressChart({ data, habitCount }: ProgressChartProps) 
       </div>
 
       {/* Chart */}
-      <div ref={wrapRef} style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
-        <svg
-          ref={svgRef}
-          width={W}
-          height={H}
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={() => setHoverIdx(null)}
-          style={{ display: 'block', cursor: 'crosshair', maxWidth: '100%' }}
-        >
-          <defs>
-            <linearGradient id="pc-fill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%"   stopColor="var(--accent-primary)" stopOpacity="0.35" />
-              <stop offset="60%"  stopColor="var(--accent-primary)" stopOpacity="0.10" />
-              <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="pc-line" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%"   stopColor="var(--accent-primary)" />
-              <stop offset="100%" stopColor="var(--cyan)" />
-            </linearGradient>
-          </defs>
+      <div ref={wrapRef} style={{ width: '100%', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
+      {/* Don't render SVG until measured to avoid width:0 artifacts */}
+      {size.w > 0 && (
+        <>
+          <svg
+            ref={svgRef}
+            width={W}
+            height={H}
+            viewBox={`0 0 ${W} ${H}`}
+            preserveAspectRatio="none"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoverIdx(null)}
+            style={{ display: 'block', cursor: 'crosshair', maxWidth: '100%' }}
+          >
+            <defs>
+              <linearGradient id="pc-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%"   stopColor="var(--accent-primary)" stopOpacity="0.35" />
+                <stop offset="60%"  stopColor="var(--accent-primary)" stopOpacity="0.10" />
+                <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
+              </linearGradient>
+              <linearGradient id="pc-line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%"   stopColor="var(--accent-primary)" />
+                <stop offset="100%" stopColor="var(--cyan)" />
+              </linearGradient>
+            </defs>
 
-          {/* Grid lines */}
-          {yTicks.map((t, i) => (
-            <g key={i}>
-              <line
-                x1={padding.left}
-                x2={W - padding.right}
-                y1={t.y}
-                y2={t.y}
-                stroke="var(--border-subtle)"
-                strokeDasharray="3 4"
-                strokeWidth={1}
-              />
+            {/* Grid lines */}
+            {yTicks.map((t, i) => (
+              <g key={i}>
+                <line
+                  x1={padding.left}
+                  x2={W - padding.right}
+                  y1={t.y}
+                  y2={t.y}
+                  stroke="var(--border-subtle)"
+                  strokeDasharray="3 4"
+                  strokeWidth={1}
+                />
+                <text
+                  x={padding.left - 6}
+                  y={t.y + 3}
+                  textAnchor="end"
+                  fill="var(--text-dimmed)"
+                  fontSize={9.5}
+                  fontFamily="'IBM Plex Mono', monospace"
+                  letterSpacing="0.04em"
+                >
+                  {t.v}
+                </text>
+              </g>
+            ))}
+
+            {/* X labels */}
+            {xTicks.map((t, i) => (
               <text
-                x={padding.left - 6}
-                y={t.y + 3}
-                textAnchor="end"
+                key={i}
+                x={t.x}
+                y={H - padding.bottom + 14}
+                textAnchor="middle"
                 fill="var(--text-dimmed)"
                 fontSize={9.5}
                 fontFamily="'IBM Plex Mono', monospace"
                 letterSpacing="0.04em"
               >
-                {t.v}
+                {t.label}
               </text>
-            </g>
-          ))}
+            ))}
 
-          {/* X labels */}
-          {xTicks.map((t, i) => (
-            <text
-              key={i}
-              x={t.x}
-              y={H - padding.bottom + 14}
-              textAnchor="middle"
-              fill="var(--text-dimmed)"
-              fontSize={9.5}
-              fontFamily="'IBM Plex Mono', monospace"
-              letterSpacing="0.04em"
-            >
-              {t.label}
-            </text>
-          ))}
+            {/* Area fill */}
+            {areaPath && (
+              <motion.path
+                d={areaPath}
+                fill="url(#pc-fill)"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+              />
+            )}
 
-          {/* Area fill */}
-          {areaPath && (
-            <motion.path
-              d={areaPath}
-              fill="url(#pc-fill)"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            />
-          )}
+            {/* Line */}
+            {linePath && (
+              <motion.path
+                d={linePath}
+                fill="none"
+                stroke="url(#pc-line)"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.9, ease: 'easeOut' }}
+              />
+            )}
 
-          {/* Line */}
-          {linePath && (
-            <motion.path
-              d={linePath}
-              fill="none"
-              stroke="url(#pc-line)"
-              strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 0.9, ease: 'easeOut' }}
-            />
-          )}
+            {/* Hover crosshair + dot */}
+            {hoverIdx !== null && points[hoverIdx] && (
+              <g>
+                <line
+                  x1={points[hoverIdx].x}
+                  x2={points[hoverIdx].x}
+                  y1={padding.top}
+                  y2={H - padding.bottom}
+                  stroke="var(--border-medium)"
+                  strokeWidth={1}
+                  strokeDasharray="2 3"
+                />
+                <circle
+                  cx={points[hoverIdx].x}
+                  cy={points[hoverIdx].y}
+                  r={5}
+                  fill="var(--bg-primary)"
+                  stroke="var(--accent-primary)"
+                  strokeWidth={2}
+                />
+              </g>
+            )}
+          </svg>
 
-          {/* Hover crosshair + dot */}
+          {/* Tooltip */}
           {hoverIdx !== null && points[hoverIdx] && (
-            <g>
-              <line
-                x1={points[hoverIdx].x}
-                x2={points[hoverIdx].x}
-                y1={padding.top}
-                y2={H - padding.bottom}
-                stroke="var(--border-medium)"
-                strokeWidth={1}
-                strokeDasharray="2 3"
-              />
-              <circle
-                cx={points[hoverIdx].x}
-                cy={points[hoverIdx].y}
-                r={5}
-                fill="var(--bg-primary)"
-                stroke="var(--accent-primary)"
-                strokeWidth={2}
-              />
-            </g>
+            <div
+              style={{
+                position: 'absolute',
+                left: Math.max(0, Math.min(points[hoverIdx].x - 60, size.w - 120)),
+                top: Math.max(0, points[hoverIdx].y - 54),
+                background: 'var(--bg-elevated)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--r-sm)',
+                padding: '7px 10px',
+                pointerEvents: 'none',
+                boxShadow: 'var(--shadow-md)',
+                minWidth: 120,
+                zIndex: 2,
+              }}
+            >
+              <p style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.02em', marginBottom: 2 }}>
+                {format(parseISO(points[hoverIdx].data.date), 'MMM d, yyyy')}
+              </p>
+              <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit'" }}>
+                {points[hoverIdx].data.count} <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>check-in{points[hoverIdx].data.count === 1 ? '' : 's'}</span>
+              </p>
+            </div>
           )}
-        </svg>
-
-        {/* Tooltip */}
-        {hoverIdx !== null && points[hoverIdx] && (
-          <div
-            style={{
-              position: 'absolute',
-              left: Math.max(0, Math.min(points[hoverIdx].x - 60, size.w - 120)),
-              top: Math.max(0, points[hoverIdx].y - 54),
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-default)',
-              borderRadius: 'var(--r-sm)',
-              padding: '7px 10px',
-              pointerEvents: 'none',
-              boxShadow: 'var(--shadow-md)',
-              minWidth: 120,
-              zIndex: 2,
-            }}
-          >
-            <p style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.02em', marginBottom: 2 }}>
-              {format(parseISO(points[hoverIdx].data.date), 'MMM d, yyyy')}
-            </p>
-            <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit'" }}>
-              {points[hoverIdx].data.count} <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>check-in{points[hoverIdx].data.count === 1 ? '' : 's'}</span>
-            </p>
-          </div>
-        )}
-      </div>
+        </>
+      )}
+      </div>{/* /wrapRef */}
     </section>
   );
 }

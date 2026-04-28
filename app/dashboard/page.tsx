@@ -310,10 +310,10 @@ export default async function DashboardPage() {
       <div
         className="hf-dashboard-page"
         style={{
-          padding: 'var(--space-6) var(--space-6) var(--space-8)',
+          padding: 'clamp(12px, 2.5vw, 32px) clamp(12px, 2.5vw, 32px) clamp(32px, 4vw, 48px)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-6)',
+          gap: 'clamp(16px, 2vw, 24px)',
           maxWidth: 1280,
           margin: '0 auto',
         }}

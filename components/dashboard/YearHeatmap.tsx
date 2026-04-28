@@ -156,7 +156,10 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
       </div>
 
       {/* Grid — horizontally scrollable on small screens */}
-      <div style={{ overflowX: 'auto', overflowY: 'hidden', paddingBottom: 4 }}>
+      <div
+        className="hf-heatmap-scroll"
+        style={{ overflowX: 'auto', overflowY: 'hidden', paddingBottom: 6, WebkitOverflowScrolling: 'touch' }}
+      >
         <div style={{ display: 'inline-flex', gap: GAP, alignItems: 'flex-start', paddingLeft: 28 }}>
           {/* Day labels column */}
           <div
@@ -268,8 +271,14 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
         {HOVER_DEFAULT}
       </div>
 
+      {/* Scroll hint — only visible on touch devices */}
+      <p className="hf-heatmap-hint" style={{ display: 'none', fontSize: 11, color: 'var(--text-dimmed)', marginTop: 8, textAlign: 'right' }}>
+        ← Scroll to see full year
+      </p>
+
       {/* CSS hover outline — no React state needed */}
-      <style>{`.hf-hm-cell:hover { outline: 1px solid var(--accent-light); outline-offset: 1px; }`}</style>
+      <style>{`.hf-hm-cell:hover { outline: 1px solid var(--accent-light); outline-offset: 1px; }
+@media (max-width: 1023px) { .hf-heatmap-hint { display: block !important; } }`}</style>
     </section>
   );
 }

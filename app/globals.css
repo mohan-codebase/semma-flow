@@ -164,7 +164,11 @@
 
 /* ─── Base ───────────────────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; height: 100%; }
+/* Next.js 16: set scroll-behavior on html but use data attribute to avoid
+   conflict with RSC transition scroll management */
+html { height: 100%; }
+html[data-scroll-behavior="smooth"],
+html:not([data-nextjs-scroll-focus-boundary]) { scroll-behavior: smooth; }
 
 body {
   background-color: var(--bg-primary);
@@ -517,6 +521,50 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Shrink h1 on narrow screens */
   .hf-page h1 { font-size: clamp(18px, 5.5vw, 22px) !important; }
+
+  /* ── Touch targets: every interactive element ≥ 44×44px ── */
+  button, [role="button"], a[href], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* …but icon-only toolbar buttons shouldn't balloon — override to 36px if they're square */
+  button[aria-label] { min-width: 36px; min-height: 36px; }
+
+  /* ── Topbar: hide text labels on very small phones ── */
+  @media (max-width: 479px) {
+    .topbar-responsive [class*="hidden sm:inline"],
+    .topbar-responsive span.hidden { display: none !important; }
+  }
+
+  /* ── Modal: drag-pill affordance on mobile ── */
+  .hf-modal-panel::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-medium);
+    margin: 10px auto -6px;
+    flex-shrink: 0;
+  }
+
+  /* ── OverviewStats: 4-col → 2-col at ≤640px ── */
+  @media (max-width: 640px) {
+    .hf-stats-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* ── InsightCards: tighten min-width ── */
+  .hf-insight-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  }
+
+  /* ── YearHeatmap: touch-momentum scroll ── */
+  .hf-heatmap-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+  }
 }
 
 /* ─── Landing page layout ────────────────────────────────────────── */
