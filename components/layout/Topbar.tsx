@@ -10,6 +10,7 @@ import type { User } from '@supabase/supabase-js';
 import CommandPalette from '@/components/layout/CommandPalette';
 import NotificationBell from '@/components/layout/NotificationBell';
 import ThemeToggle from '@/components/layout/ThemeToggle';
+import PushNotificationToggle from '@/components/settings/PushNotificationToggle';
 
 interface TopbarProps {
   title?: string;
@@ -105,6 +106,7 @@ export default function Topbar({ title }: TopbarProps) {
           </span>
 
           <ThemeToggle />
+          <PushNotificationToggle compact />
           <NotificationBell />
 
           <button
