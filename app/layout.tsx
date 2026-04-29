@@ -3,6 +3,7 @@ import { Inter, Outfit, IBM_Plex_Mono } from 'next/font/google';
 import "./globals.css";
 import AppProviders from "@/components/ui/AppProviders";
 import ServiceWorkerRegistrar from "@/components/ui/ServiceWorkerRegistrar";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ['latin'],
@@ -70,6 +71,7 @@ export default function RootLayout({
       <body className="min-h-full">
         <AppProviders>{children}</AppProviders>
         <ServiceWorkerRegistrar />
+        <SpeedInsights />
       </body>
     </html>
   );
