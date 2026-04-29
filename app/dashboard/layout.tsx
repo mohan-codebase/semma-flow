@@ -1,22 +1,16 @@
-import { redirect } from 'next/navigation';
-import { createServerClient } from '@/lib/supabase/server';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
 import MobileNav from '@/components/layout/MobileNav';
 
-export default async function DashboardLayout({
+// Auth guard is handled by middleware (middleware.ts checks supabase.auth.getUser()
+// before every /dashboard/* request and redirects unauthenticated users to /login).
+// Repeating getUser() here adds a redundant Supabase network round-trip on every
+// tab switch — removed for performance.
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createServerClient();
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
-
-  if (!user) {
-    redirect('/login');
-  }
-
   return (
     <div className="flex min-h-screen">
       {/* Floating glass sidebar — md+ */}
