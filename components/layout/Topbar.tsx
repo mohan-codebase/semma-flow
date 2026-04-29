@@ -78,15 +78,15 @@ export default function Topbar({ title }: TopbarProps) {
         className="flex items-center justify-between shrink-0 topbar-responsive"
         style={{
           height: 64,
-          padding: '0 16px',
+          padding: '10px 26px',
+          margin:'0px 13px 0px 0px',
           background: 'var(--bg-glass-strong)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
           borderBottom: '1px solid var(--border-subtle)',
+          borderRadius:'15px',
           position: 'sticky',
-          top: 0,
+          top: 10,
           zIndex: 20,
-          boxShadow: 'var(--glass-highlight)',
+          // boxShadow: 'var(--glass-highlight)',
         }}
       >
         {/* Left */}
@@ -101,12 +101,12 @@ export default function Topbar({ title }: TopbarProps) {
 
         {/* Right */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <span className="hidden lg:block" style={{ fontSize: 13, color: 'var(--text-muted)', marginRight: 4 }}>
+          <span className="hidden lg:block" style={{ fontSize: 13, color: 'var(--text-muted)', marginRight: 0 }}>
             {greeting(name)}
           </span>
 
           <ThemeToggle />
-          <PushNotificationToggle compact />
+          {/* <PushNotificationToggle compact /> */}
           <NotificationBell />
 
           <button

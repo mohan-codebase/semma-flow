@@ -343,10 +343,10 @@ export default async function DashboardPage() {
         <OverviewStats stats={stats} loading={false} />
 
         {/* Insights strip */}
-        <InsightCards habits={habits} heatmap={heatmap} todayISO={today} />
+        {/* <InsightCards habits={habits} heatmap={heatmap} todayISO={today} /> */}
 
         {/* Advanced progress chart — full width */}
-        <ProgressChart data={heatmap} habitCount={habits.length} />
+        {/* <ProgressChart data={heatmap} habitCount={habits.length} /> */}
 
         {/* Two-column layout — stacks under lg via .hf-dashboard-grid */}
         <div className="hf-dashboard-grid">
