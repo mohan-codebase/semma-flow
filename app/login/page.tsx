@@ -72,7 +72,7 @@ function LoginContent() {
               letterSpacing: '-0.03em',
             }}
           >
-            HabitForge
+            Semma Flow
           </span>
         </div>
 

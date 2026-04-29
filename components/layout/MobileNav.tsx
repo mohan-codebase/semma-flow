@@ -52,7 +52,7 @@ export default function MobileNav() {
         {/* Quick Add Floating Action */}
         <div style={{ flex: 0.8, display: 'flex', justifyContent: 'center', position: 'relative' }}>
           <button
-            onClick={() => window.dispatchEvent(new CustomEvent('habitforge:open-habit-form'))}
+            onClick={() => window.dispatchEvent(new CustomEvent('semma-flow:open-add'))}
             style={{
               width: 48,
               height: 48,

@@ -110,16 +110,16 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       setFormOpen(true);
     };
     const checkStorage = () => {
-      if (typeof window !== 'undefined' && localStorage.getItem('habitforge_open_form') === '1') {
-        localStorage.removeItem('habitforge_open_form');
+      if (typeof window !== 'undefined' && localStorage.getItem('semma_flow_open_form') === '1') {
+        localStorage.removeItem('semma_flow_open_form');
         open();
       }
     };
     checkStorage();
-    window.addEventListener('habitforge:open-add', open);
+    window.addEventListener('semma-flow:open-add', open);
     window.addEventListener('focus', checkStorage);
     return () => {
-      window.removeEventListener('habitforge:open-add', open);
+      window.removeEventListener('semma-flow:open-add', open);
       window.removeEventListener('focus', checkStorage);
     };
   }, []);
@@ -326,7 +326,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
         toast(`Saved ${changed.length} entr${changed.length === 1 ? 'y' : 'ies'}`, 'success');
       }
       setBackfillOpen(false);
-      window.dispatchEvent(new Event('habitforge:habit-mutated'));
+      window.dispatchEvent(new Event('semma-flow:habit-mutated'));
       startTransition(() => {
         router.refresh();
       });
@@ -344,7 +344,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_archived: true }),
     });
-    window.dispatchEvent(new Event('habitforge:habit-mutated'));
+    window.dispatchEvent(new Event('semma-flow:habit-mutated'));
     startTransition(() => {
       router.refresh();
     });
@@ -361,7 +361,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       const res = await fetch(`/api/habits/${deleteTarget}`, { method: 'DELETE' });
       if (res.ok) {
         setHabits((prev) => prev.filter((h) => h.id !== deleteTarget));
-        window.dispatchEvent(new Event('habitforge:habit-mutated'));
+        window.dispatchEvent(new Event('semma-flow:habit-mutated'));
         startTransition(() => {
           router.refresh();
         });
@@ -389,7 +389,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
     });
     setFormOpen(false);
     setEditingHabit(null);
-    window.dispatchEvent(new Event('habitforge:habit-mutated'));
+    window.dispatchEvent(new Event('semma-flow:habit-mutated'));
     startTransition(() => {
       router.refresh();
     });
@@ -409,7 +409,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
       ...prev,
       { ...newHabit, todayEntry: null, completionRate: 0 },
     ]);
-    window.dispatchEvent(new Event('habitforge:habit-mutated'));
+    window.dispatchEvent(new Event('semma-flow:habit-mutated'));
     router.refresh();
   };
 

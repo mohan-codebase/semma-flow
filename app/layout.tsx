@@ -24,27 +24,28 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HabitForge — Your Personal Performance OS",
-  description: "Track habits, build streaks, and analyze your patterns with a premium habit tracking experience.",
+  title: "Semma Flow — Build daily habits that actually stick",
+  description: "Premium habit tracker for routines, streaks, and self-growth. Track, analyze, and stay consistent — beautifully.",
   manifest: "/manifest.json",
   openGraph: {
-    title: "HabitForge",
-    description: "Your Personal Performance OS",
+    title: "Semma Flow",
+    description: "Premium habit tracker for routines, streaks, and self-growth.",
     type: "website",
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "HabitForge",
+    title: "Semma Flow",
   },
 };
 
+// NOTE: maximumScale/userScalable=false breaks pinch-zoom for low-vision users
+// and is a WCAG 1.4.4 violation. Default initialScale=1 is enough — we don't
+// need to lock zoom for a habit tracker.
 export const viewport: Viewport = {
   themeColor: "#10E5B0",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({
@@ -62,7 +63,7 @@ export default function RootLayout({
         <script
           // Prevent flash of wrong theme — runs before paint.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='habitforge_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
+            __html: `(function(){try{var k='semma_flow_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
           }}
         />
       </head>

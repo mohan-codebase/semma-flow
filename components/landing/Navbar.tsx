@@ -70,7 +70,7 @@ export default function Navbar() {
             fontFamily: "'Outfit', sans-serif",
             letterSpacing: '-0.02em',
           }}>
-            HabitForge
+            Semma Flow
           </span>
         </Link>
 

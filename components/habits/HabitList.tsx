@@ -48,24 +48,31 @@ export default function HabitList({
     if (!result.destination) return;
     if (result.destination.index === result.source.index) return;
 
-    // We only reorder the 'pending' list for now to keep logic simple
     const newPending = Array.from(pending);
-    const [reordered] = newPending.splice(result.source.index, 1);
-    newPending.splice(result.destination.index, 0, reordered);
+    const [moved] = newPending.splice(result.source.index, 1);
+    newPending.splice(result.destination.index, 0, moved);
 
-    // Merge back with completed
-    const newAll = [...newPending, ...completed];
+    // Preserve completed habits' relative order from the original list. The
+    // previous implementation appended `completed` at the end of every save,
+    // silently rewriting their sort_order on every drag.
+    const reorderedIds = new Set(newPending.map((h) => h.id));
+    const stableTail = localHabits.filter((h) => !reorderedIds.has(h.id));
+    const newAll = [...newPending, ...stableTail];
+
     setLocalHabits(newAll);
 
-    // Persist to server
     try {
-      await fetch('/api/habits/reorder', {
+      const res = await fetch('/api/habits/reorder', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ habitIds: newAll.map(h => h.id) }),
+        body: JSON.stringify({ habitIds: newAll.map((h) => h.id) }),
       });
-    } catch (err) {
-      console.error('Failed to save order:', err);
+      if (!res.ok) {
+        // Roll back optimistic order on server rejection
+        setLocalHabits(initialHabits);
+      }
+    } catch {
+      setLocalHabits(initialHabits);
     }
   };
 

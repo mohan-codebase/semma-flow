@@ -189,7 +189,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="Welcome to HabitForge"
+      aria-label="Welcome to Semma Flow"
       style={{
         position: 'fixed', inset: 0, zIndex: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -262,7 +262,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                     Welcome{userName ? `, ${userName.split(' ')[0]}` : ''}!
                   </h2>
                   <p style={{ fontSize: 14.5, color: 'var(--text-secondary)', lineHeight: 1.6, margin: '0 0 28px', maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
-                    HabitForge turns daily check-ins into unstoppable streaks. Let&apos;s create your very first habit — it takes about 60 seconds.
+                    Semma Flow turns daily check-ins into unstoppable streaks. Let&apos;s create your very first habit — it takes about 60 seconds.
                   </p>
                   <button
                     onClick={() => go(1)}

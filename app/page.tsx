@@ -12,11 +12,11 @@ import Footer from '@/components/landing/Footer';
 import CTABanner from '@/components/landing/CTABanner';
 
 export const metadata: Metadata = {
-  title: 'HabitForge — Build habits that actually stick.',
+  title: 'Semma Flow — Build habits that actually stick.',
   description:
     'The performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, mood tracking, and achievements — all in one place.',
   openGraph: {
-    title: 'HabitForge — Build habits that actually stick.',
+    title: 'Semma Flow — Build habits that actually stick.',
     description: 'Track habits with precision. Analyse your patterns. Level up your life.',
     type: 'website',
   },

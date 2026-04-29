@@ -71,7 +71,7 @@ function Section({ id, title, content, items, footer }: {
 const PRIVACY_SECTIONS = [
   {
     id: 'overview', title: '1. Overview',
-    content: 'HabitForge ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. If you disagree with its terms, please discontinue use of the Service.',
+    content: 'Semma Flow ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. If you disagree with its terms, please discontinue use of the Service.',
   },
   {
     id: 'data-collected', title: '2. Information We Collect',
@@ -116,11 +116,11 @@ const PRIVACY_SECTIONS = [
       { subtitle: 'Portability', text: 'Export your habits and entries in JSON format.' },
       { subtitle: 'Objection', text: 'Object to processing for certain purposes.' },
     ],
-    footer: 'To exercise any right, email privacy@habitforge.app. We respond within 30 days.',
+    footer: 'To exercise any right, email privacy@semma-flow.app. We respond within 30 days.',
   },
   {
     id: 'cookies', title: '7. Cookies & Local Storage',
-    content: 'HabitForge uses the following browser storage:',
+    content: 'Semma Flow uses the following browser storage:',
     items: [
       { subtitle: 'Auth Cookies', text: 'Supabase sets a secure, HttpOnly session cookie to keep you logged in.' },
       { subtitle: 'Preferences (localStorage)', text: 'Theme and onboarding state. These never leave your device.' },
@@ -134,7 +134,7 @@ const PRIVACY_SECTIONS = [
   },
   {
     id: 'children', title: "9. Children's Privacy",
-    content: 'The Service is not directed at children under 13. We do not knowingly collect data from children under 13. Contact privacy@habitforge.app immediately if you believe a child has registered.',
+    content: 'The Service is not directed at children under 13. We do not knowingly collect data from children under 13. Contact privacy@semma-flow.app immediately if you believe a child has registered.',
   },
   {
     id: 'changes', title: '10. Changes to This Policy',
@@ -143,7 +143,7 @@ const PRIVACY_SECTIONS = [
   {
     id: 'contact', title: '11. Contact',
     content: 'For privacy questions or data requests:',
-    footer: 'privacy@habitforge.app',
+    footer: 'privacy@semma-flow.app',
   },
 ];
 

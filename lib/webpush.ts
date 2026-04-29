@@ -16,7 +16,7 @@ function initWebPush() {
   if (initialised) return;
   const pub = process.env.VAPID_PUBLIC_KEY;
   const priv = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT ?? 'mailto:hello@habitforge.app';
+  const subject = process.env.VAPID_SUBJECT ?? 'mailto:hello@semma-flow.app';
 
   if (!pub || !priv) {
     // Gracefully degrade — push won't work, but nothing crashes

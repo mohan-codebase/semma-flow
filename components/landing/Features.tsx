@@ -211,7 +211,7 @@ export default function Features() {
             margin: '0 auto',
           }}
         >
-          HabitForge packs analytics, gamification, and journaling into a single clean interface — no bloat, no clutter.
+          Semma Flow packs analytics, gamification, and journaling into a single clean interface — no bloat, no clutter.
         </motion.p>
       </div>
 

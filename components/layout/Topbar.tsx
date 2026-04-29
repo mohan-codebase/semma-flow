@@ -44,10 +44,10 @@ export default function Topbar({ title }: TopbarProps) {
 
   const handleAddHabit = () => {
     if (pathname === '/dashboard') {
-      window.dispatchEvent(new Event('habitforge:open-add'));
+      window.dispatchEvent(new Event('semma-flow:open-add'));
     } else {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('habitforge_open_form', '1');
+        localStorage.setItem('semma_flow_open_form', '1');
       }
       router.push('/dashboard');
     }

@@ -1,9 +1,9 @@
 /**
- * HabitForge Service Worker
+ * Semma Flow Service Worker
  * Handles: Web Push notifications + basic offline shell caching
  */
 
-const CACHE_NAME = 'habitforge-v1';
+const CACHE_NAME = 'semma-flow-v1';
 
 // Cache the app shell so the install prompt works
 const SHELL_URLS = [
@@ -66,12 +66,12 @@ self.addEventListener('fetch', (event) => {
 // ── Push: show notification ───────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'HabitForge',
+    title: 'Semma Flow',
     body: "Time to check in on today's habits! 🔥",
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     url: '/dashboard',
-    tag: 'habitforge-reminder',
+    tag: 'semma-flow-reminder',
   };
 
   try {

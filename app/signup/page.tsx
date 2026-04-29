@@ -91,7 +91,7 @@ function SignupContent() {
               letterSpacing: '-0.03em',
             }}
           >
-            HabitForge
+            Semma Flow
           </span>
         </div>
 

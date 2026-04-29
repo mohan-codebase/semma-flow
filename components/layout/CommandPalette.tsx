@@ -105,7 +105,7 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
       icon: <Plus size={16} />,
       action: () => {
         // Signal TodayHabits to open form — it picks this up on mount / focus
-        localStorage.setItem('habitforge_open_form', '1');
+        localStorage.setItem('semma_flow_open_form', '1');
         navigate('/dashboard');
       },
       keywords: ['add', 'create', 'track'],

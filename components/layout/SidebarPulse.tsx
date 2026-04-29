@@ -149,10 +149,10 @@ export default function SidebarPulse() {
       .subscribe();
 
     const refetch = () => loadSnapshot(userId);
-    window.addEventListener('habitforge:habit-mutated', refetch);
+    window.addEventListener('semma-flow:habit-mutated', refetch);
     return () => {
       supabase.removeChannel(channel);
-      window.removeEventListener('habitforge:habit-mutated', refetch);
+      window.removeEventListener('semma-flow:habit-mutated', refetch);
     };
   }, [userId, loadSnapshot]);
 
@@ -362,8 +362,8 @@ export default function SidebarPulse() {
       <button
         onClick={() => {
           if (typeof window === 'undefined') return;
-          localStorage.setItem('habitforge_open_form', '1');
-          window.dispatchEvent(new Event('habitforge:open-add'));
+          localStorage.setItem('semma_flow_open_form', '1');
+          window.dispatchEvent(new Event('semma-flow:open-add'));
           if (window.location.pathname !== '/dashboard') {
             window.location.href = '/dashboard';
           }

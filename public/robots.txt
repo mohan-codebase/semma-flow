@@ -4,4 +4,4 @@ Allow: /
 Disallow: /dashboard/
 Disallow: /api/
 
-Sitemap: https://habitforge.app/sitemap.xml
+Sitemap: https://semma-flow.app/sitemap.xml

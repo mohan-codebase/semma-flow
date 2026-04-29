@@ -23,7 +23,7 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
   const level = Math.floor(stats.totalCompletions / 50) + 1;
   const rank = stats.totalCompletions >= 500 ? 'Master' : stats.totalCompletions >= 250 ? 'Elite' : stats.totalCompletions >= 100 ? 'Pro' : 'Adept';
 
-  const shareText = `🔥 My streak is at ${stats.bestStreak} days on HabitForge! Just reached Level ${level} (${rank}). How's your consistency? #HabitForge #Productivity`;
+  const shareText = `🔥 My streak is at ${stats.bestStreak} days on Semma Flow! Just reached Level ${level} (${rank}). How's your consistency? #Semma Flow #Productivity`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareText);
@@ -59,7 +59,7 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
               <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Target size={18} color="black" />
               </div>
-              <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.03em', fontFamily: "'Outfit'" }}>HabitForge</span>
+              <span style={{ fontWeight: 800, fontSize: 18, letterSpacing: '-0.03em', fontFamily: "'Outfit'" }}>Semma Flow</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -88,7 +88,7 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
             </div>
 
             <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Tracked at habitforge.app</p>
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Tracked at semma-flow.app</p>
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({
-                    title: 'My HabitForge Stats',
+                    title: 'My Semma Flow Stats',
                     text: shareText,
                     url: window.location.origin,
                   });

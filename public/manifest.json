@@ -1,7 +1,7 @@
 {
-  "name": "HabitForge",
-  "short_name": "HabitForge",
-  "description": "The performance-grade habit tracker for builders, athletes, and lifelong learners.",
+  "name": "Semma Flow",
+  "short_name": "Semma Flow",
+  "description": "Premium habit tracker for routines, streaks, and self-growth.",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#08090F",

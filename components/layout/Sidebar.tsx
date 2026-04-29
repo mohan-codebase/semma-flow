@@ -108,7 +108,7 @@ export default function Sidebar() {
                 lineHeight: 1.1,
               }}
             >
-              HabitForge
+              Semma Flow
             </span>
             <span style={{ fontSize: 10.5, color: 'var(--text-muted)', letterSpacing: '0.04em', textTransform: 'uppercase', fontWeight: 600 }}>
               Level up daily

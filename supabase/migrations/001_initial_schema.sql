@@ -1,5 +1,5 @@
 -- ============================================================
--- HabitForge — Initial Schema
+-- Semma Flow — Initial Schema
 -- ============================================================
 
 -- Profiles (extends Supabase auth.users)

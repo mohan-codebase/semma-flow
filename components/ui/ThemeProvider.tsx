@@ -11,7 +11,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-const STORAGE_KEY = 'habitforge_theme';
+const STORAGE_KEY = 'semma_flow_theme';
 
 function readStoredTheme(): Theme {
   if (typeof window === 'undefined') return 'dark';

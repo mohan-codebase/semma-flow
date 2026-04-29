@@ -43,6 +43,25 @@ function currentTimeInTZ(tz: string): string {
   }
 }
 
+// Calendar date (YYYY-MM-DD) for the current instant in a given timezone.
+// Cron runs in UTC, so a user in IST near midnight already lives in tomorrow's
+// row. Using a UTC date for completion checks would either silently mark
+// already-done habits as due, or skip habits whose entry was logged "today" in
+// the user's local calendar.
+function currentDateInTZ(tz: string): string {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: tz,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+    return parts; // en-CA gives YYYY-MM-DD
+  } catch {
+    return new Date().toISOString().slice(0, 10);
+  }
+}
+
 // Produce all "HH:MM" strings within a ±2-minute window of `nowHHMM`
 function timeWindow(nowHHMM: string): string[] {
   const [h, m] = nowHHMM.split(':').map(Number);
@@ -75,8 +94,6 @@ export async function POST(req: NextRequest) {
     return err('Supabase service role not configured — skipping cron run.', 503);
   }
 
-  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD UTC
-
   // ── Fetch all active habits that have a reminder_time ────────────────
   const { data: habits, error: habitsErr } = await supabase
     .from('habits')
@@ -90,15 +107,6 @@ export async function POST(req: NextRequest) {
   }
   if (!habits || habits.length === 0) return ok({ sent: 0 });
 
-  // ── Fetch completions for today ───────────────────────────────────────
-  const { data: entries } = await supabase
-    .from('habit_entries')
-    .select('habit_id')
-    .eq('entry_date', today)
-    .eq('is_completed', true);
-
-  const doneSet = new Set((entries ?? []).map((e: { habit_id: string }) => e.habit_id));
-
   // ── Group habits by user_id ───────────────────────────────────────────
   const byUser: Record<string, typeof habits> = {};
   for (const h of habits) {
@@ -107,6 +115,37 @@ export async function POST(req: NextRequest) {
   }
 
   const userIds = Object.keys(byUser);
+
+  // ── Fetch user timezones from profiles ───────────────────────────────
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, timezone')
+    .in('id', userIds);
+
+  const tzMap: Record<string, string> = {};
+  for (const p of profiles ?? []) {
+    tzMap[p.id] = p.timezone ?? 'UTC';
+  }
+
+  // ── Fetch completions per user, scoped to that user's local calendar
+  // date(s). The previous implementation used a single UTC date for all users,
+  // which silently re-fired reminders for users whose local calendar had
+  // already rolled to "tomorrow" relative to UTC.
+  const localDates = Array.from(new Set(userIds.map((u) => currentDateInTZ(tzMap[u] ?? 'UTC'))));
+  const { data: entries } = await supabase
+    .from('habit_entries')
+    .select('habit_id, entry_date, user_id')
+    .eq('is_completed', true)
+    .in('entry_date', localDates)
+    .in('user_id', userIds);
+
+  const doneByUserDate = new Map<string, Set<string>>();
+  for (const e of entries ?? []) {
+    const key = `${e.user_id}|${e.entry_date}`;
+    const set = doneByUserDate.get(key) ?? new Set<string>();
+    set.add(e.habit_id);
+    doneByUserDate.set(key, set);
+  }
 
   // ── Fetch all push subscriptions for these users ──────────────────────
   const { data: subs } = await supabase
@@ -120,17 +159,6 @@ export async function POST(req: NextRequest) {
     subsByUser[s.user_id]!.push(s);
   }
 
-  // ── Fetch user timezones from profiles ───────────────────────────────
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, timezone')
-    .in('id', userIds);
-
-  const tzMap: Record<string, string> = {};
-  for (const p of profiles ?? []) {
-    tzMap[p.id] = p.timezone ?? 'UTC';
-  }
-
   // ── Send notifications ────────────────────────────────────────────────
   let sent = 0;
   const staleEndpoints: string[] = [];
@@ -141,10 +169,12 @@ export async function POST(req: NextRequest) {
 
     const tz = tzMap[userId] ?? 'UTC';
     const nowLocal = currentTimeInTZ(tz);
+    const todayLocal = currentDateInTZ(tz);
     const window = timeWindow(nowLocal);
+    const userDone = doneByUserDate.get(`${userId}|${todayLocal}`) ?? new Set<string>();
 
     const dueHabits = (byUser[userId] ?? []).filter(
-      (h) => !doneSet.has(h.id) && h.reminder_time && window.includes(h.reminder_time.slice(0, 5))
+      (h) => !userDone.has(h.id) && h.reminder_time && window.includes(h.reminder_time.slice(0, 5))
     );
     if (dueHabits.length === 0) continue;
 
@@ -159,7 +189,7 @@ export async function POST(req: NextRequest) {
       try {
         await sendPushNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_key } },
-          { title: 'HabitForge Reminder', body, url: '/dashboard', tag: 'habitforge-reminder' }
+          { title: 'Semma Flow Reminder', body, url: '/dashboard', tag: 'semma-flow-reminder' }
         );
         sent++;
       } catch (e: unknown) {

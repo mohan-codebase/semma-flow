@@ -74,7 +74,7 @@ export default function Footer() {
                 fontFamily: "'Outfit'",
                 letterSpacing: '-0.02em',
               }}>
-                HabitForge
+                Semma Flow
               </span>
             </Link>
 
@@ -177,7 +177,7 @@ export default function Footer() {
           gap: 12,
         }}>
           <p style={{ fontSize: 12.5, color: 'var(--text-dimmed)', margin: 0 }}>
-            © {year} HabitForge. All rights reserved.
+            © {year} Semma Flow. All rights reserved.
           </p>
           <p style={{
             fontSize: 12.5,
