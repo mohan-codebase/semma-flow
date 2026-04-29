@@ -54,7 +54,6 @@ function StatCard({ label, value, icon, color }: { label: string; value: string;
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
-        backdropFilter: 'blur(20px)',
       }}
     >
       <div style={{ color: color ?? 'var(--accent-primary)' }}>{icon}</div>
@@ -362,7 +361,6 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
           border: '1px solid var(--border-subtle)',
           borderRadius: 16,
           padding: '20px',
-          backdropFilter: 'blur(20px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
@@ -381,7 +379,6 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
           border: '1px solid var(--border-subtle)',
           borderRadius: 16,
           padding: '20px',
-          backdropFilter: 'blur(20px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
@@ -404,7 +401,6 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
           border: '1px solid var(--border-subtle)',
           borderRadius: 16,
           padding: '20px',
-          backdropFilter: 'blur(20px)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>

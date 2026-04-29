@@ -101,8 +101,6 @@ function LoginContent() {
         <div
           style={{
             background: 'var(--bg-card)',
-            backdropFilter: 'blur(20px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--r-xl)',
             padding: 'var(--space-6)',

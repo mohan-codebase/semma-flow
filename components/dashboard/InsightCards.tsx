@@ -147,8 +147,6 @@ export default function InsightCards({ habits, heatmap, todayISO }: InsightCards
               transition={{ duration: 0.3, delay: i * 0.04 }}
               style={{
                 background: 'var(--bg-card)',
-                backdropFilter: 'blur(14px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(14px) saturate(160%)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 'var(--r-lg)',
                 padding: '14px 16px',

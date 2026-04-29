@@ -42,8 +42,6 @@ export default function Navbar() {
           justifyContent: 'space-between',
           padding: '0 clamp(16px, 4vw, 48px)',
           background: scrolled ? 'var(--bg-glass-strong)' : 'var(--bg-glass)',
-          backdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-sat))',
-          WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-sat))',
           borderBottom: `1px solid ${scrolled ? 'var(--border-default)' : 'var(--border-subtle)'}`,
           transition: 'background 0.2s ease, border-color 0.2s ease',
         }}
@@ -181,8 +179,6 @@ export default function Navbar() {
               top: 60, left: 0, right: 0, bottom: 0,
               zIndex: 49,
               background: 'var(--bg-glass-strong)',
-              backdropFilter: 'blur(24px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
               display: 'flex',
               flexDirection: 'column',
               padding: '24px clamp(16px, 5vw, 32px)',

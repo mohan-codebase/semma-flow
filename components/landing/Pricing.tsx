@@ -105,8 +105,6 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
       style={{
         position: 'relative',
         background: tier.highlight ? 'var(--bg-elevated)' : 'var(--bg-card)',
-        backdropFilter: 'blur(16px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(160%)',
         border: `1px solid ${tier.border}`,
         borderRadius: 'var(--r-2xl)',
         padding: '28px 24px',

@@ -71,8 +71,6 @@ export default function Sidebar() {
         left: 12,
         zIndex: 40,
         background: 'var(--bg-glass-strong)',
-        backdropFilter: 'blur(28px) saturate(170%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(170%)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--r-xl)',
         boxShadow: 'var(--glass-highlight), var(--shadow-lg)',

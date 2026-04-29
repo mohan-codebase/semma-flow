@@ -103,8 +103,6 @@ function StatCard({
       transition={{ duration: 0.35, ease: 'easeOut', delay }}
       style={{
         background: 'var(--bg-card)',
-        backdropFilter: 'blur(16px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(160%)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: '18px 20px 20px',

@@ -83,8 +83,6 @@ export default function FocusBanner({ habits }: FocusBannerProps) {
         background: allDone
           ? 'linear-gradient(135deg, rgba(16,229,176,0.18) 0%, rgba(91,199,218,0.12) 100%)'
           : 'var(--bg-card)',
-        backdropFilter: 'blur(16px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(160%)',
         border: `1px solid ${allDone ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
         borderRadius: 'var(--r-xl)',
         padding: 'var(--space-4) var(--space-5)',

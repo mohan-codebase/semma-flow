@@ -86,8 +86,6 @@ function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
       transition={{ duration: 0.5, delay: (index % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
       style={{
         background: 'var(--bg-card)',
-        backdropFilter: 'blur(14px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(14px) saturate(160%)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: '20px 18px',

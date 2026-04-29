@@ -56,7 +56,6 @@ function StatCard({
         border: '1px solid var(--border-subtle)',
         borderRadius: 16,
         padding: '20px 20px',
-        backdropFilter: 'blur(20px)',
       }}
     >
       <p style={{ margin: '0 0 6px', fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontFamily: "'IBM Plex Sans'" }}>
@@ -87,7 +86,6 @@ function SectionCard({ title, icon, children, loading }: { title: string; icon: 
         border: '1px solid var(--border-subtle)',
         borderRadius: 16,
         padding: '20px',
-        backdropFilter: 'blur(20px)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>

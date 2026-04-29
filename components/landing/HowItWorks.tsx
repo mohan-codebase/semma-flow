@@ -84,8 +84,6 @@ function StepCard({ step, index }: { step: (typeof STEPS)[0]; index: number }) {
       <div
         style={{
           background: 'var(--bg-card)',
-          backdropFilter: 'blur(16px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(16px) saturate(160%)',
           border: `1px solid ${step.border}`,
           borderRadius: 'var(--r-xl)',
           padding: '28px 24px',

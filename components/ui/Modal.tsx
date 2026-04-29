@@ -124,8 +124,6 @@ export default function Modal({
             position: 'fixed',
             inset: 0,
             background: 'rgba(0, 0, 0, 0.6)',
-            backdropFilter: 'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

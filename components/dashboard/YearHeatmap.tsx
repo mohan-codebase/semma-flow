@@ -133,8 +133,6 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
       className="hf-heatmap-container"
       style={{
         background: 'var(--bg-card)',
-        backdropFilter: 'blur(16px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(160%)',
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: 'var(--space-5)',

@@ -123,8 +123,6 @@ function DashboardPreview() {
       style={{
         perspective: 1000,
         background: 'var(--bg-card)',
-        backdropFilter: 'blur(24px) saturate(160%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(160%)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--r-2xl)',
         padding: 20,
@@ -405,8 +403,6 @@ export default function Hero() {
             <div key={label} style={{
               padding: 'clamp(20px, 3vw, 32px)',
               background: 'var(--bg-card)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
               textAlign: 'center',
             }}>
               <p style={{

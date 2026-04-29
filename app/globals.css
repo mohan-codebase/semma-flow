@@ -243,24 +243,18 @@ h1, h2, h3, h4, h5, h6 {
 /* Glass panel — tuned for product UI, not demo. */
 .glass {
   background: var(--bg-glass);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border: 1px solid var(--border-subtle);
   box-shadow: var(--glass-highlight), var(--shadow-md);
 }
 
 .glass-strong {
   background: var(--bg-glass-strong);
-  backdrop-filter: blur(28px) saturate(170%);
-  -webkit-backdrop-filter: blur(28px) saturate(170%);
   border: 1px solid var(--border-default);
   box-shadow: var(--glass-highlight), var(--shadow-lg);
 }
 
 .surface {
   background: var(--bg-card);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-xl);
   box-shadow: var(--glass-highlight), var(--shadow-sm);

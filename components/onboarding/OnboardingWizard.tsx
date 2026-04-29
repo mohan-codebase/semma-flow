@@ -195,8 +195,6 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
         background: 'rgba(0,0,0,0.65)',
-        backdropFilter: 'blur(6px)',
-        WebkitBackdropFilter: 'blur(6px)',
       }}
     >
       <motion.div

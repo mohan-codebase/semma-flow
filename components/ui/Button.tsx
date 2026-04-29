@@ -94,8 +94,6 @@ export default function Button({
     color:          v.color,
     border:         v.border,
     boxShadow:      v.shadow,
-    backdropFilter: variant === 'secondary' ? 'blur(14px) saturate(160%)' : undefined,
-    WebkitBackdropFilter: variant === 'secondary' ? 'blur(14px) saturate(160%)' : undefined,
     ...sizes[size],
   };
 

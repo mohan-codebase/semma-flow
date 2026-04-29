@@ -33,8 +33,6 @@ export default function CTABanner() {
           style={{
             position: 'relative',
             background: 'var(--bg-card)',
-            backdropFilter: 'blur(24px) saturate(160%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(160%)',
             border: '1px solid var(--border-accent)',
             borderRadius: 'var(--r-2xl)',
             padding: 'clamp(36px, 5vw, 64px)',

@@ -206,7 +206,6 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
               position: 'fixed',
               inset: 0,
               background: 'rgba(0,0,0,0.6)',
-              backdropFilter: 'blur(4px)',
               zIndex: 100,
             }}
           />

@@ -29,8 +29,6 @@ export default function MobileNav() {
       className="hf-mobile-nav fixed bottom-0 left-0 right-0 z-50 flex lg:hidden"
       style={{
         background: 'rgba(15,15,20,0.92)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
         borderTop: '1px solid var(--border-subtle)',
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}

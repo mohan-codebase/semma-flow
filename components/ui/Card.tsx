@@ -41,8 +41,6 @@ export default function Card({
 }: CardProps) {
   const baseStyle: React.CSSProperties = {
     background: 'var(--bg-card)',
-    backdropFilter: 'blur(16px) saturate(160%)',
-    WebkitBackdropFilter: 'blur(16px) saturate(160%)',
     border: '1px solid var(--border-subtle)',
     borderRadius: 'var(--r-xl)',
     padding: paddingMap[padding],

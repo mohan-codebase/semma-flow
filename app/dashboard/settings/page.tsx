@@ -31,7 +31,6 @@ function SectionCard({ title, icon, children }: { title: string; icon: React.Rea
         border: '1px solid var(--border-subtle)',
         borderRadius: 16,
         padding: '20px',
-        backdropFilter: 'blur(20px)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
@@ -152,7 +151,7 @@ export default function SettingsPage() {
       const result = await res.json();
       if (result.success) {
         toast(`Successfully imported ${result.habitsCount} habits and history!`, 'success');
-        router.refresh();
+        router.push('/dashboard');
       } else {
         toast(result.error || 'Failed to import data', 'error');
       }
@@ -316,6 +315,13 @@ export default function SettingsPage() {
                 onClick={handleExportJSON}
               >
                 Export JSON
+              </Button>
+              <Button
+                variant="secondary"
+                icon={<Download size={14} />}
+                onClick={handleExportCSV}
+              >
+                Export CSV
               </Button>
               <Button
                 variant="secondary"
