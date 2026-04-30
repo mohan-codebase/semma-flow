@@ -65,9 +65,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // Optimize package imports — tree-shake unused lucide icons, date-fns, etc.
-  // Note: Next.js 16 handles this automatically via Turbopack.
-  // optimizePackageImports: ['lucide-react', 'date-fns', 'date-fns-tz'],
+  // Enable Next.js 16 server component output cache (use cache directive + cacheLife/cacheTag)
+  cacheComponents: true,
+
+  // Tree-shake unused exports from large packages
+  optimizePackageImports: ['lucide-react', 'date-fns', 'date-fns-tz', 'recharts'],
 
   // Server external packages — keep Supabase out of the client bundle
   serverExternalPackages: [],
