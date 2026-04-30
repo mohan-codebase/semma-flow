@@ -32,6 +32,31 @@ const securityHeaders = [
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
 ];
 
+// Cache-Control for static assets — aggressive caching for immutable assets
+const cacheControlHeaders = [
+  // Static JS/CSS chunks (hashed filenames — safe to cache forever)
+  {
+    source: '/_next/static/:path*',
+    headers: [
+      { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+    ],
+  },
+  // Static public assets (images, fonts, etc.)
+  {
+    source: '/:path*.(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot)',
+    headers: [
+      { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
+    ],
+  },
+  // API routes — short cache for analytics data, no cache for mutations
+  {
+    source: '/api/analytics/:path*',
+    headers: [
+      { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
+    ],
+  },
+];
+
 const nextConfig: NextConfig = {
   // CI guard re-enabled: typecheck failures now block production builds.
   // Run `npm run lint` as a separate CI step (Next 16 dropped the integrated
@@ -39,11 +64,50 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+
+  // Optimize package imports — tree-shake unused lucide icons, date-fns, etc.
+  // Note: Next.js 16 handles this automatically via Turbopack.
+  // optimizePackageImports: ['lucide-react', 'date-fns', 'date-fns-tz'],
+
+  // Server external packages — keep Supabase out of the client bundle
+  serverExternalPackages: [],
+
+  // Compression — gzip + brotli for production
+  compress: true,
+
+  // Powered-by header — remove for security
+  poweredByHeader: false,
+
+  // React strict mode — keep enabled in dev for catching bugs
+  reactStrictMode: !isDev,
+
+  // Image optimization
+  images: {
+    // Use Vercel's CDN for image optimization
+    formats: ['image/avif', 'image/webp'],
+    // Remote patterns for external images (if any)
+    remotePatterns: [],
+  },
+
+  // Headers — security + cache control
   async headers() {
     return [
       {
         source: '/:path*',
         headers: securityHeaders,
+      },
+      ...cacheControlHeaders,
+    ];
+  },
+
+  // Redirects — canonical URLs
+  async redirects() {
+    return [
+      // Redirect /dashboard/ to /dashboard (trailing slash consistency)
+      {
+        source: '/dashboard/',
+        destination: '/dashboard',
+        permanent: true,
       },
     ];
   },

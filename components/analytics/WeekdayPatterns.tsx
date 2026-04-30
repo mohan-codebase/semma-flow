@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import {
   BarChart,
   Bar,
@@ -45,7 +45,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   );
 }
 
-export default function WeekdayPatterns({ data }: Props) {
+const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
   if (!data || data.length === 0) {
     return (
       <div style={{ color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', padding: '24px 0' }}>
@@ -89,4 +89,6 @@ export default function WeekdayPatterns({ data }: Props) {
       </BarChart>
     </ResponsiveContainer>
   );
-}
+});
+
+export default WeekdayPatterns;

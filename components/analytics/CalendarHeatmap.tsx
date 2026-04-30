@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, memo } from 'react';
 import type { HeatmapCell } from '@/types/analytics';
 import { toLocalDateString } from '@/lib/utils/dates';
 
@@ -20,7 +20,7 @@ function getColor(pct: number): string {
   return 'rgba(16,185,129,0.9)';
 }
 
-export default function CalendarHeatmap({ data }: CalendarHeatmapProps) {
+const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapProps) {
   const { weeks, monthLabels } = useMemo(() => {
     if (!data || data.length === 0) return { weeks: [], monthLabels: [] };
 
@@ -178,4 +178,6 @@ export default function CalendarHeatmap({ data }: CalendarHeatmapProps) {
       </div>
     </div>
   );
-}
+});
+
+export default CalendarHeatmap;

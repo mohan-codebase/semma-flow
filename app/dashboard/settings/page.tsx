@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
 import { User, Bell, Download, Upload, LogOut, Save, ChevronRight, FileJson } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -177,11 +176,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="hf-page"
+    <div
+      className="hf-page page-fade-in"
       style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: 640 }}
     >
       {/* Header */}
@@ -378,6 +374,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </SectionCard>
-    </motion.div>
+    </div>
   );
 }

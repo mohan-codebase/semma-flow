@@ -64,7 +64,7 @@
   --shadow-accent: 0 0 24px rgba(16, 229, 176, 0.18);
 
   /* Glass mechanics */
-  --glass-blur:      20px;
+  /* --glass-blur:      20px; */
   --glass-sat:       160%;
   --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 
@@ -372,6 +372,25 @@ h1, h2, h3, h4, h5, h6 {
   50%      { transform: translateY(-4px); }
 }
 .float-slow { animation: float-slow 5s ease-in-out infinite; }
+
+/* ─── Performance: lightweight page transitions (CSS-only) ────────────
+   Replaces framer-motion page wrappers. Uses GPU-accelerated properties
+   (opacity, transform) for 60fps animations with zero JS overhead. */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-fade-in {
+  animation: page-fade-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fab-entrance {
+  from { opacity: 0; transform: scale(0); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.fab-entrance {
+  animation: fab-entrance 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
 
 /* ─── Focus ──────────────────────────────────────────────────────────── */
 :focus-visible {

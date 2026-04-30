@@ -85,11 +85,8 @@ export default function AchievementsPage() {
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="hf-page"
+    <div
+      className="hf-page page-fade-in"
       style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
     >
       {/* New achievement celebration banner */}
@@ -156,6 +153,6 @@ export default function AchievementsPage() {
 
       {/* Content */}
       {loading ? <SkeletonGrid /> : <AchievementGrid achievements={achievements} />}
-    </motion.div>
+    </div>
   );
 }

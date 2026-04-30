@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useCallback } from 'react';
+import React, { useMemo, useRef, useCallback, memo } from 'react';
 import { format, parseISO } from 'date-fns';
 import { toLocalDateString } from '@/lib/utils/dates';
 
@@ -67,7 +67,7 @@ function HeatmapSkeleton() {
   );
 }
 
-export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps) {
+const YearHeatmap = memo(function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps) {
   const readoutRef = useRef<HTMLDivElement>(null);
 
   const grid = useMemo(() => {
@@ -312,4 +312,6 @@ export default function YearHeatmap({ data, totalDays = 365 }: YearHeatmapProps)
       )}
     </section>
   );
-}
+});
+
+export default YearHeatmap;

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "workspace": {
+    "name": "semma-flow",
+    "createdAt": 1777474165482,
+    "preset": "starter"
+  },
+  "authorizedRoots": [
+    "/Users/mohan/Developer/projects/semma-flow"
+  ]
+}

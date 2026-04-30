@@ -13,7 +13,6 @@ import YearHeatmap, { type HeatmapDay } from '@/components/dashboard/YearHeatmap
 import InsightCards from '@/components/dashboard/InsightCards';
 import FocusBanner from '@/components/dashboard/FocusBanner';
 import ActivityFeed, { type ActivityItem } from '@/components/dashboard/ActivityFeed';
-import ProgressChart from '@/components/dashboard/ProgressChart';
 
 // -----------------------------------------------------------------------
 // Server-side data fetching helpers

@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState, useMemo } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { format } from 'date-fns';
 import { usePathname, useRouter } from 'next/navigation';
@@ -35,7 +34,8 @@ function greeting(name: string) {
 }
 
 export default function Topbar({ title }: TopbarProps) {
-  const supabase    = createClient();
+  // Memoize the Supabase client to avoid re-creation on every render
+  const supabase = useMemo(() => createClient(), []);
   const router      = useRouter();
   const pathname    = usePathname();
   const [user, setUser]           = useState<User | null>(null);
@@ -71,10 +71,7 @@ export default function Topbar({ title }: TopbarProps) {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -8, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.3 }}
+      <header
         className="flex items-center justify-between shrink-0 topbar-responsive"
         style={{
           height: 64,
@@ -86,7 +83,6 @@ export default function Topbar({ title }: TopbarProps) {
           position: 'sticky',
           top: 10,
           zIndex: 20,
-          // boxShadow: 'var(--glass-highlight)',
         }}
       >
         {/* Left */}
@@ -183,7 +179,7 @@ export default function Topbar({ title }: TopbarProps) {
             </kbd>
           </button>
         </div>
-      </motion.header>
+      </header>
 
       <CommandPalette isOpen={paletteOpen} onClose={() => setPalette(false)} />
     </>

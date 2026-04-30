@@ -412,11 +412,8 @@ export default function HabitsPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' as const }}
-      className="hf-page"
+    <div
+      className="hf-page page-fade-in"
       style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
     >
       {/* Page header */}
@@ -500,10 +497,7 @@ export default function HabitsPage() {
           </div>
         </div>
       ) : (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+        <div
           style={gridStyle}
         >
           <AnimatePresence mode="popLayout">
@@ -524,20 +518,15 @@ export default function HabitsPage() {
               </motion.div>
             ))}
           </AnimatePresence>
-        </motion.div>
+        </div>
       )}
 
       {/* FAB (mobile) */}
-      <motion.button
+      <button
         type="button"
         onClick={openNewHabitForm}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, type: 'spring', stiffness: 260, damping: 20 }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.94 }}
         aria-label="Add new habit"
-        className="md:hidden"
+        className="md:hidden fab-entrance"
         style={{
           position: 'fixed',
           bottom: '80px', // above mobile nav
@@ -554,10 +543,13 @@ export default function HabitsPage() {
           cursor: 'pointer',
           zIndex: 30,
           color: '#0A0A0F',
+          transition: 'transform 0.15s ease',
         }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
       >
         <Plus size={22} />
-      </motion.button>
+      </button>
 
       {/* HabitForm modal */}
       {formOpen && (
@@ -595,6 +587,6 @@ export default function HabitsPage() {
           </div>
         </div>
       </Modal>
-    </motion.div>
+    </div>
   );
 }

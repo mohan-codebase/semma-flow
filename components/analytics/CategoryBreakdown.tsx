@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import type { CategoryStat } from '@/types/analytics';
 
@@ -47,7 +47,7 @@ function resolveColor(raw: string | undefined | null, index: number): string {
   return raw;
 }
 
-export default function CategoryBreakdown({ data }: Props) {
+const CategoryBreakdown = memo(function CategoryBreakdown({ data }: Props) {
   if (!data || data.length === 0) {
     return (
       <div style={{ color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', padding: '24px 0' }}>
@@ -136,4 +136,6 @@ export default function CategoryBreakdown({ data }: Props) {
       </div>
     </div>
   );
-}
+});
+
+export default CategoryBreakdown;

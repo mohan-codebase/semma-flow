@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   AreaChart,
   Area,
@@ -65,7 +65,7 @@ function CustomTooltip({
   );
 }
 
-export default function CompletionChart({ data, onRangeChange, currentRange = 30 }: CompletionChartProps) {
+const CompletionChart = memo(function CompletionChart({ data, onRangeChange, currentRange = 30 }: CompletionChartProps) {
   const [range, setRange] = useState(currentRange);
 
   const handleRange = (days: number) => {
@@ -167,4 +167,6 @@ export default function CompletionChart({ data, onRangeChange, currentRange = 30
       </ResponsiveContainer>
     </div>
   );
-}
+});
+
+export default CompletionChart;

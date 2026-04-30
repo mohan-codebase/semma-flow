@@ -4,8 +4,11 @@ import { DAY_LABELS } from '@/lib/constants';
 import { toLocalDateString } from '@/lib/utils/dates';
 import { formatInTimeZone } from 'date-fns-tz';
 
-function ok<T>(data: T) {
-  return NextResponse.json({ data, error: null });
+function ok<T>(data: T, maxAge = 120) {
+  return NextResponse.json(
+    { data, error: null },
+    { headers: { 'Cache-Control': `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 5}` } }
+  );
 }
 function err(message: string, status = 400) {
   return NextResponse.json({ data: null, error: message }, { status });

@@ -2,7 +2,6 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   Dumbbell,
@@ -13,7 +12,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { User } from '@supabase/supabase-js';
 import SidebarPulse from './SidebarPulse';
 
@@ -35,6 +34,15 @@ export default function Sidebar() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
+  // Prefetch all dashboard routes on mount so transitions are instant.
+  // Next.js 16's router.prefetch() pre-rendes the route's React tree and
+  // prefetches any data requirements (RSC payloads, JS chunks).
+  useEffect(() => {
+    for (const item of NAV) {
+      router.prefetch(item.href);
+    }
+  }, [router]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/login');
@@ -55,11 +63,13 @@ export default function Sidebar() {
     .toUpperCase()
     .slice(0, 2);
 
+  // Prefetch a single route on hover for faster perceived navigation.
+  const handleNavHover = useCallback((href: string) => {
+    router.prefetch(href);
+  }, [router]);
+
   return (
-    <motion.aside
-      initial={{ x: -260, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    <aside
       data-desktop-sidebar="true"
       className="hf-desktop-sidebar hidden lg:flex flex-col"
       style={{
@@ -123,7 +133,12 @@ export default function Sidebar() {
         {NAV.map(({ label, href, icon: Icon, exact }) => {
           const active = isActive(href, exact);
           return (
-            <Link key={href} href={href} style={{ textDecoration: 'none' }}>
+            <Link
+              key={href}
+              href={href}
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={() => handleNavHover(href)}
+            >
               <div
                 style={{
                   display: 'flex',
@@ -262,6 +277,6 @@ export default function Sidebar() {
           </button>
         </div>
       </div>
-    </motion.aside>
+    </aside>
   );
 }
