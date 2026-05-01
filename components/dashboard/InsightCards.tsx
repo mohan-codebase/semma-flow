@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, TrendingUp, TrendingDown, AlertTriangle, Calendar, Trophy, Minus } from 'lucide-react';
 import type { HabitWithEntry } from '@/types/habit';
-import type { HeatmapDay } from './YearHeatmap';
+interface HeatmapDay { date: string; count: number; }
 
 interface InsightCardsProps {
   habits:  HabitWithEntry[];

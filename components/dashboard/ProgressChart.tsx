@@ -4,7 +4,7 @@ import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
 import { TrendingUp, TrendingDown, Minus, Check } from 'lucide-react';
-import type { HeatmapDay } from './YearHeatmap';
+interface HeatmapDay { date: string; count: number; }
 
 interface ProgressChartProps {
   data: HeatmapDay[];       // 365 days of {date, count}

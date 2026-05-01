@@ -9,8 +9,6 @@ import TodayHabits from '@/components/dashboard/TodayHabits';
 import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
 import MoodLogger from '@/components/dashboard/MoodLogger';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import YearHeatmap, { type HeatmapDay } from '@/components/dashboard/YearHeatmap';
-import InsightCards from '@/components/dashboard/InsightCards';
 import FocusBanner from '@/components/dashboard/FocusBanner';
 import ActivityFeed, { type ActivityItem } from '@/components/dashboard/ActivityFeed';
 
@@ -195,43 +193,6 @@ async function fetchWeekData(
   }
 }
 
-async function fetchHeatmap(
-  supabase: Awaited<ReturnType<typeof createServerClient>>,
-  userId: string,
-  today: string,
-  days = 365
-): Promise<HeatmapDay[]> {
-  try {
-    const start = new Date();
-    start.setDate(start.getDate() - (days - 1));
-    const startStr = toLocalDateString(start);
-
-    const { data } = await supabase
-      .from('habit_entries')
-      .select('entry_date, is_completed')
-      .eq('user_id', userId)
-      .eq('is_completed', true)
-      .gte('entry_date', startStr)
-      .lte('entry_date', today);
-
-    const counts = new Map<string, number>();
-    for (const e of data ?? []) {
-      counts.set(e.entry_date, (counts.get(e.entry_date) ?? 0) + 1);
-    }
-
-    const out: HeatmapDay[] = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const iso = toLocalDateString(d);
-      out.push({ date: iso, count: counts.get(iso) ?? 0 });
-    }
-    return out;
-  } catch {
-    return [];
-  }
-}
-
 async function fetchRecentActivity(
   supabase: Awaited<ReturnType<typeof createServerClient>>,
   userId: string,
@@ -276,7 +237,7 @@ export default async function DashboardPage() {
   const userId = user?.id ?? '';
 
   // Parallel fetches
-  const [stats, habits, weekData, heatmap, activity] = await Promise.all([
+  const [stats, habits, weekData, activity] = await Promise.all([
     userId ? fetchOverviewStats(supabase, userId, today) : Promise.resolve(null),
     userId ? fetchTodayHabits(supabase, userId, today) : Promise.resolve([]),
     userId ? fetchWeekData(supabase, userId, today) : Promise.resolve(
@@ -287,7 +248,6 @@ export default async function DashboardPage() {
         return { date: dateStr, percentage: 0, isToday: dateStr === today };
       })
     ),
-    userId ? fetchHeatmap(supabase, userId, today)       : Promise.resolve([] as HeatmapDay[]),
     userId ? fetchRecentActivity(supabase, userId)        : Promise.resolve([] as ActivityItem[]),
   ]);
 
@@ -341,18 +301,11 @@ export default async function DashboardPage() {
         {/* Overview stats — full width */}
         <OverviewStats stats={stats} loading={false} />
 
-        {/* Insights strip */}
-        {/* <InsightCards habits={habits} heatmap={heatmap} todayISO={today} /> */}
-
-        {/* Advanced progress chart — full width */}
-        {/* <ProgressChart data={heatmap} habitCount={habits.length} /> */}
-
         {/* Two-column layout — stacks under lg via .hf-dashboard-grid */}
         <div className="hf-dashboard-grid">
-          {/* Left — Today's Habits + Heatmap */}
+          {/* Left — Today's Habits */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
             <TodayHabits habits={habits} loading={false} />
-            <YearHeatmap data={heatmap} />
           </div>
 
           {/* Right — Weekly Overview + Activity Feed + Mood Logger */}
