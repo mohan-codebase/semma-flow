@@ -49,6 +49,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+import { Suspense } from 'react';
+
+function ProvidersFallback() {
+  return null; // Minimal fallback for providers
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,7 +75,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full">
-        <AppProviders>{children}</AppProviders>
+        <Suspense fallback={<ProvidersFallback />}>
+          <AppProviders>{children}</AppProviders>
+        </Suspense>
         <ServiceWorkerRegistrar />
         <SpeedInsights />
       </body>

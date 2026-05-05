@@ -42,16 +42,17 @@ export default function SidebarPulse() {
   const [userId, setUserId] = useState<string | null>(null);
   const [snap, setSnap] = useState<Snapshot>(EMPTY);
   const [loaded, setLoaded] = useState(false);
-  const [tick, setTick] = useState(msUntilMidnight());
+  const [tick, setTick] = useState(0); // Initialize with 0, will set after mount
   const [mounted, setMounted] = useState(false);
+  const [today, setToday] = useState(''); // Initialize empty, will set after mount
 
   useEffect(() => {
     setMounted(true);
+    setTick(msUntilMidnight()); // Now safe to call - runs only on client
+    setToday(todayString()); // Now safe to call - runs only on client
     const id = setInterval(() => setTick(msUntilMidnight()), 30000);
     return () => clearInterval(id);
   }, []);
-
-  const today = todayString();
 
   const loadSnapshot = useMemo(
     () => async (uid: string) => {
@@ -121,7 +122,7 @@ export default function SidebarPulse() {
     supabase.auth.getUser().then(({ data }) => {
       const uid = data.user?.id ?? null;
       setUserId(uid);
-      if (uid) loadSnapshot(uid);
+      // loadSnapshot is called by the effect below when both userId and today are set
     });
   }, [loadSnapshot]);
 
@@ -133,6 +134,12 @@ export default function SidebarPulse() {
       loadSnapshot(userId);
     },
   });
+
+  // Don't fetch data until we have a valid date (after mount)
+  useEffect(() => {
+    if (!userId || !today) return;
+    loadSnapshot(userId);
+  }, [userId, today, loadSnapshot]);
 
   // Also refresh when habits themselves change (add, edit, archive, delete),
   // since entry-only subscription misses new habits with no entry yet.

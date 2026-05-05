@@ -69,7 +69,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
 
   // Tree-shake unused exports from large packages
-  optimizePackageImports: ['lucide-react', 'date-fns', 'date-fns-tz', 'recharts'],
+  // Note: optimizePackageImports was removed in Next.js 16 - use package.json imports field or next.config.js instead
+  // For now, we rely on Next.js built-in tree-shaking
 
   // Server external packages — keep Supabase out of the client bundle
   serverExternalPackages: [],

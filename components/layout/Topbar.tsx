@@ -40,7 +40,20 @@ export default function Topbar({ title }: TopbarProps) {
   const pathname    = usePathname();
   const [user, setUser]           = useState<User | null>(null);
   const [paletteOpen, setPalette] = useState(false);
+  const [mounted, setMounted]     = useState(false);
+  const [currentDate, setCurrentDate] = useState('');
+  const [greetingText, setGreetingText] = useState('');
   const displayTitle = title ?? titleFromPath(pathname);
+
+  useEffect(() => {
+    setMounted(true);
+    // Now safe to call new Date() - runs only on client
+    setCurrentDate(format(new Date(), 'EEEE, d MMMM yyyy'));
+    const name = (user?.user_metadata?.full_name as string | undefined)?.split(' ')[0]
+      ?? user?.email?.split('@')[0]
+      ?? 'there';
+    setGreetingText(greeting(name));
+  }, [user]);
 
   const handleAddHabit = () => {
     if (pathname === '/dashboard') {
@@ -91,14 +104,14 @@ export default function Topbar({ title }: TopbarProps) {
             {displayTitle}
           </h1>
           <p className="hidden sm:block" style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 1 }}>
-            {format(new Date(), 'EEEE, d MMMM yyyy')}
+            {mounted ? currentDate : '—'}
           </p>
         </div>
 
         {/* Right */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <span className="hidden lg:block" style={{ fontSize: 13, color: 'var(--text-muted)', marginRight: 0 }}>
-            {greeting(name)}
+            {mounted ? greetingText : '—'}
           </span>
 
           <ThemeToggle />

@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
 import MobileNav from '@/components/layout/MobileNav';
@@ -6,6 +7,15 @@ import MobileNav from '@/components/layout/MobileNav';
 // before every /dashboard/* request and redirects unauthenticated users to /login).
 // Repeating getUser() here adds a redundant Supabase network round-trip on every
 // tab switch — removed for performance.
+
+function LoadingFallback() {
+  return (
+    <div style={{ padding: '20px', color: 'var(--text-muted)', fontSize: 14 }}>
+      Loading...
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -14,7 +24,9 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen">
       {/* Floating glass sidebar — md+ */}
-      <Sidebar />
+      <Suspense fallback={<LoadingFallback />}>
+        <Sidebar />
+      </Suspense>
 
       {/* Main content area — offset by floating sidebar width */}
       <div
@@ -27,7 +39,9 @@ export default function DashboardLayout({
             paddingLeft: 'var(--sidebar-offset, 0px)',
           }}
         >
-          <Topbar />
+          <Suspense fallback={<LoadingFallback />}>
+            <Topbar />
+          </Suspense>
           <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 72 }}>
             {children}
           </main>
@@ -35,7 +49,9 @@ export default function DashboardLayout({
       </div>
 
       {/* Mobile bottom nav — hidden md+ */}
-      <MobileNav />
+      <Suspense fallback={null}>
+        <MobileNav />
+      </Suspense>
 
       {/* Responsive offset for floating sidebar — only at lg+ when sidebar visible */}
       <style>{`
