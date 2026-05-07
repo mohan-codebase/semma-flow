@@ -67,6 +67,15 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="icon" href="/icon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
+        <link rel="shortcut icon" href="/icon.png" />
+        <script
+          // Prevent flash of wrong theme — runs before paint.
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='semma_flow_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
+          }}
+        />
         <script
           // Prevent flash of wrong theme — runs before paint.
           dangerouslySetInnerHTML={{
