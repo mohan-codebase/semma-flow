@@ -7,10 +7,10 @@ import type { HabitEntry } from '@/types/entry';
 import OverviewStats from '@/components/dashboard/OverviewStats';
 import TodayHabits from '@/components/dashboard/TodayHabits';
 import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
-import MoodLogger from '@/components/dashboard/MoodLogger';
+// import MoodLogger from '@/components/dashboard/MoodLogger';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import FocusBanner from '@/components/dashboard/FocusBanner';
-import ActivityFeed, { type ActivityItem } from '@/components/dashboard/ActivityFeed';
+// import ActivityFeed, { type ActivityItem } from '@/components/dashboard/ActivityFeed';
 
 // -----------------------------------------------------------------------
 // Server-side data fetching helpers
@@ -311,8 +311,8 @@ export default async function DashboardPage() {
           {/* Right — Weekly Overview + Activity Feed + Mood Logger */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <WeeklyOverview weekData={weekData} />
-            <ActivityFeed items={activity} />
-            <MoodLogger />
+            {/* <ActivityFeed items={activity} />
+            <MoodLogger /> */}
           </div>
         </div>
       </div>
