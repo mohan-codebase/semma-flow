@@ -10,7 +10,6 @@ import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
 // import MoodLogger from '@/components/dashboard/MoodLogger';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import FocusBanner from '@/components/dashboard/FocusBanner';
-// import ActivityFeed, { type ActivityItem } from '@/components/dashboard/ActivityFeed';
 
 // -----------------------------------------------------------------------
 // Server-side data fetching helpers
@@ -193,37 +192,6 @@ async function fetchWeekData(
   }
 }
 
-async function fetchRecentActivity(
-  supabase: Awaited<ReturnType<typeof createServerClient>>,
-  userId: string,
-  limit = 10
-): Promise<ActivityItem[]> {
-  try {
-    const { data } = await supabase
-      .from('habit_entries')
-      .select('id, habit_id, completed_at, habits!inner(name, icon, color)')
-      .eq('user_id', userId)
-      .eq('is_completed', true)
-      .not('completed_at', 'is', null)
-      .order('completed_at', { ascending: false })
-      .limit(limit);
-
-    return (data ?? []).map((row) => {
-      const habit = (row as unknown as { habits: { name: string; icon: string; color: string } }).habits;
-      return {
-        entry_id:     row.id as string,
-        habit_id:     row.habit_id as string,
-        habit_name:   habit?.name  ?? 'Habit',
-        habit_icon:   habit?.icon  ?? 'check',
-        habit_color:  habit?.color ?? '#10B981',
-        completed_at: row.completed_at as string,
-      };
-    });
-  } catch {
-    return [];
-  }
-}
-
 // -----------------------------------------------------------------------
 // Page
 // -----------------------------------------------------------------------
@@ -237,7 +205,7 @@ export default async function DashboardPage() {
   const userId = user?.id ?? '';
 
   // Parallel fetches
-  const [stats, habits, weekData, activity] = await Promise.all([
+  const [stats, habits, weekData] = await Promise.all([
     userId ? fetchOverviewStats(supabase, userId, today) : Promise.resolve(null),
     userId ? fetchTodayHabits(supabase, userId, today) : Promise.resolve([]),
     userId ? fetchWeekData(supabase, userId, today) : Promise.resolve(
@@ -248,7 +216,6 @@ export default async function DashboardPage() {
         return { date: dateStr, percentage: 0, isToday: dateStr === today };
       })
     ),
-    userId ? fetchRecentActivity(supabase, userId)        : Promise.resolve([] as ActivityItem[]),
   ]);
 
   const heroPct = stats?.todayTotal
