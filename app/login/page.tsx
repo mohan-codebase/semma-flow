@@ -58,7 +58,7 @@ function LoginContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 0 1px rgba(16,229,176,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+              boxShadow: 'none',
             }}
           >
             <Zap size={17} color="var(--accent-on-primary)" fill="var(--accent-on-primary)" />
@@ -104,7 +104,7 @@ function LoginContent() {
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--r-xl)',
             padding: 'var(--space-6)',
-            boxShadow: 'var(--glass-highlight), var(--shadow-lg)',
+            boxShadow: 'none',
           }}
         >
           <motion.div
@@ -114,8 +114,8 @@ function LoginContent() {
               padding: '10px 12px',
               borderRadius: 'var(--r-md)',
               marginBottom: 'var(--space-4)',
-              background: error && error.includes('successfully') ? 'rgba(16,229,176,0.1)' : error ? 'var(--danger-glow)' : 'transparent',
-              border: error ? `1px solid ${error.includes('successfully') ? 'rgba(16,229,176,0.25)' : 'rgba(240,114,114,0.24)'}` : 'none',
+              background: error && error.includes('successfully') ? 'color-mix(in srgb, var(--accent-primary) 10%, transparent)' : error ? 'var(--danger-glow)' : 'transparent',
+              border: error ? `1px solid ${error.includes('successfully') ? 'color-mix(in srgb, var(--accent-primary) 25%, transparent)' : 'rgba(240,114,114,0.24)'}` : 'none',
               color: error && error.includes('successfully') ? 'var(--accent-primary)' : 'var(--danger)',
               fontSize: 12.5,
               fontWeight: 500,
@@ -205,25 +205,22 @@ function LoginContent() {
                 color: 'var(--accent-on-primary)',
                 background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
                 border: '1px solid rgba(255,255,255,0.14)',
-                boxShadow:
-                  '0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.10) inset, 0 2px 8px rgba(16,229,176,0.22)',
+                boxShadow: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1,
-                transition: 'filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease',
+                transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
                 marginTop: 'var(--space-1)',
               }}
               onMouseEnter={(e) => {
                 if (loading) return;
                 (e.currentTarget as HTMLElement).style.filter = 'brightness(1.06)';
                 (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
-                (e.currentTarget as HTMLElement).style.boxShadow =
-                  '0 1px 0 rgba(255,255,255,0.22) inset, 0 6px 20px rgba(16,229,176,0.32)';
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none';
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLElement).style.filter = '';
                 (e.currentTarget as HTMLElement).style.transform = '';
-                (e.currentTarget as HTMLElement).style.boxShadow =
-                  '0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.10) inset, 0 2px 8px rgba(16,229,176,0.22)';
+                (e.currentTarget as HTMLElement).style.boxShadow = 'none';
               }}
             >
               {loading ? 'Signing in…' : (
@@ -299,8 +296,8 @@ function Field({ label, type, value, onChange, placeholder, required, autoComple
           border: `1px solid ${focus ? 'var(--border-active)' : 'var(--border-default)'}`,
           borderRadius: 'var(--r-md)',
           padding: '0 10px 0 12px',
-          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-          boxShadow: focus ? '0 0 0 3px var(--accent-glow-md)' : 'none',
+          transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
+          boxShadow: 'none',
         }}
       >
         <input

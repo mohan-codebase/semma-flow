@@ -21,7 +21,7 @@ function barColor(pct: number): string {
   if (pct === 0)   return 'var(--bg-elevated)';
   if (pct <= 40)   return 'rgba(239,68,68,0.55)';
   if (pct <= 70)   return 'rgba(245,158,11,0.65)';
-  return '#10B981';
+  return 'var(--accent-primary)';
 }
 
 export default function WeeklyOverview({ weekData }: { weekData: WeekDayData[] }) {
@@ -76,7 +76,7 @@ export default function WeeklyOverview({ weekData }: { weekData: WeekDayData[] }
                     whiteSpace: 'nowrap',
                     zIndex: 10,
                     pointerEvents: 'none',
-                    boxShadow: 'var(--shadow-md)',
+                    boxShadow: 'none',
                   }}
                 >
                   <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 2 }}>{fullDate(day.date)}</p>
@@ -95,9 +95,9 @@ export default function WeeklyOverview({ weekData }: { weekData: WeekDayData[] }
                     minHeight: 4,
                     borderRadius: 4,
                     background: day.isToday && day.percentage > 0
-                      ? `linear-gradient(180deg, #34D399, #10B981)`
+                      ? `linear-gradient(180deg, var(--accent-light), var(--accent-primary))`
                       : color,
-                    boxShadow: day.isToday && day.percentage > 0 ? '0 0 10px rgba(16,185,129,0.3)' : 'none',
+                    boxShadow: day.isToday && day.percentage > 0 ? '0 0 10px color-mix(in srgb, var(--accent-primary) 30%, transparent)' : 'none',
                     transition: 'background 0.2s',
                     opacity: isHov ? 1 : 0.85,
                   }}

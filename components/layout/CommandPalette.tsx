@@ -232,7 +232,7 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-subtle)',
                 borderRadius: 16,
-                boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
+                boxShadow: 'none',
                 overflow: 'hidden',
               }}
             >
@@ -314,7 +314,7 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
                             height: 32,
                             borderRadius: 8,
                             background: isSelected ? 'var(--accent-glow)' : 'var(--bg-tertiary)',
-                            border: isSelected ? '1px solid rgba(16,185,129,0.25)' : '1px solid var(--border-subtle)',
+                            border: isSelected ? '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)' : '1px solid var(--border-subtle)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',

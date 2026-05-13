@@ -136,7 +136,7 @@ export default function Navbar() {
                 border: 'none',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
-                boxShadow: '0 0 16px rgba(16,229,176,0.15)',
+                boxShadow: 'none',
               }}
             >
               Get started
@@ -236,7 +236,7 @@ export default function Navbar() {
                   border: 'none',
                   fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', fontFamily: 'inherit',
-                  boxShadow: '0 0 24px rgba(16,229,176,0.2)',
+                  boxShadow: 'none',
                 }}>
                   Start for free
                 </button>

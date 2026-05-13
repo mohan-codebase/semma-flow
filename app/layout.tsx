@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 // and is a WCAG 1.4.4 violation. Default initialScale=1 is enough — we don't
 // need to lock zoom for a habit tracker.
 export const viewport: Viewport = {
-  themeColor: "#10E5B0",
+  themeColor: "#771828ff",
   width: "device-width",
   initialScale: 1,
 };

@@ -29,7 +29,7 @@ export const habitSchema = z.object({
   name: safeName,
   description: safeDescription,
   icon: z.string().default('circle-check'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color').default('#10B981'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color').default('var(--accent-primary)'),
   category_id: z.string().uuid().nullable().optional(),
   frequency: z.object({
     type: z.enum(['daily', 'weekly', 'x_per_week', 'x_per_month']),

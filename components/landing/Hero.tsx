@@ -110,7 +110,7 @@ function MiniHabitCard({
 function DashboardPreview() {
   const habits = [
     { icon: '🧘', name: 'Morning Meditation', streak: 34, color: '#8B7FE8', done: true },
-    { icon: '🏃', name: 'Morning Run', streak: 12, color: '#10E5B0', done: true },
+    { icon: '🏃', name: 'Morning Run', streak: 12, color: 'var(--accent-primary)', done: true },
     { icon: '📚', name: 'Read 30 mins', streak: 7, color: '#F4B740', done: false },
     { icon: '💧', name: 'Drink 8 glasses', streak: 21, color: '#5BC7DA', done: true },
   ];
@@ -126,7 +126,7 @@ function DashboardPreview() {
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--r-2xl)',
         padding: 20,
-        boxShadow: '0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.06)',
+        boxShadow: 'none',
         maxWidth: 360,
         width: '100%',
       }}
@@ -145,7 +145,7 @@ function DashboardPreview() {
           padding: '4px 10px',
           borderRadius: 999,
           background: 'var(--accent-glow-md)',
-          border: '1px solid rgba(16,229,176,0.3)',
+          border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
           fontSize: 11,
           fontWeight: 700,
           color: 'var(--accent-primary)',
@@ -236,7 +236,7 @@ export default function Hero() {
         <div style={{
           position: 'absolute', top: '-15%', left: '-5%',
           width: '55%', height: '60%',
-          background: 'radial-gradient(ellipse, rgba(16,229,176,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse, color-mix(in srgb, var(--accent-primary) 10%, transparent) 0%, transparent 70%)',
           filter: 'blur(1px)',
         }} />
         <div style={{
@@ -318,8 +318,8 @@ export default function Hero() {
                     color: 'var(--accent-on-primary)',
                     fontSize: 15, fontWeight: 700,
                     border: 'none', cursor: 'pointer',
-                    boxShadow: '0 0 28px rgba(16,229,176,0.25)',
-                    transition: 'box-shadow 0.2s ease',
+                    boxShadow: 'none',
+                    transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
                   }}
                 >
                   Start for free

@@ -148,7 +148,7 @@ export default function Modal({
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-default)',
               borderRadius: 18,
-              boxShadow: '0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px var(--border-subtle)',
+              boxShadow: 'none',
               width: '100%',
               maxWidth: sizeMap[size],
               maxHeight: '90vh',

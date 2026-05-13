@@ -89,18 +89,18 @@ export default function HabitStreak({ streak, size = 'md' }: HabitStreakProps) {
       <style>{`
         @keyframes fire-glow-anim {
           0%, 100% {
-            filter: drop-shadow(0 0 3px currentColor);
+            filter: 'none';
           }
           50% {
-            filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 14px currentColor);
+            filter: 'none';
           }
         }
         @keyframes glow-pulse-anim {
           0%, 100% {
-            text-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+            textShadow: 'none';
           }
           50% {
-            text-shadow: 0 0 16px rgba(245, 158, 11, 0.9), 0 0 28px rgba(245, 158, 11, 0.4);
+            textShadow: 'none';
           }
         }
         .fire-glow {

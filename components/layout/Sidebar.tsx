@@ -83,7 +83,7 @@ export default function Sidebar() {
         background: 'var(--bg-glass-strong)',
         border: '1px solid var(--border-default)',
         borderRadius: 'var(--r-xl)',
-        boxShadow: 'var(--glass-highlight), var(--shadow-lg)',
+        boxShadow: 'none',
       }}
     >
       {/* ── Logo ── */}
@@ -98,7 +98,7 @@ export default function Sidebar() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 0 1px rgba(16,229,176,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+              boxShadow: 'none',
               flexShrink: 0,
             }}
           >
@@ -152,7 +152,7 @@ export default function Sidebar() {
                   border: `1px solid ${active ? 'var(--border-accent)' : 'transparent'}`,
                   color: active ? 'var(--text-primary)' : 'var(--text-muted)',
                   position: 'relative',
-                  boxShadow: active ? 'var(--glass-highlight)' : 'none',
+                  boxShadow: 'none',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) {
@@ -177,7 +177,7 @@ export default function Sidebar() {
                       width: 3,
                       borderRadius: '0 4px 4px 0',
                       background: 'linear-gradient(180deg, var(--accent-light), var(--cyan))',
-                      boxShadow: '0 0 10px var(--accent-primary)',
+                      boxShadow: 'none',
                     }}
                   />
                 )}
@@ -214,7 +214,7 @@ export default function Sidebar() {
             borderRadius: 12,
             background: 'var(--bg-tertiary)',
             border: '1px solid var(--border-subtle)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
+            boxShadow: 'none',
           }}
         >
           <div
@@ -232,7 +232,7 @@ export default function Sidebar() {
               color: 'var(--text-primary)',
               flexShrink: 0,
               letterSpacing: '0.02em',
-              boxShadow: 'var(--glass-highlight)',
+              boxShadow: 'none',
             }}
           >
             {initials}

@@ -74,7 +74,7 @@ export default function EmptyState({
             borderRadius: compact ? 16 : 20,
             background: `${accentColor}14`,
             border: `1px solid ${accentColor}30`,
-            boxShadow: `0 0 28px ${accentColor}18`,
+            boxShadow: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

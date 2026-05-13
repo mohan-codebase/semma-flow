@@ -105,7 +105,7 @@ export default function AchievementsPage() {
               background: 'linear-gradient(135deg, rgba(234,179,8,0.12), rgba(234,179,8,0.05))',
               border: '1px solid rgba(234,179,8,0.3)',
               borderRadius: 16,
-              boxShadow: '0 0 40px rgba(234,179,8,0.1)',
+              boxShadow: 'none',
             }}
           >
             <Sparkles size={20} color="#EAB308" />

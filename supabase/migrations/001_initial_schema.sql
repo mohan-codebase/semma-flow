@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   name TEXT NOT NULL,
-  color TEXT NOT NULL DEFAULT '#10B981',
+  color TEXT NOT NULL DEFAULT '#F43F5E',
   icon TEXT NOT NULL DEFAULT 'target',
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.habits (
   name TEXT NOT NULL,
   description TEXT,
   icon TEXT DEFAULT 'circle-check',
-  color TEXT DEFAULT '#10B981',
+  color TEXT DEFAULT '#F43F5E',
   frequency JSONB NOT NULL DEFAULT '{"type": "daily"}',
   target_type TEXT NOT NULL DEFAULT 'boolean',
   target_value NUMERIC DEFAULT 1,

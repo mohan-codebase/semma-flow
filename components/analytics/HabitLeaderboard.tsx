@@ -25,7 +25,7 @@ function DynamicIcon({ name, size = 16, color }: { name: string; size?: number; 
 }
 
 function hexToRgba(hex: string, alpha: number): string {
-  if (!hex.startsWith('#')) return `rgba(16,185,129,${alpha})`;
+  if (!hex.startsWith('#')) return `rgba(var(--accent-primary-rgb),${alpha})`;
   const s = hex.replace('#', '');
   const full = s.length === 3 ? s.split('').map((c) => c + c).join('') : s;
   const n = parseInt(full, 16);

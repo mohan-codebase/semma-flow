@@ -219,7 +219,7 @@ export default function PushNotificationToggle({ compact = false }: Props) {
           background: 'var(--bg-card)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--r-xl)',
-          boxShadow: 'var(--glass-highlight)',
+          boxShadow: 'none',
         }}
       >
         {/* Icon chip */}

@@ -20,7 +20,7 @@ interface HabitFormProps {
 }
 
 const PRESET_COLORS = [
-  '#10B981', '#3B82F6', '#8B5CF6', '#EC4899',
+  'var(--accent-primary)', '#3B82F6', '#8B5CF6', '#EC4899',
   '#F59E0B', '#EF4444', '#06B6D4', '#84CC16',
   '#F97316', '#6366F1',
 ];
@@ -45,7 +45,7 @@ const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const DAY_FULL_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function hexToRgba(hex: string, alpha: number): string {
-  if (!hex.startsWith('#')) return `rgba(16,185,129,${alpha})`;
+  if (!hex.startsWith('#')) return `rgba(var(--accent-primary-rgb),${alpha})`;
   const s = hex.replace('#', '');
   const full = s.length === 3 ? s.split('').map((c) => c + c).join('') : s;
   const n = parseInt(full, 16);
@@ -95,7 +95,7 @@ function SegmentedControl<T extends string>({
               fontWeight: active ? 600 : 400,
               cursor: 'pointer',
               transition: 'all 0.15s ease',
-              boxShadow: active ? '0 1px 4px rgba(0,0,0,0.25)' : 'none',
+              boxShadow: 'none',
               whiteSpace: 'nowrap',
             }}
           >
@@ -138,7 +138,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
       : {
           name: '',
           icon: 'circle-check',
-          color: '#10B981',
+          color: 'var(--accent-primary)',
           frequency: { type: 'daily' },
           target_type: 'boolean',
           target_value: 1,
@@ -288,7 +288,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                               ? `0 0 0 2px ${c}, 0 0 10px ${hexToRgba(c, 0.5)}`
                               : 'none',
                             cursor: 'pointer',
-                            transition: 'box-shadow 0.15s ease, transform 0.12s ease',
+                            transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
                             transform: selected ? 'scale(1.15)' : 'scale(1)',
                           }}
                         />
@@ -310,7 +310,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                         type="text"
                         value={field.value}
                         onChange={(e) => field.onChange(e.target.value)}
-                        placeholder="#10B981"
+                        placeholder="var(--accent-primary)"
                         style={{
                           width: 90,
                           background: 'var(--bg-tertiary)',
@@ -548,9 +548,9 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
               style={{
                 padding: '10px 14px',
                 borderRadius: 10,
-                background: 'rgba(244,63,94,0.1)',
-                border: '1px solid rgba(244,63,94,0.25)',
-                color: 'var(--danger, #F43F5E)',
+                background: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+                border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
+                color: 'var(--danger, var(--accent-primary))',
                 fontSize: 13,
               }}
             >

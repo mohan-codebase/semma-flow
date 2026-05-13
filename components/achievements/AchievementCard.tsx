@@ -67,7 +67,7 @@ export default function AchievementCard({ achievement, onNewUnlock = false }: Pr
         transition: 'all 0.2s ease',
         boxShadow: isUnlocked ? `0 0 24px ${rarityStyle.glow}` : 'none',
       }}
-      whileHover={isUnlocked ? { y: -2, boxShadow: `0 8px 32px ${rarityStyle.glow}` } : { opacity: 0.7 }}
+      whileHover={isUnlocked ? { y: -2, boxShadow: 'none' } : { opacity: 0.7 }}
     >
       {/* Rarity badge */}
       <div

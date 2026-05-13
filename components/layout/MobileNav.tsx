@@ -61,7 +61,7 @@ export default function MobileNav() {
               alignItems: 'center',
               justifyContent: 'center',
               color: 'var(--accent-on-primary)',
-              boxShadow: '0 4px 14px rgba(16,229,176,0.4)',
+              boxShadow: 'none',
               transform: 'translateY(-14px)',
               cursor: 'pointer',
             }}

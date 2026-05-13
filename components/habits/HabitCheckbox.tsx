@@ -19,7 +19,7 @@ interface Particle {
 }
 
 function hexToRgba(hex: string, alpha: number): string {
-  if (!hex.startsWith('#')) return `rgba(16, 185, 129, ${alpha})`;
+  if (!hex.startsWith('#')) return `rgba(var(--accent-primary-rgb), ${alpha})`;
   const sanitized = hex.replace('#', '');
   const full =
     sanitized.length === 3
@@ -45,7 +45,7 @@ const PARTICLES: Particle[] = [
 export default function HabitCheckbox({
   checked,
   onChange,
-  color = '#10B981',
+  color = 'var(--accent-primary)',
   size = 40,
   disabled = false,
 }: HabitCheckboxProps) {

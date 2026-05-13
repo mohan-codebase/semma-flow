@@ -56,7 +56,7 @@ export default function AchievementGrid({ achievements }: Props) {
                   gap: 6,
                   padding: '6px 14px',
                   borderRadius: '9999px',
-                  border: active ? '1px solid rgba(16,185,129,0.35)' : '1px solid var(--border-subtle)',
+                  border: active ? '1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent)' : '1px solid var(--border-subtle)',
                   background: active ? 'var(--accent-glow)' : 'transparent',
                   color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
                   fontSize: 13,
@@ -72,7 +72,7 @@ export default function AchievementGrid({ achievements }: Props) {
                     fontWeight: 600,
                     padding: '1px 6px',
                     borderRadius: 20,
-                    background: active ? 'rgba(16,185,129,0.2)' : 'var(--bg-tertiary)',
+                    background: active ? 'color-mix(in srgb, var(--accent-primary) 20%, transparent)' : 'var(--bg-tertiary)',
                     color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
                   }}
                 >

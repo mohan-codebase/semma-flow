@@ -22,7 +22,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
         border: '1px solid var(--border-subtle)',
         borderRadius: 10,
         padding: '10px 14px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        boxShadow: 'none',
       }}
     >
       <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: d.color }}>{d.category}</p>
@@ -37,7 +37,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
 }
 
 // Fallback palette when category.color is missing or near-grey.
-const PALETTE = ['#10E5B0', '#5BC7DA', '#8B7FE8', '#F4B740', '#F07272', '#4FD1C5', '#F687B3', '#B794F4'];
+const PALETTE = ['var(--accent-primary)', '#5BC7DA', '#8B7FE8', '#F4B740', '#F07272', '#4FD1C5', '#F687B3', '#B794F4'];
 
 function resolveColor(raw: string | undefined | null, index: number): string {
   if (!raw || !/^#[0-9A-Fa-f]{6}$/.test(raw)) return PALETTE[index % PALETTE.length];

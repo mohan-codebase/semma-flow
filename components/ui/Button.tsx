@@ -35,13 +35,13 @@ const base: Record<ButtonVariant, { bg: string; color: string; border: string; s
     bg:     'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
     color:  'var(--accent-on-primary)',
     border: '1px solid rgba(255,255,255,0.14)',
-    shadow: '0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.10) inset, 0 2px 8px rgba(16,229,176,0.22)',
+    shadow: 'none',
   },
   secondary: {
     bg:     'var(--bg-tertiary)',
     color:  'var(--text-primary)',
     border: '1px solid var(--border-default)',
-    shadow: 'var(--glass-highlight)',
+    shadow: 'none',
   },
   ghost: {
     bg:     'transparent',
@@ -52,7 +52,7 @@ const base: Record<ButtonVariant, { bg: string; color: string; border: string; s
     bg:     'rgba(248,113,113,0.12)',
     color:  'var(--danger)',
     border: '1px solid rgba(248,113,113,0.30)',
-    shadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+    shadow: 'none',
   },
 };
 
@@ -85,7 +85,7 @@ export default function Button({
     letterSpacing:  '-0.1px',
     cursor:         off ? 'not-allowed' : 'pointer',
     opacity:        off ? 0.45 : 1,
-    transition:     'transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease, filter 0.14s ease, background 0.14s ease',
+    transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
     width:          fullWidth ? '100%' : undefined,
     outline:        'none',
     userSelect:     'none',
@@ -103,7 +103,7 @@ export default function Button({
     if (variant === 'primary') {
       el.style.filter = 'brightness(1.06)';
       el.style.transform = 'translateY(-1px)';
-      el.style.boxShadow = '0 1px 0 rgba(255,255,255,0.22) inset, 0 6px 20px rgba(16,229,176,0.32)';
+      el.style.boxShadow = 'none';
     } else if (variant === 'secondary') {
       el.style.background = 'rgba(255,255,255,0.10)';
       el.style.borderColor = 'var(--border-medium)';
@@ -122,7 +122,7 @@ export default function Button({
     el.style.transform = '';
     el.style.background = v.bg;
     el.style.borderColor = '';
-    el.style.boxShadow = v.shadow ?? 'none';
+    el.style.boxShadow = 'none';
     el.style.color = v.color;
   };
 

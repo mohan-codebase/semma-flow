@@ -38,14 +38,14 @@ export default function CTABanner() {
             padding: 'clamp(36px, 5vw, 64px)',
             textAlign: 'center',
             overflow: 'hidden',
-            boxShadow: '0 0 60px rgba(16,229,176,0.08), var(--shadow-lg)',
+            boxShadow: 'none',
           }}
         >
           {/* Background glow */}
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at 50% 0%, rgba(16,229,176,0.06) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--accent-primary) 6%, transparent) 0%, transparent 70%)',
             pointerEvents: 'none',
           }} />
 
@@ -109,7 +109,7 @@ export default function CTABanner() {
                   fontSize: 15, fontWeight: 700,
                   border: 'none', cursor: 'pointer',
                   fontFamily: 'inherit',
-                  boxShadow: '0 0 32px rgba(16,229,176,0.28)',
+                  boxShadow: 'none',
                 }}
               >
                 Start for free

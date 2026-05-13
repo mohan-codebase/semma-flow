@@ -72,12 +72,12 @@ export async function GET(req: NextRequest) {
       const cat = (catRaw && typeof catRaw === 'object' && !Array.isArray(catRaw))
         ? (catRaw as { name: string; color: string })
         : null;
-      habitCategoryMap.set(h.id, cat ?? { name: 'Uncategorized', color: '#10E5B0' });
+      habitCategoryMap.set(h.id, cat ?? { name: 'Uncategorized', color: 'var(--accent-primary)' });
     }
 
     const categoryMap = new Map<string, { color: string; completed: number; total: number }>();
     for (const e of entries ?? []) {
-      const cat = habitCategoryMap.get(e.habit_id) ?? { name: 'Uncategorized', color: '#10E5B0' };
+      const cat = habitCategoryMap.get(e.habit_id) ?? { name: 'Uncategorized', color: 'var(--accent-primary)' };
       const slot = categoryMap.get(cat.name) ?? { color: cat.color, completed: 0, total: 0 };
       slot.total += 1;
       if (e.is_completed) slot.completed += 1;

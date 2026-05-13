@@ -98,7 +98,7 @@ function FeatureCard({ feature, index }: { feature: Feature; index: number }) {
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: '22px 20px',
-        boxShadow: 'var(--glass-highlight), var(--shadow-sm)',
+        boxShadow: 'none',
         cursor: 'default',
       }}
     >

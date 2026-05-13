@@ -49,7 +49,7 @@ function CustomTooltip({
         border: '1px solid var(--border-subtle)',
         borderRadius: 10,
         padding: '10px 14px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        boxShadow: 'none',
       }}
     >
       <p style={{ margin: '0 0 4px', fontSize: 12, color: 'var(--text-muted)', fontFamily: "'IBM Plex Sans'" }}>
@@ -113,7 +113,7 @@ const CompletionChart = memo(function CompletionChart({ data, onRangeChange, cur
               style={{
                 padding: '4px 12px',
                 borderRadius: 8,
-                border: active ? '1px solid rgba(16,185,129,0.4)' : '1px solid var(--border-subtle)',
+                border: active ? '1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent)' : '1px solid var(--border-subtle)',
                 background: active ? 'var(--accent-glow)' : 'transparent',
                 color: active ? 'var(--accent-primary)' : 'var(--text-muted)',
                 fontSize: 12,
@@ -133,8 +133,8 @@ const CompletionChart = memo(function CompletionChart({ data, onRangeChange, cur
         <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="completionGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -153,15 +153,15 @@ const CompletionChart = memo(function CompletionChart({ data, onRangeChange, cur
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(16,185,129,0.2)', strokeWidth: 1 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'color-mix(in srgb, var(--accent-primary) 20%, transparent)', strokeWidth: 1 }} />
           <Area
             type="monotone"
             dataKey="percentage"
-            stroke="#10B981"
+            stroke="var(--accent-primary)"
             strokeWidth={2}
             fill="url(#completionGradient)"
             dot={false}
-            activeDot={{ r: 5, fill: '#10B981', stroke: 'var(--bg-primary)', strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: 'var(--accent-primary)', stroke: 'var(--bg-primary)', strokeWidth: 2 }}
           />
         </AreaChart>
       </ResponsiveContainer>

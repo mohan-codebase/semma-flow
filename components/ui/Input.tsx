@@ -22,7 +22,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const boxShadow = error
       ? focused
-        ? '0 0 0 3px rgba(244, 63, 94, 0.15)'
+        ? '0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent)'
         : 'none'
       : focused
       ? '0 0 0 3px var(--accent-glow)'
@@ -92,7 +92,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               fontSize: '14px',
               outline: 'none',
               boxShadow,
-              transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+              transition: 'transform 0.15s ease, filter 0.15s ease, background 0.15s ease, opacity 0.15s ease, border-color 0.15s ease',
               opacity: props.disabled ? 0.5 : 1,
               cursor: props.disabled ? 'not-allowed' : undefined,
             }}

@@ -44,9 +44,9 @@ const typeConfig: Record<
         <path d="M5 8l2.5 2.5L11 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
-    color: '#10B981',
-    bg: 'rgba(16,185,129,0.1)',
-    border: 'rgba(16,185,129,0.25)',
+    color: 'var(--accent-primary)',
+    bg: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+    border: 'color-mix(in srgb, var(--accent-primary) 25%, transparent)',
   },
   error: {
     icon: (
@@ -55,9 +55,9 @@ const typeConfig: Record<
         <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     ),
-    color: '#F43F5E',
-    bg: 'rgba(244,63,94,0.1)',
-    border: 'rgba(244,63,94,0.25)',
+    color: 'var(--accent-primary)',
+    bg: 'color-mix(in srgb, var(--accent-primary) 10%, transparent)',
+    border: 'color-mix(in srgb, var(--accent-primary) 25%, transparent)',
   },
   info: {
     icon: (
@@ -131,7 +131,7 @@ function ToastCard({ item, onDismiss }: ToastCardProps) {
         background: 'var(--bg-secondary)',
         border: `1px solid ${cfg.border}`,
         borderRadius: '12px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        boxShadow: 'none',
         overflow: 'hidden',
         minWidth: '280px',
         maxWidth: '360px',

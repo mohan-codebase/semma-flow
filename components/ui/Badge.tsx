@@ -11,7 +11,7 @@ interface BadgeProps {
 function hexToRgba(hex: string, alpha: number): string {
   // Handle CSS variable strings or non-hex values gracefully
   if (!hex.startsWith('#')) {
-    return `rgba(16, 185, 129, ${alpha})`;
+    return `rgba(var(--accent-primary-rgb), ${alpha})`;
   }
   const sanitized = hex.replace('#', '');
   const full =

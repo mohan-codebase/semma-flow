@@ -89,7 +89,7 @@ function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
         border: '1px solid var(--border-subtle)',
         borderRadius: 'var(--r-xl)',
         padding: '20px 18px',
-        boxShadow: 'var(--glass-highlight), var(--shadow-sm)',
+        boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
         gap: 14,

@@ -202,7 +202,7 @@ export default function SettingsPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.5)'; }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-primary) 50%, transparent)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
             />
           </div>
@@ -219,7 +219,7 @@ export default function SettingsPage() {
           </div>
 
           {saveError && (
-            <p style={{ margin: 0, fontSize: 13, color: 'var(--danger, #F43F5E)' }}>{saveError}</p>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--danger, var(--accent-primary))' }}>{saveError}</p>
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '-0.005em' }}>
@@ -245,7 +245,7 @@ export default function SettingsPage() {
               style={{ ...inputBase, cursor: 'pointer', appearance: 'none' as const }}
               value={timezone}
               onChange={(e) => setTimezone(e.target.value)}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'rgba(16,185,129,0.5)'; }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-primary) 50%, transparent)'; }}
               onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
             >
               {TIMEZONES.map((tz) => (
@@ -272,7 +272,7 @@ export default function SettingsPage() {
                       flex: 1,
                       padding: '10px',
                       borderRadius: 10,
-                      border: active ? '1px solid rgba(16,185,129,0.4)' : '1px solid var(--border-subtle)',
+                      border: active ? '1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent)' : '1px solid var(--border-subtle)',
                       background: active ? 'var(--accent-glow)' : 'var(--bg-tertiary)',
                       color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
                       fontSize: 13,

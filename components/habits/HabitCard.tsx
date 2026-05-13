@@ -17,7 +17,9 @@ interface HabitCardProps {
 }
 
 function hexToRgba(hex: string, alpha: number): string {
-  if (!hex?.startsWith('#')) return `rgba(16,185,129,${alpha})`;
+  if (hex === 'var(--accent-primary)') return `color-mix(in srgb, var(--accent-primary) ${alpha * 100}%, transparent)`;
+  if (hex === 'var(--accent-light)') return `color-mix(in srgb, var(--accent-light) ${alpha * 100}%, transparent)`;
+  if (!hex?.startsWith('#')) return `rgba(var(--accent-primary-rgb), ${alpha})`;
   const s    = hex.replace('#', '');
   const full = s.length === 3 ? s.split('').map((c) => c + c).join('') : s;
   const n    = parseInt(full, 16);
@@ -98,7 +100,8 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
-  const color     = habit.color ?? '#10B981';
+  let color = habit.color ?? 'var(--accent-primary)';
+  if (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E') color = 'var(--accent-primary)';
   const completed = checked;
   const streak    = habit.current_streak ?? 0;
 
@@ -117,12 +120,12 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
           overflow:         'visible',
           transition:       'border-color 0.18s ease, opacity 0.18s ease, background 0.18s ease',
           opacity:          completed ? 0.78 : 1,
-          boxShadow:        'var(--glass-highlight)',
+          boxShadow: 'none',
         }}
         whileHover={{
           y: -1,
           borderColor: completed ? hexToRgba(color, 0.32) : 'var(--border-default)',
-          boxShadow: 'var(--glass-highlight), var(--shadow-sm)',
+          boxShadow: 'none',
         }}
         transition={{ type: 'spring', stiffness: 320, damping: 26 }}
       >
@@ -242,7 +245,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
                     background: 'var(--bg-elevated)',
                     border: '1px solid var(--border-default)',
                     borderRadius: 11,
-                    boxShadow: 'var(--shadow-lg)',
+                    boxShadow: 'none',
                     padding: 5, minWidth: 152, zIndex: 30,
                   }}
                 >

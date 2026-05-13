@@ -139,7 +139,7 @@ export default function NotificationBell() {
               height: 14,
               padding: '0 3px',
               borderRadius: 7,
-              background: '#F43F5E',
+              background: 'var(--accent-primary)',
               color: '#fff',
               fontSize: 9.5,
               fontWeight: 700,
@@ -169,7 +169,7 @@ export default function NotificationBell() {
               background: 'var(--bg-secondary)',
               border: '1px solid var(--border-default)',
               borderRadius: 12,
-              boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+              boxShadow: 'none',
               padding: 8,
               zIndex: 50,
             }}
@@ -224,7 +224,7 @@ export default function NotificationBell() {
                       borderRadius: 8,
                       background:
                         n.icon === 'streak' ? 'rgba(245,158,11,0.14)' : 'var(--accent-glow)',
-                      border: `1px solid ${n.icon === 'streak' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.25)'}`,
+                      border: `1px solid ${n.icon === 'streak' ? 'rgba(245,158,11,0.3)' : 'color-mix(in srgb, var(--accent-primary) 25%, transparent)'}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

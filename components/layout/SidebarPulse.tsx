@@ -179,7 +179,7 @@ export default function SidebarPulse() {
         borderRadius: 'var(--r-lg)',
         background: 'var(--bg-tertiary)',
         border: '1px solid var(--border-subtle)',
-        boxShadow: 'var(--glass-highlight)',
+        boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
@@ -314,7 +314,7 @@ export default function SidebarPulse() {
                   : isToday
                     ? 'var(--accent-primary)'
                     : 'var(--accent-glow-md)',
-                border: v > 0 ? '1px solid rgba(16,229,176,0.35)' : 'none',
+                border: v > 0 ? '1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent)' : 'none',
                 boxShadow: isToday && v > 0 ? '0 0 4px var(--accent-primary)' : 'none',
                 transition: 'height 0.3s ease',
               }}

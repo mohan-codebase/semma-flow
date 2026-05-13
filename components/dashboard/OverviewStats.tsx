@@ -110,7 +110,7 @@ function StatCard({
         overflow: 'hidden',
         transition: 'border-color 0.18s ease, transform 0.18s ease',
         cursor: 'default',
-        boxShadow: 'var(--glass-highlight), var(--shadow-xs)',
+        boxShadow: 'none',
       }}
       whileHover={{
         y: -1,

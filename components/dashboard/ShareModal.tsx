@@ -46,12 +46,12 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
             position: 'relative',
             overflow: 'hidden',
             border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+            boxShadow: 'none',
             color: 'white',
           }}
         >
           {/* Abstract background glows */}
-          <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(16,229,176,0.15) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 15%, transparent) 0%, transparent 70%)' }} />
           <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,127,232,0.1) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', zIndex: 1 }}>
@@ -80,7 +80,7 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
                   <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>Top Streak</p>
                 </div>
                 <div style={{ background: 'rgba(255,255,255,0.04)', padding: 16, borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <Trophy size={16} color="#10E5B0" style={{ marginBottom: 8 }} />
+                  <Trophy size={16} color="var(--accent-primary)" style={{ marginBottom: 8 }} />
                   <p style={{ fontSize: 24, fontWeight: 800, fontFamily: "'Outfit'" }}>{stats.totalCompletions}</p>
                   <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>Total Habits</p>
                 </div>

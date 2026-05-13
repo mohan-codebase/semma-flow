@@ -36,7 +36,7 @@ function DynamicIcon({ name, size = 22, color }: { name: string; size?: number; 
 }
 
 function hexToRgba(hex: string, alpha: number): string {
-  if (!hex.startsWith('#')) return `rgba(16,185,129,${alpha})`;
+  if (!hex.startsWith('#')) return `rgba(var(--accent-primary-rgb),${alpha})`;
   const s = hex.replace('#', '');
   const full = s.length === 3 ? s.split('').map((c) => c + c).join('') : s;
   const n = parseInt(full, 16);
@@ -287,7 +287,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: `0 0 20px ${hexToRgba(habit.color, 0.15)}`,
+            boxShadow: 'none',
           }}
         >
           <DynamicIcon name={habit.icon} size={26} color={habit.color} />
@@ -429,7 +429,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
                 transition: 'background 0.15s ease, border-color 0.15s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)';
+                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--accent-primary) 40%, transparent)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.borderColor = 'var(--border-subtle)';

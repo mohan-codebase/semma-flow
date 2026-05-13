@@ -31,7 +31,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
         border: '1px solid var(--border-subtle)',
         borderRadius: 10,
         padding: '10px 14px',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+        boxShadow: 'none',
       }}
     >
       <p style={{ margin: '0 0 4px', fontSize: 13, color: 'var(--text-secondary)' }}>{d.day}</p>
@@ -81,7 +81,7 @@ const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
             return (
               <Cell
                 key={index}
-                fill={`rgba(16,185,129,${opacity})`}
+                fill={`rgba(var(--accent-primary-rgb),${opacity})`}
               />
             );
           })}

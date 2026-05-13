@@ -108,9 +108,7 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
         border: `1px solid ${tier.border}`,
         borderRadius: 'var(--r-2xl)',
         padding: '28px 24px',
-        boxShadow: tier.highlight
-          ? 'var(--glass-highlight), 0 0 40px rgba(16,229,176,0.12), var(--shadow-lg)'
-          : 'var(--glass-highlight), var(--shadow-sm)',
+        boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -220,7 +218,7 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
             gap: 7,
             transition: 'background 0.15s ease',
             fontFamily: 'inherit',
-            boxShadow: tier.highlight ? '0 0 20px rgba(16,229,176,0.2)' : 'none',
+            boxShadow: 'none',
           }}
         >
           {tier.cta}

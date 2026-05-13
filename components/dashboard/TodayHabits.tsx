@@ -458,7 +458,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
                 padding: '2px 10px',
                 borderRadius: '9999px',
                 background: 'var(--accent-glow)',
-                border: '1px solid rgba(16,185,129,0.25)',
+                border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
                 color: 'var(--accent-primary)',
                 fontSize: '12px',
                 fontWeight: 600,

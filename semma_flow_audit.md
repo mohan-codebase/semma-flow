@@ -69,7 +69,7 @@ The two-column dashboard grid (`hf-dashboard-grid`) with a 2fr/1fr split is prof
 - ❌ No bottom-sheet UX for modals on mobile (`hf-modal-backdrop` uses `align-items: flex-end` which is correct, but the backfill modal lacks a drag handle).
 
 ### Color Psychology: **8.5 / 10**
-- The mint green `#10E5B0` accent is energetic without being aggressive — communicates growth and health perfectly.
+- The mint green `var(--accent-primary)` accent is energetic without being aggressive — communicates growth and health perfectly.
 - The dual-token warm `#F4B740` / danger `#F07272` creates clear semantic meaning.
 - **Risk:** The light theme switches accent to `#059669` (Emerald 600) — much lower contrast against `#FAFAFC` backgrounds than the dark theme equivalent. Needs WCAG AA audit.
 

@@ -47,7 +47,7 @@ export default function Card({
     position: 'relative',
     overflow: 'hidden',
     cursor: onClick ? 'pointer' : undefined,
-    boxShadow: `var(--glass-highlight), var(--shadow-xs)`,
+    boxShadow: 'none',
   };
 
   if (!hover && !onClick) {
@@ -67,7 +67,7 @@ export default function Card({
         hover
           ? {
               y: -1,
-              boxShadow: `var(--glass-highlight), var(--shadow-md), 0 0 24px ${toneGlow[tone]}`,
+              boxShadow: 'none',
               borderColor: 'var(--border-default)',
             }
           : undefined

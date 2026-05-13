@@ -34,12 +34,12 @@ const CATEGORIES = [
 const TEMPLATES: Record<string, Template[]> = {
   health:       [
     { name: 'Drink 8 glasses of water', icon: '💧', color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Take vitamins',             icon: '💊', color: '#10B981', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Take vitamins',             icon: '💊', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Sleep 8 hours',            icon: '😴', color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'No alcohol',               icon: '🚫', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   fitness:      [
-    { name: 'Morning run',              icon: '🏃', color: '#10E5B0', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Morning run',              icon: '🏃', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Workout 30 mins',          icon: '🏋️', color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: '10,000 steps',             icon: '👟', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Stretch / mobility',       icon: '🤸', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
@@ -51,26 +51,26 @@ const TEMPLATES: Record<string, Template[]> = {
     { name: 'Evening reflection',       icon: '🌙', color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   learning:     [
-    { name: 'Read 30 minutes',          icon: '📚', color: '#10B981', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Read 30 minutes',          icon: '📚', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Practice a language',      icon: '🌍', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Write 500 words',          icon: '✍️', color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Watch a tutorial',         icon: '🎓', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   productivity: [
-    { name: 'Plan the day (5 min)',     icon: '📋', color: '#10E5B0', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Plan the day (5 min)',     icon: '📋', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: '2-hour deep work block',  icon: '🎯', color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Weekly review',           icon: '🔄', color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Inbox zero',              icon: '📬', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   finance:      [
-    { name: 'Log daily expenses',      icon: '💸', color: '#10B981', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Log daily expenses',      icon: '💸', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'No impulse purchases',    icon: '🛑', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Transfer to savings',     icon: '🏦', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Review investments',      icon: '📈', color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
 };
 
-const PRESET_COLORS = ['#10E5B0','#3B82F6','#8B7FE8','#EC4899','#F59E0B','#F07272','#5BC7DA','#10B981','#F4B740','#6366F1'];
+const PRESET_COLORS = ['var(--accent-primary)','#3B82F6','#8B7FE8','#EC4899','#F59E0B','#F07272','#5BC7DA','var(--accent-primary)','#F4B740','#6366F1'];
 
 /* ─── Mini confetti burst (CSS only, no dep) ────────────────── */
 function Confetti() {
@@ -132,7 +132,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
   const [categoryId, setCategoryId] = useState('');
   const [template, setTemplate] = useState<Template | null>(null);
   const [habitName, setHabitName] = useState('');
-  const [habitColor, setHabitColor] = useState('#10E5B0');
+  const [habitColor, setHabitColor] = useState('var(--accent-primary)');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [createdHabit, setCreatedHabit] = useState<Habit | null>(null);
@@ -207,7 +207,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
           background: 'var(--bg-elevated)',
           border: '1px solid var(--border-default)',
           borderRadius: 22,
-          boxShadow: '0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px var(--border-subtle)',
+          boxShadow: 'none',
           overflow: 'hidden',
         }}
       >
@@ -270,7 +270,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                       color: 'var(--accent-on-primary)', fontSize: 15, fontWeight: 700,
                       border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      boxShadow: '0 0 24px rgba(16,229,176,0.22)',
+                      boxShadow: 'none',
                     }}
                   >
                     Let&apos;s go <ArrowRight size={16} />
@@ -397,7 +397,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                           style={{
                             width: 30, height: 30, borderRadius: '50%',
                             background: c, border: habitColor === c ? '2px solid white' : '2px solid transparent',
-                            boxShadow: habitColor === c ? `0 0 0 2px ${c}` : 'none',
+                            boxShadow: 'none',
                             cursor: 'pointer', transition: 'transform 0.12s ease',
                             transform: habitColor === c ? 'scale(1.18)' : 'scale(1)',
                           }}
@@ -490,7 +490,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                       color: 'var(--accent-on-primary)', fontSize: 15, fontWeight: 700,
                       border: 'none', cursor: 'pointer', fontFamily: 'inherit',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      boxShadow: '0 0 24px rgba(16,229,176,0.22)',
+                      boxShadow: 'none',
                     }}
                   >
                     Go to dashboard <ArrowRight size={16} />

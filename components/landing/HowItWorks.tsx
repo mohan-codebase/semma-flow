@@ -87,7 +87,7 @@ function StepCard({ step, index }: { step: (typeof STEPS)[0]; index: number }) {
           border: `1px solid ${step.border}`,
           borderRadius: 'var(--r-xl)',
           padding: '28px 24px',
-          boxShadow: 'var(--glass-highlight), var(--shadow-md)',
+          boxShadow: 'none',
           height: '100%',
         }}
       >

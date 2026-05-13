@@ -155,7 +155,7 @@ export default function TermsPage() {
           {/* TOC */}
           <nav aria-label="Contents" style={{
             background: 'var(--bg-card)', border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--r-xl)', padding: '22px 26px', boxShadow: 'var(--glass-highlight)',
+            borderRadius: 'var(--r-xl)', padding: '22px 26px', boxShadow: 'none',
           }}>
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", margin: '0 0 12px' }}>Contents</p>
             <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>

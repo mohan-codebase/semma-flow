@@ -14,10 +14,10 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getColor(pct: number): string {
   if (pct === 0) return 'rgba(255,255,255,0.04)';
-  if (pct < 25) return 'rgba(16,185,129,0.2)';
-  if (pct < 50) return 'rgba(16,185,129,0.4)';
-  if (pct < 75) return 'rgba(16,185,129,0.65)';
-  return 'rgba(16,185,129,0.9)';
+  if (pct < 25) return 'color-mix(in srgb, var(--accent-primary) 20%, transparent)';
+  if (pct < 50) return 'color-mix(in srgb, var(--accent-primary) 40%, transparent)';
+  if (pct < 75) return 'color-mix(in srgb, var(--accent-primary) 65%, transparent)';
+  return 'color-mix(in srgb, var(--accent-primary) 90%, transparent)';
 }
 
 const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapProps) {
