@@ -9,7 +9,6 @@ import TodayHabits from '@/components/dashboard/TodayHabits';
 import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
 // import MoodLogger from '@/components/dashboard/MoodLogger';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import FocusBanner from '@/components/dashboard/FocusBanner';
 
 // -----------------------------------------------------------------------
 // Server-side data fetching helpers
@@ -263,7 +262,6 @@ export default async function DashboardPage() {
         </div>
 
         {/* Focus banner — next habit + midnight countdown */}
-        <FocusBanner habits={habits} />
 
         {/* Overview stats — full width */}
         <OverviewStats stats={stats} loading={false} />
