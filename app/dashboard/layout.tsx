@@ -1,5 +1,4 @@
 import { Suspense } from 'react';
-import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
 import MobileNav from '@/components/layout/MobileNav';
 
@@ -22,43 +21,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen">
-      {/* Floating glass sidebar — md+ */}
+    <div className="flex min-h-screen flex-col">
       <Suspense fallback={<LoadingFallback />}>
-        <Sidebar />
+        <Topbar />
       </Suspense>
 
-      {/* Main content area — offset by floating sidebar width */}
-      <div
-        className="flex flex-col flex-1 min-w-0"
-        style={{ marginLeft: 'clamp(0px, 0px, 0px)' }}
-      >
-        <div
-          className="flex flex-col flex-1 min-w-0"
-          style={{
-            paddingLeft: 'var(--sidebar-offset, 0px)',
-          }}
-        >
-          <Suspense fallback={<LoadingFallback />}>
-            <Topbar />
-          </Suspense>
-          <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 72 }}>
-            {children}
-          </main>
-        </div>
-      </div>
+      {/* Main content area */}
+      <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 72 }}>
+        {children}
+      </main>
 
-      {/* Mobile bottom nav — hidden md+ */}
+      {/* Mobile bottom nav — hidden lg+ */}
       <Suspense fallback={null}>
         <MobileNav />
       </Suspense>
-
-      {/* Responsive offset for floating sidebar — only at lg+ when sidebar visible */}
-      <style>{`
-        @media (min-width: 1024px) {
-          :root { --sidebar-offset: 264px; }
-        }
-      `}</style>
     </div>
   );
 }
