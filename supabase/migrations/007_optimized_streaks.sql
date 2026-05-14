@@ -21,7 +21,7 @@ BEGIN
   date_groups AS (
     SELECT 
       entry_date,
-      entry_date - (ROW_NUMBER() OVER (ORDER BY entry_date DESC))::INT as grp
+      entry_date + (ROW_NUMBER() OVER (ORDER BY entry_date DESC))::INT as grp
     FROM completed_dates
   ),
   target_group AS (

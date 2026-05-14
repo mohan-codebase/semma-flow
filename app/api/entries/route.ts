@@ -75,27 +75,30 @@ export async function PATCH(req: NextRequest) {
     if (!habit) return err('Habit not found', 404);
 
     const now = new Date().toISOString();
+    const payload: any = {
+      habit_id,
+      user_id: user.id,
+      entry_date,
+      is_completed,
+      completed_at: is_completed ? now : null,
+      updated_at: now,
+    };
+    if (value !== undefined) payload.value = value;
+    if (notes !== undefined) payload.notes = notes;
+
     const { data: entry, error } = await supabase
       .from('habit_entries')
-      .upsert(
-        {
-          habit_id,
-          user_id: user.id,
-          entry_date,
-          is_completed,
-          value: value ?? null,
-          notes: notes ?? null,
-          completed_at: is_completed ? now : null,
-          updated_at: now,
-        },
-        { onConflict: 'habit_id,entry_date' }
-      )
+      .upsert(payload, { onConflict: 'habit_id,entry_date' })
       .select()
       .single();
 
-    if (error) return err(safeErrorMessage(error, 'Failed to save entry'), 500);
+    if (error) {
+      require('fs').writeFileSync('/tmp/semma_error.txt', JSON.stringify(error, null, 2));
+      return err(safeErrorMessage(error, 'Failed to save entry'), 500);
+    }
     return ok(entry);
   } catch (e) {
+    require('fs').writeFileSync('/tmp/semma_error2.txt', String(e));
     return err(safeErrorMessage(e, 'Failed to save entry'), 500);
   }
 }
