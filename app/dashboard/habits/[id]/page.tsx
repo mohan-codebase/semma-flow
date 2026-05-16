@@ -180,6 +180,48 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
     void loadTrends();
   }, [trendDays]);
 
+  // Derive heatmap cells from entries - MOVED HOOKS BEFORE EARLY RETURNS!
+  const entryHeatmap = React.useMemo<HeatmapCell[]>(
+    () => (habit?.entries ?? []).map((e) => ({
+      date: e.entry_date,
+      count: e.is_completed ? 1 : 0,
+      percentage: e.is_completed ? 100 : 0,
+    })),
+    [habit?.entries]
+  );
+
+  // Use the fetched heatmap (habit-specific) if available, otherwise derive from entries
+  const heatmapData = React.useMemo<HeatmapCell[]>(
+    () => (heatmap.length > 0 ? heatmap : entryHeatmap),
+    [heatmap, entryHeatmap]
+  );
+
+  // Calculate per-habit trend from entries
+  const entriesMap = new Map((habit?.entries ?? []).map((e) => [e.entry_date, e]));
+  const habitTrends: DailyTrend[] = trends.map((t) => {
+    const entry = entriesMap.get(t.date);
+    const completed = entry?.is_completed ? 1 : 0;
+    return { date: t.date, completed, total: 1, percentage: completed * 100 };
+  });
+
+  // Stats
+  const totalEntries = (habit?.entries ?? []).length;
+  const totalCompleted = (habit?.entries ?? []).filter((e) => e.is_completed).length;
+  const completionRate = totalEntries > 0 ? Math.round((totalCompleted / totalEntries) * 100) : 0;
+
+  const frequencyLabel = (() => {
+    if (!habit) return '';
+    const f = habit.frequency;
+    if (f.type === 'daily') return 'Daily';
+    if (f.type === 'weekly') {
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      return (f.days ?? []).map((d) => dayNames[d]).join(', ') || 'Weekly';
+    }
+    if (f.type === 'x_per_week') return `${f.count ?? 1}× per week`;
+    if (f.type === 'x_per_month') return `${f.count ?? 1}× per month`;
+    return '';
+  })();
+
   if (loading) {
     return (
       <div className="hf-page" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -207,47 +249,6 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
       </div>
     );
   }
-
-  // Derive heatmap cells from entries
-  const entryHeatmap = React.useMemo<HeatmapCell[]>(
-    () => (habit.entries ?? []).map((e) => ({
-      date: e.entry_date,
-      count: e.is_completed ? 1 : 0,
-      percentage: e.is_completed ? 100 : 0,
-    })),
-    [habit.entries]
-  );
-
-  // Use the fetched heatmap (habit-specific) if available, otherwise derive from entries
-  const heatmapData = React.useMemo<HeatmapCell[]>(
-    () => (heatmap.length > 0 ? heatmap : entryHeatmap),
-    [heatmap, entryHeatmap]
-  );
-
-  // Calculate per-habit trend from entries
-  const entriesMap = new Map((habit.entries ?? []).map((e) => [e.entry_date, e]));
-  const habitTrends: DailyTrend[] = trends.map((t) => {
-    const entry = entriesMap.get(t.date);
-    const completed = entry?.is_completed ? 1 : 0;
-    return { date: t.date, completed, total: 1, percentage: completed * 100 };
-  });
-
-  // Stats
-  const totalEntries = (habit.entries ?? []).length;
-  const totalCompleted = (habit.entries ?? []).filter((e) => e.is_completed).length;
-  const completionRate = totalEntries > 0 ? Math.round((totalCompleted / totalEntries) * 100) : 0;
-
-  const frequencyLabel = (() => {
-    const f = habit.frequency;
-    if (f.type === 'daily') return 'Daily';
-    if (f.type === 'weekly') {
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      return (f.days ?? []).map((d) => dayNames[d]).join(', ') || 'Weekly';
-    }
-    if (f.type === 'x_per_week') return `${f.count ?? 1}× per week`;
-    if (f.type === 'x_per_month') return `${f.count ?? 1}× per month`;
-    return '';
-  })();
 
   return (
     <motion.div
