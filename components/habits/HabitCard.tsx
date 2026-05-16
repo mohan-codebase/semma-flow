@@ -110,7 +110,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
       <motion.div
         style={{
           background:       'var(--bg-card)',
-          border:           `1px solid ${completed ? hexToRgba(color, 0.22) : 'var(--border-subtle)'}`,
+          border:           `1px solid ${completed ? hexToRgba(color, 0.22) : 'var(--border-default)'}`,
           borderRadius:     'var(--r-lg)',
           padding:          '13px 16px',
           display:          'flex',
@@ -118,14 +118,14 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
           gap:              12,
           position:         'relative',
           overflow:         'visible',
-          transition:       'border-color 0.18s ease, opacity 0.18s ease, background 0.18s ease',
-          opacity:          completed ? 0.78 : 1,
-          boxShadow: 'none',
+          transition:       'all 0.2s ease',
+          opacity:          completed ? 0.8 : 1,
+          boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
         }}
         whileHover={{
-          y: -1,
-          borderColor: completed ? hexToRgba(color, 0.32) : 'var(--border-default)',
-          boxShadow: 'none',
+          y: -2,
+          borderColor: completed ? hexToRgba(color, 0.32) : 'var(--border-accent)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
         }}
         transition={{ type: 'spring', stiffness: 320, damping: 26 }}
       >

@@ -98,25 +98,36 @@ function StatCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut', delay }}
+      transition={{ duration: 0.4, ease: 'easeOut', delay }}
       style={{
         background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
+        border: '1px solid var(--border-default)',
         borderRadius: 'var(--r-xl)',
-        padding: '18px 20px 20px',
+        padding: '20px 22px 22px',
         position: 'relative',
         overflow: 'hidden',
-        transition: 'border-color 0.18s ease, transform 0.18s ease',
+        transition: 'all 0.2s ease',
         cursor: 'default',
-        boxShadow: 'none',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
       }}
       whileHover={{
-        y: -1,
-        borderColor: 'var(--border-default)',
+        y: -2,
+        borderColor: 'var(--border-accent)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
       }}
     >
+      {/* Subtle top accent line */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 3,
+        background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-light))',
+        opacity: 0.6,
+      }} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <span style={{ ...labelStyle, marginBottom: 0 }}>{label}</span>
         {trend && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut } from 'lucide-react';
+import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, Menu, X } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -9,6 +9,7 @@ import type { User } from '@supabase/supabase-js';
 import CommandPalette from '@/components/layout/CommandPalette';
 import NotificationBell from '@/components/layout/NotificationBell';
 import ThemeToggle from '@/components/layout/ThemeToggle';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV = [
   { label: 'Dashboard',    href: '/dashboard',              icon: LayoutDashboard, exact: true },
@@ -24,6 +25,7 @@ export default function Topbar() {
   const pathname    = usePathname();
   const [user, setUser]           = useState<User | null>(null);
   const [paletteOpen, setPalette] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted]     = useState(false);
 
   useEffect(() => {
@@ -85,55 +87,279 @@ export default function Topbar() {
 
   return (
     <>
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSidebarOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.6)',
+                zIndex: 100,
+              }}
+            />
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 300,
+                background: 'var(--bg-primary)',
+                borderRight: '1px solid var(--border-default)',
+                zIndex: 101,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: 20,
+                paddingBottom: 'calc(20px + env(safe-area-inset-bottom, 0px))',
+              }}
+            >
+              {/* Sidebar Header */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 12,
+                      background: 'var(--accent-primary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Zap size={18} color="var(--accent-on-primary)" fill="var(--accent-on-primary)" />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 800,
+                      fontFamily: "'Outfit', sans-serif",
+                    }}
+                  >
+                    Semma Flow
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--bg-tertiary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* User Profile */}
+              {user && (
+                <div style={{
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 16,
+                  padding: 16,
+                  marginBottom: 20,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 12,
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-default)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 16,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {initials}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, margin: 0 }}>{displayName}</p>
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Actions */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                <ThemeToggle />
+                <NotificationBell />
+                <button
+                  onClick={handleAddHabit}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    border: 'none',
+                    background: 'var(--accent-primary)',
+                    color: 'var(--accent-on-primary)',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  <Plus size={18} />
+                  Add Habit
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+                {NAV.map(({ label, href, icon: Icon, exact }) => {
+                  const active = isActive(href, exact);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setSidebarOpen(false)}
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          cursor: 'pointer',
+                          background: active ? 'var(--accent-glow-md)' : 'transparent',
+                          border: active ? '1px solid var(--border-accent)' : '1px solid transparent',
+                          color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                          fontWeight: active ? 700 : 500,
+                        }}
+                      >
+                        <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
+                        <span style={{ fontSize: 14 }}>{label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {/* Search & Logout at Bottom */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button
+                  onClick={() => { setPalette(true); setSidebarOpen(false); }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--bg-tertiary)',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: 14,
+                  }}
+                >
+                  <Search size={18} />
+                  Search (⌘K)
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1px solid rgba(239,68,68,0.3)',
+                    background: 'var(--danger-glow)',
+                    color: 'var(--danger)',
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  <LogOut size={18} />
+                  Sign Out
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <header
-        className="flex items-center justify-between shrink-0 topbar-responsive"
+        className="flex items-center justify-between shrink-0"
         style={{
-          height: 64,
-          padding: '0 20px',
-          margin: '12px 16px',
-          background: 'var(--bg-glass-strong)',
-          border: '1px solid var(--border-default)',
-          borderRadius: 'var(--r-xl)',
+          height: 72,
+          padding: '0 24px',
+          background: 'var(--bg-card)',
+          borderBottom: '1px solid var(--border-default)',
           position: 'sticky',
-          top: 12,
+          top: 0,
           zIndex: 40,
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
         }}
       >
         {/* Left: Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           <div
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 'var(--r-md)',
-              background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: 'var(--accent-primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'none',
               flexShrink: 0,
             }}
           >
-            <Zap size={16} color="var(--accent-on-primary)" fill="var(--accent-on-primary)" />
+            <Zap size={20} color="var(--accent-on-primary)" fill="var(--accent-on-primary)" />
           </div>
-          <span
-            className="gradient-text hidden lg:block"
-            style={{
-              fontSize: 17,
-              fontWeight: 800,
-              fontFamily: "'Outfit', sans-serif",
-              letterSpacing: '-0.4px',
-              lineHeight: 1.1,
-            }}
-          >
-            Semma Flow
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                fontFamily: "'Outfit', sans-serif",
+                letterSpacing: '-0.4px',
+              }}
+            >
+              Semma Flow
+            </span>
+            <span
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+                fontWeight: 500,
+                marginTop: 1,
+              }}
+            >
+              Build better habits
+            </span>
+          </div>
         </div>
 
-        {/* Center: Navigation Links (hidden on mobile, managed by MobileNav) */}
-        <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 4 }}>
+        {/* Center: Navigation Links (desktop only) */}
+        <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 6 }}>
           {NAV.map(({ label, href, icon: Icon, exact }) => {
             const active = isActive(href, exact);
             return (
@@ -148,163 +374,152 @@ export default function Topbar() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
-                    padding: '8px 14px',
-                    borderRadius: 'var(--r-md)',
+                    padding: '10px 16px',
+                    borderRadius: 12,
                     cursor: 'pointer',
-                    transition: 'background 0.15s ease, border-color 0.15s ease, color 0.15s ease',
+                    transition: 'all 0.2s ease',
                     background: active ? 'var(--accent-glow-md)' : 'transparent',
-                    border: `1px solid ${active ? 'var(--border-accent)' : 'transparent'}`,
-                    color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+                    border: active ? '1px solid var(--border-accent)' : '1px solid transparent',
+                    color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                    fontWeight: active ? 700 : 500,
                   }}
                   onMouseEnter={(e) => {
                     if (!active) {
                       (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
-                      (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-default)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!active) {
                       (e.currentTarget as HTMLElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                      (e.currentTarget as HTMLElement).style.borderColor = 'transparent';
                     }
                   }}
                 >
-                  <Icon size={16} strokeWidth={active ? 2.4 : 1.8} color={active ? 'var(--accent-light)' : undefined} />
-                  <span
-                    style={{
-                      fontSize: 13.5,
-                      fontWeight: active ? 700 : 500,
-                      letterSpacing: '-0.1px',
-                    }}
-                  >
-                    {label}
-                  </span>
+                  <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
+                  <span style={{ fontSize: 14 }}>{label}</span>
                 </div>
               </Link>
             );
           })}
         </nav>
 
-        {/* Right: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <ThemeToggle />
-          <NotificationBell />
-
-          <button
-            onClick={handleAddHabit}
-            title="Add Habit"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '7px 12px',
-              borderRadius: 'var(--r-sm)',
-              border: '1px solid var(--border-accent)',
-              background: 'var(--accent-glow-md)',
-              color: 'var(--accent-light)',
-              cursor: 'pointer',
-              fontSize: 12.5,
-              fontWeight: 600,
-              letterSpacing: '-0.01em',
-              transition: 'background 0.15s ease, border-color 0.15s ease',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'var(--accent-glow-lg)';
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-active)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'var(--accent-glow-md)';
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-accent)';
-            }}
-          >
-            <Plus size={13} />
-            <span className="hidden sm:inline">Add</span>
-          </button>
-
-          <button
-            onClick={() => setPalette(true)}
-            title="Search (⌘K)"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 7,
-              padding: '7px 12px',
-              borderRadius: 'var(--r-sm)',
-              border: '1px solid var(--border-default)',
-              background: 'var(--bg-tertiary)',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              fontSize: 13,
-              transition: 'background 0.15s, border-color 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)';
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-medium)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-default)';
-            }}
-          >
-            <Search size={13} />
-            <span className="hidden sm:inline" style={{ fontSize: 12 }}>Search</span>
-          </button>
-
-          {/* User Profile / Logout */}
-          <div style={{ width: 1, height: 24, background: 'var(--border-subtle)', margin: '0 4px' }} />
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div
-              title={displayName}
+        {/* Right: Desktop actions (lg+ only) + Mobile hamburger menu */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          {/* Desktop actions (ONLY visible on lg screens and larger!) */}
+          <div style={{ display: 'none', alignItems: 'center', gap: 8 }} className="lg:flex">
+            <ThemeToggle />
+            <NotificationBell />
+            <button
+              onClick={handleAddHabit}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 'var(--r-sm)',
-                background: 'var(--bg-elevated)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 16px',
+                borderRadius: 12,
+                border: 'none',
+                background: 'var(--accent-primary)',
+                color: 'var(--accent-on-primary)',
+                cursor: 'pointer',
+                fontSize: 14,
+                fontWeight: 700,
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Plus size={18} />
+              Add Habit
+            </button>
+            <button
+              onClick={() => setPalette(true)}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
                 border: '1px solid var(--border-default)',
+                background: 'var(--bg-tertiary)',
+                color: 'var(--text-secondary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 12,
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                flexShrink: 0,
-                letterSpacing: '0.02em',
+                cursor: 'pointer',
               }}
             >
-              {initials}
-            </div>
+              <Search size={18} />
+            </button>
+            {user && (
+              <div
+                title={displayName}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 12,
+                  background: 'var(--bg-elevated)',
+                  border: '1px solid var(--border-default)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                }}
+              >
+                {initials}
+              </div>
+            )}
             <button
               onClick={handleLogout}
               title="Sign out"
               style={{
-                width: 32,
-                height: 32,
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                border: '1px solid rgba(239,68,68,0.3)',
+                background: 'var(--danger-glow)',
+                color: 'var(--danger)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 'var(--r-sm)',
-                border: '1px solid var(--border-default)',
-                background: 'transparent',
-                color: 'var(--text-muted)',
                 cursor: 'pointer',
-                flexShrink: 0,
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--danger-glow)';
-                (e.currentTarget as HTMLElement).style.color = 'var(--danger)';
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(239,68,68,0.3)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'transparent';
-                (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
-                (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-default)';
               }}
             >
-              <LogOut size={14} />
+              <LogOut size={18} />
             </button>
           </div>
+
+          {/* Mobile hamburger menu (ONLY visible on mobile!) */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            style={{
+              width: 48,
+              height: 44,
+              borderRadius: 12,
+              border: 'none',
+              background: 'transparent',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              gap: 6,
+              padding: 0,
+            }}
+            className="flex lg:hidden"
+          >
+            <div style={{
+              width: 32,
+              height: 3,
+              background: 'var(--text-primary)',
+              borderRadius: 2,
+            }} />
+            <div style={{
+              width: 32,
+              height: 3,
+              background: 'var(--accent-primary)',
+              borderRadius: 2,
+            }} />
+          </button>
         </div>
       </header>
 

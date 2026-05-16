@@ -14,10 +14,10 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getColor(pct: number): string {
   if (pct === 0) return 'rgba(255,255,255,0.04)';
-  if (pct < 25) return 'color-mix(in srgb, var(--accent-primary) 20%, transparent)';
-  if (pct < 50) return 'color-mix(in srgb, var(--accent-primary) 40%, transparent)';
-  if (pct < 75) return 'color-mix(in srgb, var(--accent-primary) 65%, transparent)';
-  return 'color-mix(in srgb, var(--accent-primary) 90%, transparent)';
+  if (pct < 25) return 'rgba(16, 185, 129, 0.2)';
+  if (pct < 50) return 'rgba(16, 185, 129, 0.4)';
+  if (pct < 75) return 'rgba(16, 185, 129, 0.7)';
+  return 'rgba(16, 185, 129, 1)';
 }
 
 const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapProps) {
@@ -83,14 +83,14 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
     );
   }
 
-  const CELL_SIZE = 13;
-  const CELL_GAP = 3;
-  const DAY_LABEL_WIDTH = 28;
+  const CELL_SIZE = 16;
+  const CELL_GAP = 4;
+  const DAY_LABEL_WIDTH = 32;
 
   return (
     <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-      <style>{`.hf-cal-cell { transition: transform 0.1s ease; } .hf-cal-cell:hover { transform: scale(1.4); position: relative; z-index: 10; }`}</style>
-      <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 6, minWidth: 'max-content' }}>
+      <style>{`.hf-cal-cell { transition: all 0.2s ease; } .hf-cal-cell:hover { transform: scale(1.5); position: relative; z-index: 10; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }`}</style>
+      <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 8, minWidth: 'max-content' }}>
         {/* Month labels */}
         <div style={{ display: 'flex', paddingLeft: DAY_LABEL_WIDTH, gap: CELL_GAP }}>
           {weeks.map((_, wi) => {
@@ -100,10 +100,11 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
                 key={wi}
                 style={{
                   width: CELL_SIZE,
-                  fontSize: 10,
+                  fontSize: 11,
                   color: label ? 'var(--text-secondary)' : 'transparent',
                   fontFamily: "'IBM Plex Sans', sans-serif",
                   whiteSpace: 'nowrap',
+                  fontWeight: 600,
                 }}
               >
                 {label?.label ?? ''}
@@ -119,12 +120,13 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
             <div
               style={{
                 width: DAY_LABEL_WIDTH,
-                fontSize: 10,
+                fontSize: 11,
                 color: dow % 2 === 1 ? 'var(--text-muted)' : 'transparent',
                 fontFamily: "'IBM Plex Sans', sans-serif",
                 textAlign: 'right',
-                paddingRight: 4,
+                paddingRight: 6,
                 flexShrink: 0,
+                fontWeight: 500,
               }}
             >
               {DAY_LABELS[dow]}
@@ -136,7 +138,7 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
                 return (
                   <div
                     key={wi}
-                    style={{ width: CELL_SIZE, height: CELL_SIZE, borderRadius: 3, flexShrink: 0 }}
+                    style={{ width: CELL_SIZE, height: CELL_SIZE, borderRadius: 5, flexShrink: 0 }}
                   />
                 );
               }
@@ -148,10 +150,11 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
                   style={{
                     width: CELL_SIZE,
                     height: CELL_SIZE,
-                    borderRadius: 3,
+                    borderRadius: 5,
                     background: getColor(cell.percentage),
                     flexShrink: 0,
                     cursor: 'default',
+                    border: cell.percentage > 0 ? '1px solid rgba(16,185,129,0.2)' : 'none',
                   }}
                 />
               );
@@ -160,20 +163,21 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
         ))}
 
         {/* Legend */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingLeft: DAY_LABEL_WIDTH, marginTop: 4 }}>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 4 }}>Less</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingLeft: DAY_LABEL_WIDTH, marginTop: 6 }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', marginRight: 6, fontWeight: 500 }}>Less</span>
           {[0, 25, 50, 75, 100].map((pct) => (
             <div
               key={pct}
               style={{
                 width: CELL_SIZE,
                 height: CELL_SIZE,
-                borderRadius: 3,
+                borderRadius: 5,
                 background: getColor(pct),
+                border: pct > 0 ? '1px solid rgba(16,185,129,0.2)' : 'none',
               }}
             />
           ))}
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 4 }}>More</span>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 6, fontWeight: 500 }}>More</span>
         </div>
       </div>
     </div>

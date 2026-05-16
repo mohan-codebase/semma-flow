@@ -1,6 +1,5 @@
 import { Suspense } from 'react';
 import Topbar from '@/components/layout/Topbar';
-import MobileNav from '@/components/layout/MobileNav';
 
 // Auth guard is handled by middleware (middleware.ts checks supabase.auth.getUser()
 // before every /dashboard/* request and redirects unauthenticated users to /login).
@@ -27,14 +26,9 @@ export default function DashboardLayout({
       </Suspense>
 
       {/* Main content area */}
-      <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 72 }}>
+      <main className="flex-1 overflow-y-auto">
         {children}
       </main>
-
-      {/* Mobile bottom nav — hidden lg+ */}
-      <Suspense fallback={null}>
-        <MobileNav />
-      </Suspense>
     </div>
   );
 }
