@@ -1,19 +1,6 @@
 import { Suspense } from 'react';
 import Topbar from '@/components/layout/Topbar';
 
-// Auth guard is handled by middleware (middleware.ts checks supabase.auth.getUser()
-// before every /dashboard/* request and redirects unauthenticated users to /login).
-// Repeating getUser() here adds a redundant Supabase network round-trip on every
-// tab switch — removed for performance.
-
-function LoadingFallback() {
-  return (
-    <div style={{ padding: '20px', color: 'var(--text-muted)', fontSize: 14 }}>
-      Loading...
-    </div>
-  );
-}
-
 export default function DashboardLayout({
   children,
 }: {
@@ -21,11 +8,10 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Suspense fallback={<LoadingFallback />}>
+      <Suspense>
         <Topbar />
       </Suspense>
 
-      {/* Main content area */}
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>

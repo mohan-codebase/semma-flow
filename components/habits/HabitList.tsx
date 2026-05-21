@@ -35,13 +35,24 @@ export default function HabitList({
     setLocalHabits(initialHabits);
   }, [initialHabits]);
 
+  const goodHabits = useMemo(() => localHabits.filter((h) => !h.is_bad_habit), [localHabits]);
+  const badHabits  = useMemo(() => localHabits.filter((h) => h.is_bad_habit), [localHabits]);
+
   const pending = useMemo(
-    () => localHabits.filter((h) => !(h.todayEntry?.is_completed ?? false)),
-    [localHabits]
+    () => goodHabits.filter((h) => !(h.todayEntry?.is_completed ?? false)),
+    [goodHabits]
   );
   const completed = useMemo(
-    () => localHabits.filter((h) => h.todayEntry?.is_completed ?? false),
-    [localHabits]
+    () => goodHabits.filter((h) => h.todayEntry?.is_completed ?? false),
+    [goodHabits]
+  );
+  const badPending = useMemo(
+    () => badHabits.filter((h) => !(h.todayEntry?.is_completed ?? false)),
+    [badHabits]
+  );
+  const badAvoided = useMemo(
+    () => badHabits.filter((h) => h.todayEntry?.is_completed ?? false),
+    [badHabits]
   );
 
   const onDragEnd = async (result: DropResult) => {
@@ -89,6 +100,8 @@ export default function HabitList({
   if (localHabits.length === 0) {
     return <EmptyStateWrapper onAdd={onAddHabit} />;
   }
+
+  const hasBadHabits = badHabits.length > 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -159,39 +172,79 @@ export default function HabitList({
       {/* Completed habits (Static, no reorder for completed to avoid confusion) */}
       {completed.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-              Completed · {completed.length}
-            </span>
-            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
-          </div>
-
-          <ul
-            style={{
-              listStyle: 'none',
-              margin: 0,
-              padding: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-            }}
-            aria-label="Completed habits"
-          >
+          <SectionDivider label={`Completed · ${completed.length}`} color="var(--border-subtle)" textColor="var(--text-muted)" />
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Completed habits">
             {completed.map((habit) => (
               <li key={habit.id}>
-                <HabitCard
-                  habit={habit}
-                  onToggle={onToggle}
-                  onEdit={onEdit}
-                  onArchive={onArchive}
-                  onDelete={onDelete}
-                />
+                <HabitCard habit={habit} onToggle={onToggle} onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} />
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      {/* Bad habits section */}
+      {hasBadHabits && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {/* Red divider with label */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ flex: 1, height: 1, background: 'rgba(239,68,68,0.25)' }} />
+            <span style={{
+              fontSize: 11, fontWeight: 700,
+              color: '#f87171',
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 5,
+            }}>
+              <span>🚫</span>
+              Bad Habits · {badAvoided.length}/{badHabits.length} avoided
+            </span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(239,68,68,0.25)' }} />
+          </div>
+
+          {/* Not yet avoided today */}
+          {badPending.length > 0 && (
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Bad habits not yet avoided">
+              {badPending.map((habit) => (
+                <li key={habit.id}>
+                  <HabitCard habit={habit} onToggle={onToggle} onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} />
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Avoided today */}
+          {badAvoided.length > 0 && (
+            <>
+              {badPending.length > 0 && (
+                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(52,211,153,0.6)" textColor="#34D399" />
+              )}
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Avoided bad habits">
+                {badAvoided.map((habit) => (
+                  <li key={habit.id}>
+                    <HabitCard habit={habit} onToggle={onToggle} onEdit={onEdit} onArchive={onArchive} onDelete={onDelete} />
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionDivider({ label, color = 'var(--border-subtle)', textColor = 'var(--text-muted)' }: { label: string; color?: string; textColor?: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      <div style={{ flex: 1, height: 1, background: color }} />
+      <span style={{ fontSize: 11, fontWeight: 600, color: textColor, letterSpacing: '0.08em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: 1, background: color }} />
     </div>
   );
 }

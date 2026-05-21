@@ -40,6 +40,7 @@ export const habitSchema = z.object({
   target_value: z.number().min(1).default(1),
   target_unit: z.preprocess((val) => (val === '' ? null : val), z.string().max(20).nullable().optional()),
   reminder_time: z.preprocess((val) => (val === '' ? null : val), z.string().nullable().optional()),
+  is_bad_habit: z.boolean().default(false),
 });
 
 export type HabitFormValues = z.infer<typeof habitSchema>;

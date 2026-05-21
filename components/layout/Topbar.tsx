@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, Menu, X } from 'lucide-react';
+import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, Menu, X, Wallet, Target, BookOpen, Timer, ClipboardList, Compass, TrendingUp } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -11,13 +11,25 @@ import NotificationBell from '@/components/layout/NotificationBell';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const NAV = [
-  { label: 'Dashboard',    href: '/dashboard',              icon: LayoutDashboard, exact: true },
-  { label: 'Habits',       href: '/dashboard/habits',       icon: Dumbbell,        exact: false },
-  { label: 'Analytics',    href: '/dashboard/analytics',    icon: BarChart2,       exact: false },
-  { label: 'Achievements', href: '/dashboard/achievements', icon: Trophy,          exact: false },
-  { label: 'Settings',     href: '/dashboard/settings',     icon: Settings2,       exact: false },
+const NAV_HABIT = [
+  { label: 'Dashboard',     href: '/dashboard',               icon: LayoutDashboard, exact: true,  color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
+  { label: 'Habits',        href: '/dashboard/habits',        icon: Dumbbell,        exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
+  { label: 'Goals',         href: '/dashboard/goals',         icon: Target,          exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
+  { label: 'Journal',       href: '/dashboard/journal',       icon: BookOpen,        exact: false, color: '#8B5CF6',                glow: 'rgba(139,92,246,0.15)' },
+  { label: 'Focus',         href: '/dashboard/focus',         icon: Timer,           exact: false, color: '#EF4444',                glow: 'rgba(239,68,68,0.12)' },
+  { label: 'Weekly Review', href: '/dashboard/weekly-review', icon: ClipboardList,   exact: false, color: '#F59E0B',                glow: 'rgba(245,158,11,0.15)' },
+  { label: 'Life Wheel',    href: '/dashboard/life-wheel',    icon: Compass,         exact: false, color: '#06B6D4',                glow: 'rgba(6,182,212,0.15)' },
+  { label: 'Analytics',     href: '/dashboard/analytics',     icon: BarChart2,       exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
+  { label: 'Achievements',  href: '/dashboard/achievements',  icon: Trophy,          exact: false, color: '#F59E0B',                glow: 'rgba(245,158,11,0.15)' },
+  { label: 'Settings',      href: '/dashboard/settings',      icon: Settings2,       exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
 ];
+
+const NAV_EXPENSE = [
+  { label: 'Expenses',  href: '/dashboard/expenses',  icon: Wallet,     exact: true,  color: 'var(--indigo)', glow: 'rgba(99,102,241,0.15)' },
+  { label: 'Net Worth', href: '/dashboard/net-worth', icon: TrendingUp, exact: false, color: '#10B981',       glow: 'rgba(16,185,129,0.15)' },
+];
+
+const NAV = [...NAV_HABIT, ...NAV_EXPENSE];
 
 export default function Topbar() {
   const supabase = useMemo(() => createClient(), []);
@@ -228,33 +240,46 @@ export default function Topbar() {
                 </button>
               </div>
 
-              {/* Navigation Links */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-                {NAV.map(({ label, href, icon: Icon, exact }) => {
+              {/* All nav pages */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, overflowY: 'auto' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0 14px 6px' }}>
+                  Habit Tracker
+                </div>
+                {NAV_HABIT.map(({ label, href, icon: Icon, exact, color, glow }) => {
                   const active = isActive(href, exact);
                   return (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setSidebarOpen(false)}
-                      style={{ textDecoration: 'none' }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          padding: '12px 14px',
-                          borderRadius: 12,
-                          cursor: 'pointer',
-                          background: active ? 'var(--accent-glow-md)' : 'transparent',
-                          border: active ? '1px solid var(--border-accent)' : '1px solid transparent',
-                          color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                          fontWeight: active ? 700 : 500,
-                        }}
-                      >
-                        <Icon size={20} strokeWidth={active ? 2.4 : 1.8} />
-                        <span style={{ fontSize: 14 }}>{label}</span>
+                    <Link key={href} href={href} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
+                        background: active ? glow : 'transparent',
+                        border: active ? `1px solid ${color}44` : '1px solid transparent',
+                        color: active ? color : 'var(--text-secondary)',
+                        fontWeight: active ? 600 : 400,
+                      }}>
+                        <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
+                        <span style={{ fontSize: 13 }}>{label}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--indigo)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '12px 14px 6px' }}>
+                  Expense Tracker
+                </div>
+                {NAV_EXPENSE.map(({ label, href, icon: Icon, exact, color, glow }) => {
+                  const active = isActive(href, exact);
+                  return (
+                    <Link key={href} href={href} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
+                        background: active ? glow : 'transparent',
+                        border: active ? `1px solid ${color}44` : '1px solid transparent',
+                        color: active ? color : 'var(--text-secondary)',
+                        fontWeight: active ? 600 : 400,
+                      }}>
+                        <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
+                        <span style={{ fontSize: 13 }}>{label}</span>
                       </div>
                     </Link>
                   );
@@ -309,10 +334,12 @@ export default function Topbar() {
       <header
         className="flex items-center justify-between shrink-0"
         style={{
-          height: 72,
+          height: 64,
           padding: '0 24px',
-          background: 'var(--bg-card)',
-          borderBottom: '1px solid var(--border-default)',
+          background: 'color-mix(in srgb, var(--bg-card) 82%, transparent)',
+          backdropFilter: 'blur(20px) saturate(1.6)',
+          WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+          borderBottom: '1px solid color-mix(in srgb, var(--border-default) 70%, transparent)',
           position: 'sticky',
           top: 0,
           zIndex: 40,
@@ -353,51 +380,60 @@ export default function Topbar() {
                 marginTop: 1,
               }}
             >
-              Build better habits
+              Habits & Finance
             </span>
           </div>
         </div>
 
-        {/* Center: Navigation Links (desktop only) */}
-        <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 6 }}>
-          {NAV.map(({ label, href, icon: Icon, exact }) => {
-            const active = isActive(href, exact);
+        {/* Center: All feature tabs (desktop only) */}
+        <nav
+          className="hidden lg:flex"
+          style={{
+            alignItems: 'center', gap: 2, flex: 1,
+            margin: '0 16px', overflowX: 'auto', scrollbarWidth: 'none',
+            maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+          }}
+        >
+          {NAV_HABIT.map(({ label, href, icon: Icon, exact, color, glow }) => {
+            const active = exact ? pathname === href : pathname.startsWith(href);
             return (
-              <Link
-                key={href}
-                href={href}
-                style={{ textDecoration: 'none' }}
-                onMouseEnter={() => handleNavHover(href)}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    padding: '10px 16px',
-                    borderRadius: 12,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: active ? 'var(--accent-glow-md)' : 'transparent',
-                    border: active ? '1px solid var(--border-accent)' : '1px solid transparent',
-                    color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                    fontWeight: active ? 700 : 500,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.background = 'var(--bg-tertiary)';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-default)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'transparent';
-                    }
-                  }}
-                >
-                  <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
-                  <span style={{ fontSize: 14 }}>{label}</span>
+              <Link key={href} href={href} style={{ textDecoration: 'none', flexShrink: 0 }} onMouseEnter={() => handleNavHover(href)}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 13px', borderRadius: 10, cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  background: active ? glow : 'transparent',
+                  border: `1px solid ${active ? color + '55' : 'transparent'}`,
+                  color: active ? color : 'var(--text-muted)',
+                  fontWeight: active ? 700 : 500,
+                  boxShadow: active ? `0 0 12px ${glow}` : 'none',
+                }}>
+                  <Icon size={14} strokeWidth={active ? 2.4 : 1.8} />
+                  <span style={{ fontSize: 12.5 }}>{label}</span>
+                </div>
+              </Link>
+            );
+          })}
+
+          {/* Section divider */}
+          <div style={{ width: 1, height: 20, background: 'var(--border-subtle)', flexShrink: 0, margin: '0 6px' }} />
+
+          {NAV_EXPENSE.map(({ label, href, icon: Icon, exact, color, glow }) => {
+            const active = exact ? pathname === href : pathname.startsWith(href);
+            return (
+              <Link key={href} href={href} style={{ textDecoration: 'none', flexShrink: 0 }} onMouseEnter={() => handleNavHover(href)}>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '7px 13px', borderRadius: 10, cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  background: active ? glow : 'transparent',
+                  border: `1px solid ${active ? color + '55' : 'transparent'}`,
+                  color: active ? color : 'var(--text-muted)',
+                  fontWeight: active ? 700 : 500,
+                  boxShadow: active ? `0 0 12px ${glow}` : 'none',
+                }}>
+                  <Icon size={14} strokeWidth={active ? 2.4 : 1.8} />
+                  <span style={{ fontSize: 12.5 }}>{label}</span>
                 </div>
               </Link>
             );

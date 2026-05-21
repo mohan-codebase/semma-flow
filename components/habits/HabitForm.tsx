@@ -134,14 +134,16 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
           target_value: habit.target_value,
           target_unit: habit.target_unit ?? null,
           reminder_time: habit.reminder_time ?? null,
+          is_bad_habit: habit.is_bad_habit ?? false,
         }
       : {
           name: '',
           icon: 'circle-check',
-          color: 'var(--accent-primary)',
+          color: '#10B981',
           frequency: { type: 'daily' },
           target_type: 'boolean',
           target_value: 1,
+          is_bad_habit: false,
         },
   });
 
@@ -150,6 +152,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
   const watchFrequencyDays = watch('frequency.days') ?? [];
   const watchTargetType = watch('target_type');
   const watchDescription = watch('description') ?? '';
+  const watchIsBadHabit = watch('is_bad_habit');
 
   const toggleDay = (day: number) => {
     const current = watchFrequencyDays;
@@ -222,6 +225,71 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Habit Type — Good vs Bad */}
+          <Controller
+            name="is_bad_habit"
+            control={control}
+            render={({ field }) => (
+              <div style={{ display: 'flex', gap: 8 }}>
+                {([false, true] as const).map((isBad) => {
+                  const active = field.value === isBad;
+                  return (
+                    <button
+                      key={String(isBad)}
+                      type="button"
+                      onClick={() => {
+                        field.onChange(isBad);
+                        if (!isEdit) {
+                          setValue('color', isBad ? '#EF4444' : '#10B981');
+                          setValue('icon', isBad ? 'ban' : 'circle-check');
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        padding: '10px 14px',
+                        borderRadius: 12,
+                        border: `1.5px solid ${active ? (isBad ? '#EF4444' : 'var(--accent-primary)') : 'var(--border-default)'}`,
+                        background: active
+                          ? isBad ? 'rgba(239,68,68,0.10)' : 'var(--accent-glow-md)'
+                          : 'var(--bg-tertiary)',
+                        color: active
+                          ? isBad ? '#EF4444' : 'var(--accent-primary)'
+                          : 'var(--text-muted)',
+                        fontSize: 13,
+                        fontWeight: active ? 700 : 500,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <span style={{ fontSize: 16 }}>{isBad ? '🚫' : '✅'}</span>
+                      {isBad ? 'Bad Habit' : 'Good Habit'}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          />
+
+          {/* Bad habit contextual hint */}
+          {watchIsBadHabit && (
+            <div style={{
+              padding: '10px 14px',
+              borderRadius: 10,
+              background: 'rgba(239,68,68,0.08)',
+              border: '1px solid rgba(239,68,68,0.22)',
+              fontSize: 12.5,
+              color: '#f87171',
+              lineHeight: 1.5,
+            }}>
+              <strong style={{ display: 'block', marginBottom: 2 }}>Avoidance tracking</strong>
+              Each day you check this off means you <em>avoided</em> the bad habit. Your streak = consecutive days clean.
+            </div>
+          )}
 
           {/* Name */}
           <Input

@@ -90,11 +90,17 @@ function StatCard({
   label,
   children,
   trend,
+  accentColor = 'var(--accent-primary)',
+  accentColorLight = 'var(--accent-light)',
+  glowColor = 'var(--accent-glow)',
 }: {
   delay: number;
   label: string;
   children: React.ReactNode;
   trend?: { value: number; positive: boolean } | null;
+  accentColor?: string;
+  accentColorLight?: string;
+  glowColor?: string;
 }) {
   return (
     <motion.div
@@ -102,8 +108,8 @@ function StatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut', delay }}
       style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-default)',
+        background: `color-mix(in srgb, ${glowColor} 40%, var(--bg-card))`,
+        border: `1px solid color-mix(in srgb, ${accentColor} 18%, var(--border-default))`,
         borderRadius: 'var(--r-xl)',
         padding: '20px 22px 22px',
         position: 'relative',
@@ -114,22 +120,21 @@ function StatCard({
       }}
       whileHover={{
         y: -2,
-        borderColor: 'var(--border-accent)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+        boxShadow: `0 8px 28px color-mix(in srgb, ${accentColor} 15%, transparent)`,
       }}
     >
-      {/* Subtle top accent line */}
+      {/* Top accent bar */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         height: 3,
-        background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-light))',
-        opacity: 0.6,
+        background: `linear-gradient(90deg, ${accentColor}, ${accentColorLight})`,
+        opacity: 0.85,
       }} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <span style={{ ...labelStyle, marginBottom: 0 }}>{label}</span>
+        <span style={{ ...labelStyle, marginBottom: 0, color: `color-mix(in srgb, ${accentColor} 60%, var(--text-muted))` }}>{label}</span>
         {trend && (
           <span
             style={{
@@ -194,7 +199,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
 
       <div className="hf-stats-grid">
         {/* Today's Progress */}
-        <StatCard delay={0} label="Today">
+        <StatCard delay={0} label="Today" accentColor="var(--accent-primary)" accentColorLight="var(--accent-light)" glowColor="var(--accent-glow)">
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <ProgressRing percentage={todayPct} size={56} strokeWidth={4} />
             <div>
@@ -210,7 +215,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
         </StatCard>
 
         {/* Best Streak */}
-        <StatCard delay={0.05} label="Best Streak">
+        <StatCard delay={0.05} label="Best Streak" accentColor="var(--warm)" accentColorLight="#fbbf24" glowColor="var(--warm-glow)">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
@@ -244,6 +249,9 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
           delay={0.1}
           label="This Week"
           trend={{ value: stats.weekPercentage, positive: stats.weekPercentage >= 50 }}
+          accentColor="var(--indigo)"
+          accentColorLight="var(--indigo-dim)"
+          glowColor="var(--indigo-glow)"
         >
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
             <p style={numStyle}>{stats.weekPercentage}</p>
@@ -253,7 +261,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
         </StatCard>
 
         {/* Level & Mastery */}
-        <StatCard delay={0.15} label="Level & Rank">
+        <StatCard delay={0.15} label="Level & Rank" accentColor="var(--cyan)" accentColorLight="#67e8f9" glowColor="var(--cyan-glow)">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div
@@ -261,15 +269,15 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
                   width: 38,
                   height: 38,
                   borderRadius: 'var(--r-md)',
-                  background: 'var(--indigo-glow)',
-                  border: '1px solid rgba(139,127,232,0.22)',
+                  background: 'var(--cyan-glow)',
+                  border: '1px solid rgba(34,211,238,0.22)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                   fontSize: 18,
                   fontWeight: 800,
-                  color: 'var(--indigo)',
+                  color: 'var(--cyan)',
                   fontFamily: "'Outfit'",
                 }}
               >
@@ -306,7 +314,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
                 initial={{ width: 0 }}
                 animate={{ width: `${(stats.totalCompletions % 50) * 2}%` }}
                 transition={{ duration: 1, ease: 'easeOut' }}
-                style={{ height: '100%', background: 'var(--indigo)', borderRadius: 2 }}
+                style={{ height: '100%', background: 'linear-gradient(90deg, var(--cyan), var(--indigo))', borderRadius: 2 }}
               />
             </div>
           </div>

@@ -230,6 +230,11 @@ export default async function DashboardPage() {
           ? `You're ${heroPct}% through today. Keep the streak alive.`
           : `${stats.todayTotal - (stats.todayCompleted ?? 0)} left today. One at a time.`;
 
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const dayName = new Date().toLocaleDateString(undefined, { weekday: 'long' });
+  const dateStr = new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
+
   return (
     <DashboardShell>
       <div
@@ -243,22 +248,63 @@ export default async function DashboardPage() {
           margin: '0 auto',
         }}
       >
-        {/* Eyebrow + context line */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-          <span className="eyebrow">Overview · {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-          <h1
-            style={{
-              fontSize: 'clamp(22px, 2.4vw, 28px)',
+        {/* Hero header */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <span style={{
+              fontSize: 11,
               fontWeight: 600,
-              color: 'var(--text-primary)',
-              margin: 0,
-              fontFamily: "'Outfit', sans-serif",
-              letterSpacing: '-0.03em',
-              maxWidth: 640,
-            }}
-          >
-            {heroLine}
-          </h1>
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: 'var(--accent-primary)',
+              fontFamily: "'IBM Plex Mono', monospace",
+              opacity: 0.85,
+            }}>
+              {dayName} · {dateStr}
+            </span>
+            <h1
+              style={{
+                fontSize: 'clamp(22px, 2.4vw, 28px)',
+                fontWeight: 700,
+                color: 'var(--text-primary)',
+                margin: 0,
+                fontFamily: "'Outfit', sans-serif",
+                letterSpacing: '-0.03em',
+                maxWidth: 640,
+              }}
+            >
+              {greeting} — {heroLine}
+            </h1>
+          </div>
+          {stats && stats.todayTotal > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '10px 16px',
+              background: heroPct === 100 ? 'var(--accent-glow-md)' : 'var(--bg-card)',
+              border: `1px solid ${heroPct === 100 ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
+              borderRadius: 12,
+              flexShrink: 0,
+            }}>
+              <div style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: heroPct === 100 ? 'var(--accent-primary)' : heroPct >= 50 ? 'var(--warm)' : 'var(--text-dimmed)',
+                boxShadow: heroPct === 100 ? '0 0 8px var(--accent-primary)' : 'none',
+              }} />
+              <span style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: heroPct === 100 ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                fontFamily: "'IBM Plex Mono'",
+                letterSpacing: '-0.01em',
+              }}>
+                {stats.todayCompleted}/{stats.todayTotal} done
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Focus banner — next habit + midnight countdown */}

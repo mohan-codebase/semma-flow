@@ -100,8 +100,10 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
     return () => document.removeEventListener('mousedown', handler);
   }, [menuOpen]);
 
+  const isBad = habit.is_bad_habit === true;
   let color = habit.color ?? 'var(--accent-primary)';
-  if (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E') color = 'var(--accent-primary)';
+  if (!isBad && (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E')) color = 'var(--accent-primary)';
+  if (isBad && color === 'var(--accent-primary)') color = '#EF4444';
   const completed = checked;
   const streak    = habit.current_streak ?? 0;
 
@@ -172,6 +174,20 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             >
               {habit.name}
             </NextLink>
+            {isBad && (
+              <span style={{
+                fontSize: 9.5, fontWeight: 700,
+                padding: '1px 6px', borderRadius: 99,
+                background: 'rgba(239,68,68,0.12)',
+                border: '1px solid rgba(239,68,68,0.28)',
+                color: '#f87171',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                flexShrink: 0,
+              }}>
+                Avoid
+              </span>
+            )}
             {habit.category && (
               <span
                 style={{
@@ -192,9 +208,12 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             {streak > 0 && (
               <>
                 <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: streak >= 7 ? '#F59E0B' : 'var(--text-muted)' }}>
-                  <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
-                  {streak}d
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#34D399' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
+                  {isBad
+                    ? <span style={{ fontSize: 10 }}>✦</span>
+                    : <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
+                  }
+                  {streak}d {isBad ? 'clean' : ''}
                 </span>
               </>
             )}

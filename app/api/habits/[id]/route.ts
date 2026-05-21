@@ -7,6 +7,7 @@ import { safeErrorMessage } from '@/lib/utils/api';
 
 const habitPatchSchema = z.object({
   is_archived: z.boolean().optional(),
+  is_bad_habit: z.boolean().optional(),
   sort_order: z.number().int().optional(),
   current_streak: z.number().int().min(0).optional(),
   longest_streak: z.number().int().min(0).optional(),

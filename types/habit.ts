@@ -24,6 +24,7 @@ export interface Habit {
   target_value: number;
   target_unit: string | null;
   reminder_time: string | null;
+  is_bad_habit: boolean;
   is_archived: boolean;
   sort_order: number;
   current_streak: number;

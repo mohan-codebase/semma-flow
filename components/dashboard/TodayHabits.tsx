@@ -413,7 +413,10 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
     router.refresh();
   };
 
-  const completedCount = habits.filter((h) => h.todayEntry?.is_completed).length;
+  const goodHabits = habits.filter((h) => !h.is_bad_habit);
+  const badHabits  = habits.filter((h) => h.is_bad_habit);
+  const completedCount = goodHabits.filter((h) => h.todayEntry?.is_completed).length;
+  const avoidedCount   = badHabits.filter((h) => h.todayEntry?.is_completed).length;
   const today = format(new Date(), 'EEEE, MMMM d');
 
   const deleteHabitName = habits.find((h) => h.id === deleteTarget)?.name;
@@ -464,7 +467,25 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
                 fontWeight: 600,
               }}
             >
-              {completedCount} / {habits.length}
+              {completedCount} / {goodHabits.length}
+            </span>
+          )}
+          {!loading && badHabits.length > 0 && (
+            <span
+              style={{
+                padding: '2px 10px',
+                borderRadius: '9999px',
+                background: 'rgba(239,68,68,0.10)',
+                border: '1px solid rgba(239,68,68,0.25)',
+                color: '#f87171',
+                fontSize: '12px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              🚫 {avoidedCount}/{badHabits.length} avoided
             </span>
           )}
         </div>
@@ -506,6 +527,30 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
           </Button>
         </div>
       </div>
+
+      {/* Completion progress bar */}
+      {!loading && habits.length > 0 && (
+        <div style={{
+          width: '100%',
+          height: 5,
+          background: 'var(--bg-tertiary)',
+          borderRadius: 99,
+          overflow: 'hidden',
+        }}>
+          <div
+            style={{
+              height: '100%',
+              width: `${habits.length > 0 ? Math.round((completedCount / habits.length) * 100) : 0}%`,
+              background: completedCount === habits.length
+                ? 'linear-gradient(90deg, var(--accent-primary), var(--accent-light))'
+                : 'var(--accent-primary)',
+              borderRadius: 99,
+              transition: 'width 0.5s ease, background 0.3s ease',
+              boxShadow: completedCount === habits.length ? '0 0 8px var(--accent-primary)' : 'none',
+            }}
+          />
+        </div>
+      )}
 
       {/* Habit list */}
       {!loading && habits.length === 0 ? (
