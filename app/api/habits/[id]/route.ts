@@ -71,9 +71,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
       return err('Invalid habit payload', 422);
     }
 
+    const { is_bad_habit, ...habitData } = parsed.data;
+
     const { data: habit, error } = await supabase
       .from('habits')
-      .update({ ...parsed.data, updated_at: new Date().toISOString() })
+      .update({
+        ...habitData,
+        ...(is_bad_habit !== undefined ? { is_bad_habit } : {}),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id)
       .eq('user_id', user.id)
       .select('*, category:categories(*)')
@@ -99,7 +105,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const body = await req.json();
     const parsed = habitPatchSchema.safeParse(body);
     if (!parsed.success) return err('Invalid patch payload', 422);
-    const patch: Record<string, unknown> = { ...parsed.data, updated_at: new Date().toISOString() };
+    const { is_bad_habit: patchBadHabit, ...patchRest } = parsed.data;
+    const patch: Record<string, unknown> = {
+      ...patchRest,
+      ...(patchBadHabit !== undefined ? { is_bad_habit: patchBadHabit } : {}),
+      updated_at: new Date().toISOString(),
+    };
 
     const { data: habit, error } = await supabase
       .from('habits')

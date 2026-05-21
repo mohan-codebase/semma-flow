@@ -106,12 +106,16 @@ export async function POST(req: NextRequest) {
 
     const sortOrder = (maxRow?.sort_order ?? -1) + 1;
 
+    // Separate is_bad_habit so the insert works even if the column doesn't exist yet
+    const { is_bad_habit, ...habitData } = parsed.data;
+
     const { data: habit, error } = await supabase
       .from('habits')
       .insert({
-        ...parsed.data,
+        ...habitData,
         user_id: user.id,
         sort_order: sortOrder,
+        ...(is_bad_habit ? { is_bad_habit: true } : {}),
       })
       .select('*, category:categories(*)')
       .single();
