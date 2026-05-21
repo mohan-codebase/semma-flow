@@ -4,10 +4,10 @@ import { todayString, toLocalDateString } from '@/lib/utils/dates';
 import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
 import type { HabitWithEntry } from '@/types/habit';
 import type { HabitEntry } from '@/types/entry';
+import FitnessSummary from '@/components/dashboard/FitnessSummary';
 import OverviewStats from '@/components/dashboard/OverviewStats';
 import TodayHabits from '@/components/dashboard/TodayHabits';
 import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
-// import MoodLogger from '@/components/dashboard/MoodLogger';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 
 // -----------------------------------------------------------------------
@@ -217,6 +217,18 @@ export default async function DashboardPage() {
     ),
   ]);
 
+  const displayName: string =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    user?.email?.split('@')[0] ??
+    'User';
+
+  const initials = displayName
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   const heroPct = stats?.todayTotal
     ? Math.round(((stats.todayCompleted ?? 0) / stats.todayTotal) * 100)
     : 0;
@@ -237,13 +249,24 @@ export default async function DashboardPage() {
 
   return (
     <DashboardShell>
+      {/* ── Mobile: Apple Fitness Summary UI ── */}
+      <div className="lg:hidden">
+        <FitnessSummary
+          stats={stats}
+          habits={habits}
+          weekData={weekData}
+          displayName={displayName}
+          initials={initials}
+        />
+      </div>
+
+      {/* ── Desktop: Original habit tracker UI ── */}
       <div
-        className="hf-dashboard-page"
+        className="hidden lg:flex"
         style={{
-          padding: 'clamp(12px, 2.5vw, 32px) clamp(12px, 2.5vw, 32px) clamp(32px, 4vw, 48px)',
-          display: 'flex',
           flexDirection: 'column',
           gap: 'clamp(16px, 2vw, 24px)',
+          padding: 'clamp(12px, 2.5vw, 32px) clamp(12px, 2.5vw, 32px) clamp(32px, 4vw, 48px)',
           maxWidth: 1280,
           margin: '0 auto',
         }}
@@ -252,54 +275,37 @@ export default async function DashboardPage() {
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <span style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--accent-primary)',
-              fontFamily: "'IBM Plex Mono', monospace",
-              opacity: 0.85,
+              fontSize: 11, fontWeight: 600, letterSpacing: '0.1em',
+              textTransform: 'uppercase', color: 'var(--accent-primary)',
+              fontFamily: "'IBM Plex Mono', monospace", opacity: 0.85,
             }}>
               {dayName} · {dateStr}
             </span>
-            <h1
-              style={{
-                fontSize: 'clamp(22px, 2.4vw, 28px)',
-                fontWeight: 700,
-                color: 'var(--text-primary)',
-                margin: 0,
-                fontFamily: "'Outfit', sans-serif",
-                letterSpacing: '-0.03em',
-                maxWidth: 640,
-              }}
-            >
+            <h1 style={{
+              fontSize: 'clamp(22px, 2.4vw, 28px)', fontWeight: 700,
+              color: 'var(--text-primary)', margin: 0,
+              fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em', maxWidth: 640,
+            }}>
               {greeting} — {heroLine}
             </h1>
           </div>
           {stats && stats.todayTotal > 0 && (
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
+              display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 16px',
               background: heroPct === 100 ? 'var(--accent-glow-md)' : 'var(--bg-card)',
               border: `1px solid ${heroPct === 100 ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
-              borderRadius: 12,
-              flexShrink: 0,
+              borderRadius: 12, flexShrink: 0,
             }}>
               <div style={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
+                width: 8, height: 8, borderRadius: '50%',
                 background: heroPct === 100 ? 'var(--accent-primary)' : heroPct >= 50 ? 'var(--warm)' : 'var(--text-dimmed)',
                 boxShadow: heroPct === 100 ? '0 0 8px var(--accent-primary)' : 'none',
               }} />
               <span style={{
-                fontSize: 13,
-                fontWeight: 700,
+                fontSize: 13, fontWeight: 700,
                 color: heroPct === 100 ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                fontFamily: "'IBM Plex Mono'",
-                letterSpacing: '-0.01em',
+                fontFamily: "'IBM Plex Mono'", letterSpacing: '-0.01em',
               }}>
                 {stats.todayCompleted}/{stats.todayTotal} done
               </span>
@@ -307,23 +313,14 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        {/* Focus banner — next habit + midnight countdown */}
-
-        {/* Overview stats — full width */}
         <OverviewStats stats={stats} loading={false} />
 
-        {/* Two-column layout — stacks under lg via .hf-dashboard-grid */}
         <div className="hf-dashboard-grid">
-          {/* Left — Today's Habits */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
             <TodayHabits habits={habits} loading={false} />
           </div>
-
-          {/* Right — Weekly Overview + Activity Feed + Mood Logger */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <WeeklyOverview weekData={weekData} />
-            {/* <ActivityFeed items={activity} />
-            <MoodLogger /> */}
           </div>
         </div>
       </div>
