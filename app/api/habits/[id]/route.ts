@@ -6,13 +6,17 @@ import { toLocalDateString } from '@/lib/utils/dates';
 import { safeErrorMessage } from '@/lib/utils/api';
 
 const habitPatchSchema = z.object({
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(500).nullable().optional(),
+  icon: z.string().max(100).optional(),
+  color: z.string().max(30).optional(),
   is_archived: z.boolean().optional(),
   is_bad_habit: z.boolean().optional(),
   sort_order: z.number().int().optional(),
   current_streak: z.number().int().min(0).optional(),
   longest_streak: z.number().int().min(0).optional(),
   total_completions: z.number().int().min(0).optional(),
-}).strict();
+});
 
 function ok<T>(data: T, status = 200) {
   return NextResponse.json({ data, error: null }, { status });

@@ -294,20 +294,26 @@ function HabitDetailSheet({
   habit,
   onClose,
   onUpdate,
+  onDelete,
 }: {
   habit: HabitWithEntry;
   onClose: () => void;
   onUpdate: (updated: Partial<HabitWithEntry> & { id: string }) => void;
+  onDelete: (id: string) => void;
 }) {
   const [entries, setEntries] = useState<{ entry_date: string; is_completed: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Edit state
-  const [editMode, setEditMode]   = useState(false);
-  const [editName, setEditName]   = useState(habit.name);
-  const [editIcon, setEditIcon]   = useState(habit.icon ?? 'circle-check');
-  const [saving, setSaving]       = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [editMode, setEditMode]     = useState(false);
+  const [editName, setEditName]     = useState(habit.name);
+  const [editIcon, setEditIcon]     = useState(habit.icon ?? 'circle-check');
+  const [saving, setSaving]         = useState(false);
+  const [saveError, setSaveError]   = useState<string | null>(null);
+
+  // Delete state
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting]           = useState(false);
 
   const saveEdit = async () => {
     if (!editName.trim()) return;
@@ -327,6 +333,19 @@ function HabitDetailSheet({
       setSaveError(e instanceof Error ? e.message : 'Failed to save');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/habits/${habit.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        onDelete(habit.id);
+        onClose();
+      }
+    } catch {
+      setDeleting(false);
     }
   };
 
@@ -672,6 +691,51 @@ function HabitDetailSheet({
             {monthDone} of {daysElapsed} days completed
           </p>
         </div>
+
+        {/* Delete */}
+        {!confirmDelete ? (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            style={{
+              marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+              background: 'rgba(239,68,68,0.08)',
+              color: '#EF4444', fontSize: 14, fontWeight: 700,
+              cursor: 'pointer', fontFamily: 'inherit',
+            }}
+          >
+            Delete Habit
+          </button>
+        ) : (
+          <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.08)', borderRadius: 16, padding: '16px' }}>
+            <p style={{ margin: '0 0 12px', fontSize: 13, color: '#EF4444', fontWeight: 600, textAlign: 'center' }}>
+              Delete &quot;{habit.name}&quot;? This removes all history and cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                style={{
+                  flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
+                  background: PURPLE_LIGHT, color: PURPLE, fontSize: 14, fontWeight: 700,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
+                  background: '#EF4444', color: '#fff', fontSize: 14, fontWeight: 700,
+                  cursor: deleting ? 'default' : 'pointer', fontFamily: 'inherit',
+                  opacity: deleting ? 0.7 : 1,
+                }}
+              >
+                {deleting ? 'Deleting…' : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        )}
       </motion.div>
     </>
   );
@@ -1350,6 +1414,11 @@ export default function FitnessSummary({
     setLocalHabits((prev) => prev.map((h) => h.id === updated.id ? { ...h, ...updated } : h));
   };
 
+  const handleDelete = (id: string) => {
+    setLocalHabits((prev) => prev.filter((h) => h.id !== id));
+    setSelectedId(null);
+  };
+
   const goodHabits   = localHabits.filter((h) => !h.is_bad_habit);
   const completedCount = goodHabits.filter((h) => h.todayEntry?.is_completed).length;
   const totalCount     = goodHabits.length;
@@ -1673,6 +1742,7 @@ export default function FitnessSummary({
               habit={h}
               onClose={() => setSelectedId(null)}
               onUpdate={handleUpdate}
+              onDelete={handleDelete}
             />
           ) : null;
         })()}
