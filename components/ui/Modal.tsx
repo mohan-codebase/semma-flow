@@ -145,10 +145,11 @@ export default function Modal({
             onClick={(e) => e.stopPropagation()}
             className="hf-modal-panel"
             style={{
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-default)',
+              background: 'var(--glass-bg)',
+              backdropFilter: 'var(--glass-blur)',
+              WebkitBackdropFilter: 'var(--glass-blur)',
+              boxShadow: 'var(--glass-shadow)',
               borderRadius: 18,
-              boxShadow: 'none',
               width: '100%',
               maxWidth: sizeMap[size],
               maxHeight: '90vh',

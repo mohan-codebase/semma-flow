@@ -35,6 +35,37 @@ const TEXT_MUTED    = 'var(--text-muted)';
 // Raw hex needed only for SVG attributes and rgba() calls
 const PURPLE_HEX    = '#7C3AED';
 
+// Liquid glass helpers (inline style objects)
+const GLASS: React.CSSProperties = {
+  background: 'var(--glass-bg)',
+  backdropFilter: 'var(--glass-blur)',
+  WebkitBackdropFilter: 'var(--glass-blur)',
+  boxShadow: 'var(--glass-shadow)',
+};
+const GLASS_SM: React.CSSProperties = {
+  background: 'var(--glass-bg)',
+  backdropFilter: 'var(--glass-blur)',
+  WebkitBackdropFilter: 'var(--glass-blur)',
+  boxShadow: 'var(--glass-shadow-sm)',
+};
+const GLASS_PURPLE: React.CSSProperties = {
+  background: 'var(--glass-bg-purple)',
+  backdropFilter: 'var(--glass-blur)',
+  WebkitBackdropFilter: 'var(--glass-blur)',
+  boxShadow: 'var(--glass-shadow-purple)',
+};
+// Nested glass — for cards INSIDE a bottom sheet that already blurs.
+// No own backdrop-filter (avoids nested-blur rendering glitches); relies on
+// the parent sheet's blur and only carries the translucent tint + edge highlight.
+const GLASS_NESTED: React.CSSProperties = {
+  background: 'var(--glass-bg)',
+  boxShadow: 'var(--glass-shadow-sm)',
+};
+const GLASS_NESTED_PURPLE: React.CSSProperties = {
+  background: 'var(--glass-bg-purple)',
+  boxShadow: 'var(--glass-shadow-purple)',
+};
+
 const RADIUS = 72;
 const STROKE = 10;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -58,13 +89,12 @@ function CircularProgress({
       style={{
         marginTop: 24,
         padding: '24px 20px',
-        background: 'var(--surface-card)',
         borderRadius: 22,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: 20,
-        boxShadow: '0 2px 12px rgba(124,58,237,0.08)',
+        ...GLASS,
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
@@ -199,7 +229,7 @@ function HabitRow({
         alignItems: 'center',
         gap: 14,
         padding: '14px 16px',
-        background: done ? PURPLE_MID : PURPLE_LIGHT,
+        ...(done ? GLASS_PURPLE : GLASS_SM),
         borderRadius: 18,
         cursor: 'pointer',
         width: '100%',
@@ -275,8 +305,7 @@ function HabitRow({
 function StatPill({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div style={{
-      background: accent ? 'linear-gradient(135deg,rgba(124,58,237,0.08),rgba(168,85,247,0.08))' : 'var(--surface-card)',
-      border: `1px solid ${accent ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.08)'}`,
+      ...(accent ? GLASS_NESTED_PURPLE : GLASS_NESTED),
       borderRadius: 14,
       padding: '14px 16px',
     }}>
@@ -424,13 +453,15 @@ function HabitDetailSheet({
           marginLeft: 'auto',
           marginRight: 'auto',
           zIndex: 201,
-          background: 'var(--bg-primary)',
+          background: 'var(--glass-bg-sheet)',
+          backdropFilter: 'blur(40px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
           borderRadius: '24px 24px 0 0',
           maxHeight: '88dvh',
           overflowY: 'auto',
           padding: '0 20px 52px',
           fontFamily: "system-ui, -apple-system, sans-serif",
-          boxShadow: '0 -8px 40px rgba(30,27,75,0.18)',
+          boxShadow: '0 -8px 48px rgba(30,27,75,0.28), inset 0 1px 0 rgba(255,255,255,0.12)',
         }}
       >
         {/* Drag handle */}
@@ -457,7 +488,7 @@ function HabitDetailSheet({
                 onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
                 style={{
                   width: '100%', boxSizing: 'border-box',
-                  background: 'var(--surface-card)', border: `1.5px solid ${PURPLE}`,
+                  background: 'var(--input-bg)', border: `1.5px solid ${PURPLE}`,
                   borderRadius: 10, padding: '8px 12px',
                   fontSize: 17, fontWeight: 700, color: TEXT_DARK,
                   outline: 'none', fontFamily: 'inherit',
@@ -504,7 +535,7 @@ function HabitDetailSheet({
 
         {/* Edit mode — icon picker + save */}
         {editMode && (
-          <div style={{ background: 'var(--surface-card)', borderRadius: 18, padding: '16px', marginBottom: 16, boxShadow: '0 1px 6px rgba(124,58,237,0.07)' }}>
+          <div style={{ ...GLASS_NESTED_PURPLE, borderRadius: 18, padding: '16px', marginBottom: 16 }}>
             <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
               Choose icon
             </p>
@@ -551,7 +582,7 @@ function HabitDetailSheet({
         </div>
 
         {/* Calendar */}
-        <div style={{ background: 'var(--surface-card)', borderRadius: 18, padding: '16px 14px', marginBottom: 14 }}>
+        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px 14px', marginBottom: 14 }}>
           {/* Month header + navigation */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <button
@@ -671,7 +702,7 @@ function HabitDetailSheet({
         </div>
 
         {/* Completion rate bar */}
-        <div style={{ background: 'var(--surface-card)', borderRadius: 18, padding: '16px' }}>
+        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT_DARK }}>
               {MONTHS[calMonth]} Completion
@@ -757,7 +788,7 @@ type TargetType = 'boolean' | 'duration';
 
 function SectionCard({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ background: 'var(--surface-card)', borderRadius: 18, padding: '16px 16px', marginBottom: 14, boxShadow: '0 1px 6px rgba(124,58,237,0.07)' }}>
+    <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px 16px', marginBottom: 14 }}>
       {children}
     </div>
   );
@@ -849,12 +880,15 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           maxWidth: 480, marginLeft: 'auto', marginRight: 'auto',
-          zIndex: 201, background: 'var(--bg-primary)',
+          zIndex: 201,
+          background: 'var(--glass-bg-sheet)',
+          backdropFilter: 'blur(40px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
           borderRadius: '24px 24px 0 0',
           maxHeight: '92dvh', overflowY: 'auto',
           padding: '0 16px 44px',
           fontFamily: "system-ui, -apple-system, sans-serif",
-          boxShadow: '0 -8px 40px rgba(30,27,75,0.18)',
+          boxShadow: '0 -8px 48px rgba(30,27,75,0.28), inset 0 1px 0 rgba(255,255,255,0.12)',
         }}
       >
         {/* Drag handle */}
@@ -1502,8 +1536,29 @@ export default function FitnessSummary({
       fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       paddingBottom: 32,
       overflowX: 'hidden',
+      position: 'relative',
+      minHeight: '100dvh',
     }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px' }}>
+      {/* Ambient color orbs — give liquid glass something to refract */}
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute', top: '-8%', left: '-12%', width: '70%', height: '46%',
+          background: 'radial-gradient(circle at 30% 30%, rgba(124,58,237,0.45) 0%, transparent 65%)',
+          filter: 'blur(36px)',
+        }} />
+        <div style={{
+          position: 'absolute', top: '34%', right: '-18%', width: '64%', height: '44%',
+          background: 'radial-gradient(circle at 70% 50%, rgba(168,85,247,0.36) 0%, transparent 65%)',
+          filter: 'blur(40px)',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: '-12%', left: '8%', width: '72%', height: '46%',
+          background: 'radial-gradient(circle at 40% 70%, rgba(91,123,250,0.30) 0%, transparent 65%)',
+          filter: 'blur(44px)',
+        }} />
+      </div>
+
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 1 }}>
 
         {/* ── Header ── */}
         <motion.div
@@ -1668,7 +1723,7 @@ export default function FitnessSummary({
               animate={{ opacity: 1 }}
               style={{
                 padding: '32px 20px',
-                background: 'var(--surface-card)',
+                ...GLASS_SM,
                 borderRadius: 18,
                 textAlign: 'center',
               }}
@@ -1696,12 +1751,11 @@ export default function FitnessSummary({
             style={{
               marginTop: 20,
               padding: '16px 18px',
-              background: 'var(--surface-card)',
+              ...GLASS_PURPLE,
               borderRadius: 18,
               display: 'flex',
               alignItems: 'center',
               gap: 14,
-              boxShadow: '0 2px 12px rgba(124,58,237,0.08)',
             }}
           >
             <div style={{

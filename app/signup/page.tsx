@@ -116,11 +116,12 @@ function SignupContent() {
         {/* Form card */}
         <div
           style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border-subtle)',
+            background: 'var(--glass-bg)',
+            backdropFilter: 'var(--glass-blur)',
+            WebkitBackdropFilter: 'var(--glass-blur)',
+            boxShadow: 'var(--glass-shadow)',
             borderRadius: 'var(--r-xl)',
             padding: 'var(--space-6)',
-            boxShadow: 'none',
           }}
         >
           {success ? (
