@@ -137,13 +137,15 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return err('Unauthorized', 401);
 
-    const { error } = await supabase
+    const { data: deleted, error } = await supabase
       .from('habits')
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id);
+      .eq('user_id', user.id)
+      .select('id');
 
     if (error) return err(safeErrorMessage(error, 'Habit request failed'), 500);
+    if (!deleted || deleted.length === 0) return err('Habit not found', 404);
     return ok({ id, deleted: true });
   } catch (e) {
     return err(safeErrorMessage(e, 'Habit request failed'), 500);

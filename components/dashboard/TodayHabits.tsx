@@ -356,18 +356,22 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
+    const targetId = deleteTarget;
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/habits/${deleteTarget}`, { method: 'DELETE' });
+      const res = await fetch(`/api/habits/${targetId}`, { method: 'DELETE' });
       if (res.ok) {
-        setHabits((prev) => prev.filter((h) => h.id !== deleteTarget));
+        setHabits((prev) => prev.filter((h) => h.id !== targetId));
         window.dispatchEvent(new Event('semma-flow:habit-mutated'));
         startTransition(() => {
           router.refresh();
         });
+      } else {
+        const json = await res.json().catch(() => ({}));
+        toast(json?.error || 'Failed to delete habit', 'error');
       }
     } catch {
-      /* silently ignore */
+      toast('Failed to delete habit. Please try again.', 'error');
     } finally {
       setDeleteLoading(false);
       setDeleteTarget(null);
