@@ -133,8 +133,8 @@ const CompletionChart = memo(function CompletionChart({ data, onRangeChange, cur
         <AreaChart data={data} margin={{ top: 8, right: 5, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="completionGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#10B981" stopOpacity={0.02} />
+              <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -154,16 +154,16 @@ const CompletionChart = memo(function CompletionChart({ data, onRangeChange, cur
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(16,185,129,0.3)', strokeWidth: 2 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(124,58,237,0.3)', strokeWidth: 2 }} />
           <Area
             type="monotone"
             dataKey="percentage"
-            stroke="#10B981"
+            stroke="#7C3AED"
             strokeWidth={3}
             strokeLinecap="round"
             fill="url(#completionGradient)"
             dot={false}
-            activeDot={{ r: 7, fill: '#10B981', stroke: 'var(--bg-primary)', strokeWidth: 3 }}
+            activeDot={{ r: 7, fill: '#7C3AED', stroke: 'var(--bg-primary)', strokeWidth: 3 }}
           />
         </AreaChart>
       </ResponsiveContainer>

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MoreHorizontal, Pencil, Archive, Trash2, Flame, Link } from 'lucide-react';
+import { MoreHorizontal, Pencil, Archive, Trash2, Flame, Link, Shield } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import type { HabitWithEntry } from '@/types/habit';
 import HabitCheckbox from '@/components/habits/HabitCheckbox';
@@ -102,7 +102,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
 
   const isBad = habit.is_bad_habit === true;
   let color = habit.color ?? 'var(--accent-primary)';
-  if (!isBad && (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E')) color = 'var(--accent-primary)';
+  if (!isBad && (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E' || color.toUpperCase() === '#7C3AED')) color = 'var(--accent-primary)';
   if (isBad && color === 'var(--accent-primary)') color = '#EF4444';
   const completed = checked;
   const streak    = habit.current_streak ?? 0;
@@ -208,9 +208,9 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             {streak > 0 && (
               <>
                 <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#34D399' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#7C3AED' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
                   {isBad
-                    ? <span style={{ fontSize: 10 }}>✦</span>
+                    ? <Shield size={11} color={streak >= 7 ? '#7C3AED' : 'var(--text-muted)'} />
                     : <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
                   }
                   {streak}d {isBad ? 'clean' : ''}

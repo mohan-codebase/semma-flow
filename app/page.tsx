@@ -14,7 +14,7 @@ import CTABanner from '@/components/landing/CTABanner';
 export const metadata: Metadata = {
   title: 'Semma Flow — Build habits that actually stick.',
   description:
-    'The performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, mood tracking, and achievements — all in one place.',
+    'The performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, and achievements — all in one place.',
   openGraph: {
     title: 'Semma Flow — Build habits that actually stick.',
     description: 'Track habits with precision. Analyse your patterns. Level up your life.',

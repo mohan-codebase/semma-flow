@@ -2,7 +2,16 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Check, X } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Sparkles, Check, X, Heart, Dumbbell, Brain, BookOpen, Target, GlassWater, Pill, Moon, Footprints, Wind, PenTool, Globe, GraduationCap, CalendarCheck, Inbox, RefreshCw, Ban, Timer } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
+
+function OWIcon({ name, size = 20, color }: { name: string; size?: number; color?: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const icons = LucideIcons as any;
+  const pascal = name.split(/[-_]/).map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+  const Comp = icons[pascal] ?? icons['Circle'];
+  return <Comp size={size} color={color} strokeWidth={2} />;
+}
 import type { Habit } from '@/types/habit';
 
 /* ─── Types ─────────────────────────────────────────────────── */
@@ -23,50 +32,43 @@ interface Template {
 
 /* ─── Data ──────────────────────────────────────────────────── */
 const CATEGORIES = [
-  { id: 'health',      label: 'Health',        emoji: '💊', desc: 'Sleep, hydration, vitamins' },
-  { id: 'fitness',     label: 'Fitness',        emoji: '🏋️', desc: 'Workouts, steps, stretching' },
-  { id: 'mindfulness', label: 'Mindfulness',    emoji: '🧘', desc: 'Meditation, journaling, gratitude' },
-  { id: 'learning',    label: 'Learning',       emoji: '📚', desc: 'Reading, courses, practice' },
-  { id: 'productivity',label: 'Productivity',   emoji: '🎯', desc: 'Deep work, planning, reviews' },
-  { id: 'finance',     label: 'Finance',        emoji: '💰', desc: 'Saving, budgeting, tracking' },
+  { id: 'health',      label: 'Health',        icon: 'heart',         desc: 'Sleep, hydration, vitamins' },
+  { id: 'fitness',     label: 'Fitness',        icon: 'dumbbell',      desc: 'Workouts, steps, stretching' },
+  { id: 'mindfulness', label: 'Mindfulness',    icon: 'brain',         desc: 'Meditation, journaling, gratitude' },
+  { id: 'learning',    label: 'Learning',       icon: 'book-open',     desc: 'Reading, courses, practice' },
+  { id: 'productivity',label: 'Productivity',   icon: 'target',        desc: 'Deep work, planning, reviews' },
 ];
 
 const TEMPLATES: Record<string, Template[]> = {
   health:       [
-    { name: 'Drink 8 glasses of water', icon: '💧', color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Take vitamins',             icon: '💊', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Sleep 8 hours',            icon: '😴', color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'No alcohol',               icon: '🚫', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Drink 8 glasses of water', icon: 'glass-water',   color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Take vitamins',             icon: 'pill',           color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Sleep 8 hours',            icon: 'moon',           color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'No alcohol',               icon: 'ban',            color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   fitness:      [
-    { name: 'Morning run',              icon: '🏃', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Workout 30 mins',          icon: '🏋️', color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: '10,000 steps',             icon: '👟', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Stretch / mobility',       icon: '🤸', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Morning run',              icon: 'footprints',     color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Workout 30 mins',          icon: 'dumbbell',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: '10,000 steps',             icon: 'activity',       color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Stretch / mobility',       icon: 'wind',           color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   mindfulness:  [
-    { name: 'Morning meditation',       icon: '🧘', color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Gratitude journal',        icon: '📓', color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'No phone first hour',      icon: '📵', color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Evening reflection',       icon: '🌙', color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Morning meditation',       icon: 'brain',          color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Gratitude journal',        icon: 'pen-tool',       color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'No phone first hour',      icon: 'ban',            color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Evening reflection',       icon: 'moon',           color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   learning:     [
-    { name: 'Read 30 minutes',          icon: '📚', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Practice a language',      icon: '🌍', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Write 500 words',          icon: '✍️', color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Watch a tutorial',         icon: '🎓', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Read 30 minutes',          icon: 'book-open',      color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Practice a language',      icon: 'globe',          color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Write 500 words',          icon: 'pen-tool',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Watch a tutorial',         icon: 'graduation-cap', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   productivity: [
-    { name: 'Plan the day (5 min)',     icon: '📋', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: '2-hour deep work block',  icon: '🎯', color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Weekly review',           icon: '🔄', color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Inbox zero',              icon: '📬', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-  ],
-  finance:      [
-    { name: 'Log daily expenses',      icon: '💸', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'No impulse purchases',    icon: '🛑', color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Transfer to savings',     icon: '🏦', color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Review investments',      icon: '📈', color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Plan the day (5 min)',     icon: 'calendar-check', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: '2-hour deep work block',  icon: 'target',          color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Weekly review',           icon: 'refresh-cw',      color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Inbox zero',              icon: 'inbox',           color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
 };
 
@@ -300,7 +302,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                           transition: 'all 0.15s ease',
                         }}
                       >
-                        <div style={{ fontSize: 22, marginBottom: 5 }}>{cat.emoji}</div>
+                        <div style={{ marginBottom: 5, color: 'var(--accent-primary)' }}><OWIcon name={cat.icon} size={22} color="var(--accent-primary)" /></div>
                         <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px' }}>{cat.label}</p>
                         <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{cat.desc}</p>
                       </button>
@@ -337,8 +339,8 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
                         <div style={{
                           width: 38, height: 38, borderRadius: 10, flexShrink: 0,
                           background: `${t.color}20`, border: `1px solid ${t.color}40`,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                        }}>{t.icon}</div>
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}><OWIcon name={t.icon} size={18} color={t.color} /></div>
                         <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{t.name}</span>
                         <ArrowRight size={14} color="var(--text-dimmed)" style={{ marginLeft: 'auto', flexShrink: 0 }} />
                       </button>

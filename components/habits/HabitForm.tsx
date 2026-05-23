@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Ban, CheckCircle2 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -139,7 +140,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
       : {
           name: '',
           icon: 'circle-check',
-          color: '#10B981',
+          color: '#7C3AED',
           frequency: { type: 'daily' },
           target_type: 'boolean',
           target_value: 1,
@@ -219,7 +220,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
   return (
     <Modal
       isOpen
-      onClose={onClose}
+      onClose={loading ? () => {} : onClose}
       title={isEdit ? 'Edit Habit' : 'New Habit'}
       size="md"
     >
@@ -241,7 +242,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                       onClick={() => {
                         field.onChange(isBad);
                         if (!isEdit) {
-                          setValue('color', isBad ? '#EF4444' : '#10B981');
+                          setValue('color', isBad ? '#EF4444' : '#7C3AED');
                           setValue('icon', isBad ? 'ban' : 'circle-check');
                         }
                       }}
@@ -266,7 +267,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                         transition: 'all 0.15s ease',
                       }}
                     >
-                      <span style={{ fontSize: 16 }}>{isBad ? '🚫' : '✅'}</span>
+                      {isBad ? <Ban size={16} /> : <CheckCircle2 size={16} />}
                       {isBad ? 'Bad Habit' : 'Good Habit'}
                     </button>
                   );
@@ -501,33 +502,40 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
 
             {/* Specific Days toggles */}
             {watchFrequencyType === 'weekly' && (
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingTop: 4 }}>
-                {DAY_LABELS.map((label, idx) => {
-                  const active = watchFrequencyDays.includes(idx);
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      aria-label={DAY_FULL_LABELS[idx]}
-                      aria-pressed={active}
-                      onClick={() => toggleDay(idx)}
-                      style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: '50%',
-                        border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-subtle)'}`,
-                        background: active ? 'var(--accent-primary)' : 'transparent',
-                        color: active ? 'var(--accent-on-primary)' : 'var(--text-secondary)',
-                        fontSize: 13,
-                        fontWeight: active ? 700 : 500,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+              <div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingTop: 4 }}>
+                  {DAY_LABELS.map((label, idx) => {
+                    const active = watchFrequencyDays.includes(idx);
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        aria-label={DAY_FULL_LABELS[idx]}
+                        aria-pressed={active}
+                        onClick={() => toggleDay(idx)}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: '50%',
+                          border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-subtle)'}`,
+                          background: active ? 'var(--accent-primary)' : 'transparent',
+                          color: active ? 'var(--accent-on-primary)' : 'var(--text-secondary)',
+                          fontSize: 13,
+                          fontWeight: active ? 700 : 500,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.frequency && (errors.frequency as Record<string, {message?: string}>)['days']?.message && (
+                  <span style={{ fontSize: 12, color: 'var(--danger)', marginTop: 4, display: 'block' }}>
+                    {(errors.frequency as Record<string, {message?: string}>)['days']!.message}
+                  </span>
+                )}
               </div>
             )}
 
@@ -633,6 +641,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
               fullWidth
               onClick={onClose}
               type="button"
+              disabled={loading}
             >
               Cancel
             </Button>

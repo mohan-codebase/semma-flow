@@ -35,7 +35,7 @@ const TESTIMONIALS: Testimonial[] = [
     handle: '@kirannair',
     role: 'Startup founder',
     avatar: '🚀',
-    text: 'The mood tracking + habit correlation is genuinely insightful. I discovered my productivity peaks when I meditate AND exercise. Changed my morning routine.',
+    text: 'The streak analytics are genuinely insightful. I discovered my productivity peaks when I meditate AND exercise. Changed my morning routine.',
     stars: 5,
   },
   {

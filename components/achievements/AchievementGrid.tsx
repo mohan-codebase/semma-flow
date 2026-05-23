@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Trophy, Lock } from 'lucide-react';
 import AchievementCard from './AchievementCard';
 import type { AchievementDef } from '@/types/achievement';
 import EmptyState from '@/components/ui/EmptyState';
@@ -117,7 +118,7 @@ export default function AchievementGrid({ achievements }: Props) {
       {filtered.length === 0 && (
         <div style={{ gridColumn: '1 / -1' }}>
           <EmptyState
-            emoji={filter === 'unlocked' ? '🏆' : '🔓'}
+            icon={filter === 'unlocked' ? <Trophy size={34} color="var(--accent-primary)" /> : <Lock size={34} color="var(--accent-primary)" />}
             title={filter === 'unlocked' ? 'No badges yet' : 'All achievements unlocked!'}
             description={
               filter === 'unlocked'

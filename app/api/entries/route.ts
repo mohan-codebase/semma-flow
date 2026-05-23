@@ -75,7 +75,12 @@ export async function PATCH(req: NextRequest) {
     if (!habit) return err('Habit not found', 404);
 
     const now = new Date().toISOString();
-    const payload: any = {
+    interface EntryPayload {
+      habit_id: string; user_id: string; entry_date: string;
+      is_completed: boolean; completed_at: string | null; updated_at: string;
+      value?: number | null; notes?: string | null;
+    }
+    const payload: EntryPayload = {
       habit_id,
       user_id: user.id,
       entry_date,
@@ -93,12 +98,12 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) {
-      require('fs').writeFileSync('/tmp/semma_error.txt', JSON.stringify(error, null, 2));
+      console.error('[entries PATCH] upsert error:', error);
       return err(safeErrorMessage(error, 'Failed to save entry'), 500);
     }
     return ok(entry);
   } catch (e) {
-    require('fs').writeFileSync('/tmp/semma_error2.txt', String(e));
+    console.error('[entries PATCH] unexpected error:', e);
     return err(safeErrorMessage(e, 'Failed to save entry'), 500);
   }
 }

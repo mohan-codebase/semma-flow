@@ -209,7 +209,7 @@ export default function Features() {
             margin: '0 auto',
           }}
         >
-          Semma Flow packs analytics, gamification, and journaling into a single clean interface — no bloat, no clutter.
+          Semma Flow packs analytics and gamification into a single clean habit tracker — no bloat, no clutter.
         </motion.p>
       </div>
 

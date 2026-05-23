@@ -20,7 +20,9 @@ export async function GET(request: Request) {
       
       const createdAt = new Date(user.created_at).getTime();
       const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : createdAt;
-      const isNewUser = lastSignIn - createdAt < 10000;
+      // 60 s window handles slow OAuth flows and clock skew; returning users
+      // will always have lastSignIn far in the future relative to createdAt.
+      const isNewUser = lastSignIn - createdAt < 60000;
 
       // 1. REJECT: New user trying to LOGIN
       if (from.includes('/login') && isNewUser) {

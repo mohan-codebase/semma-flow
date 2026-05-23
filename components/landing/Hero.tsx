@@ -83,7 +83,7 @@ function MiniHabitCard({
           {name}
         </p>
         <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>
-          🔥 {streak} day streak
+          <Flame size={11} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 3 }} /> {streak} day streak
         </p>
       </div>
       <div
@@ -301,7 +301,7 @@ export default function Hero() {
               margin: '0 0 36px',
               maxWidth: 520,
             }}>
-              Semma Flow is the performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, mood tracking — everything in one place.
+              Semma Flow is the performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, achievements — everything in one place.
             </motion.p>
 
             {/* CTA buttons */}

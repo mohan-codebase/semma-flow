@@ -29,7 +29,7 @@ export const habitSchema = z.object({
   name: safeName,
   description: safeDescription,
   icon: z.string().default('circle-check'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color').default('var(--accent-primary)'),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color').default('#7C3AED'),
   category_id: z.string().uuid().nullable().optional(),
   frequency: z.object({
     type: z.enum(['daily', 'weekly', 'x_per_week', 'x_per_month']),
@@ -41,6 +41,25 @@ export const habitSchema = z.object({
   target_unit: z.preprocess((val) => (val === '' ? null : val), z.string().max(20).nullable().optional()),
   reminder_time: z.preprocess((val) => (val === '' ? null : val), z.string().nullable().optional()),
   is_bad_habit: z.boolean().default(false),
+  challenge_days: z.number().int().nullable().optional(),
+}).superRefine((data, ctx) => {
+  if (data.frequency.type === 'weekly' && (!data.frequency.days || data.frequency.days.length === 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Select at least one day for weekly habits',
+      path: ['frequency', 'days'],
+    });
+  }
+  if (
+    (data.frequency.type === 'x_per_week' || data.frequency.type === 'x_per_month') &&
+    !data.frequency.count
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Count is required',
+      path: ['frequency', 'count'],
+    });
+  }
 });
 
 export type HabitFormValues = z.infer<typeof habitSchema>;

@@ -61,10 +61,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Default JSON
-    const [habitsRes, entriesRes, moodsRes] = await Promise.all([
+    const [habitsRes, entriesRes] = await Promise.all([
       supabase.from('habits').select('*').eq('user_id', user.id),
       supabase.from('habit_entries').select('*').eq('user_id', user.id),
-      supabase.from('daily_moods').select('*').eq('user_id', user.id),
     ]);
 
     const exportData = {
@@ -72,7 +71,6 @@ export async function GET(req: NextRequest) {
       schemaVersion: 1,
       habits: habitsRes.data ?? [],
       entries: entriesRes.data ?? [],
-      moods: moodsRes.data ?? [],
     };
 
     return new NextResponse(JSON.stringify(exportData, null, 2), {

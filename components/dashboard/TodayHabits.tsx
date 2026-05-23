@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useTransition } from 'react';
-import { Plus, CalendarClock } from 'lucide-react';
+import { Plus, CalendarClock, Zap } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import type { HabitWithEntry, Habit, HabitEntry, Category } from '@/types/habit';
@@ -560,7 +560,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
           borderRadius: 16,
         }}>
           <EmptyState
-            emoji="⚡"
+            icon={<Zap size={34} color="var(--accent-primary)" />}
             title="No habits tracked today"
             description="You don't have any habits set up yet. Build your first routine — even one habit changes everything."
             accentColor="var(--accent-primary)"

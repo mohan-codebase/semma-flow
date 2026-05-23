@@ -1,151 +1,124 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import React from 'react';
 
-const GREEN   = '#32D74B';
-const GRAY    = 'rgba(255,255,255,0.55)';
-const FONT    = 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif';
+const ACTIVE_COLOR = '#FFFFFF';
+const MUTED_COLOR  = 'rgba(255,255,255,0.45)';
 
-// ── Apple Fitness-matching SVG icons ──────────────────────────────────────────
-
-function SummaryIcon({ active }: { active: boolean }) {
-  const c = active ? GREEN : GRAY;
-  // Apple's activity ring: a single thick ring with a gap at the top (like the Move ring)
+function HomeIcon({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <circle
-        cx="14" cy="14" r="10"
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 10.5L12 3L21 10.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V10.5Z"
+        fill={active ? c : 'none'}
         stroke={c}
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        // gap at the top — ~300° arc
-        strokeDasharray={`${2 * Math.PI * 10 * 0.82} ${2 * Math.PI * 10}`}
-        strokeDashoffset={`${-2 * Math.PI * 10 * 0.09}`}
-        style={{ transform: 'rotate(-90deg)', transformOrigin: 'center' }}
+        strokeWidth={active ? 0 : 1.8}
+        strokeLinejoin="round"
       />
-      {/* arrow at leading edge */}
-      <circle cx="14" cy="4.2" r="3.5" fill={c} />
-      <path d="M12.4 4.8 L14 2.6 L15.6 4.8" fill="none" stroke={active ? '#000' : '#1C1C1E'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
 function HabitsIcon({ active }: { active: boolean }) {
-  const c = active ? GREEN : GRAY;
+  const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <rect x="5" y="5.5" width="18" height="17" rx="3" stroke={c} strokeWidth="1.8" />
-      <path d="M9 10h10M9 14h10M9 18h6" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M18 17l1.5 1.5L22 16" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="4" y="5" width="16" height="15" rx="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255,255,255,0.15)' : 'none'} />
+      <path d="M8 10h8M8 14h8M8 18h5" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="16.5" cy="17.5" r="3.5" fill={active ? ACTIVE_COLOR : 'none'} stroke={c} strokeWidth="1.8" />
+      <path d="M15.5 17.5l.8.8 1.4-1.4" stroke={active ? '#1E1B4B' : c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-function WorkoutIcon({ active }: { active: boolean }) {
-  const c = active ? GREEN : GRAY;
-  // Running person silhouette — matching Apple Fitness "Workout" icon
+function AnalyticsIcon({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="6" r="2.8" fill={c} />
-      {/* body */}
-      <path d="M14 9.2 L12.5 15 L10 20" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M14 9.2 L15.5 15 L18 20" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      {/* arms */}
-      <path d="M11 12 L8.5 10.5" stroke={c} strokeWidth="2" strokeLinecap="round" />
-      <path d="M17 12 L20 11" stroke={c} strokeWidth="2" strokeLinecap="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="14" width="4" height="7" rx="1.5" fill={active ? c : 'none'} stroke={c} strokeWidth="1.8" />
+      <rect x="10" y="9" width="4" height="12" rx="1.5" fill={active ? c : 'none'} stroke={c} strokeWidth="1.8" />
+      <rect x="17" y="4" width="4" height="17" rx="1.5" fill={active ? c : 'none'} stroke={c} strokeWidth="1.8" />
     </svg>
   );
 }
 
-function SharingIcon({ active }: { active: boolean }) {
-  const c = active ? GREEN : GRAY;
-  // Two people — matching Apple Fitness "Sharing" icon
+function SettingsIcon({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      {/* left person */}
-      <circle cx="10" cy="9" r="2.5" fill={c} />
-      <path d="M5.5 21c0-3.5 2-5 4.5-5s4.5 1.5 4.5 5" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
-      {/* right person */}
-      <circle cx="18.5" cy="9" r="2.5" fill={c} />
-      <path d="M14 21c0-3.5 2-5 4.5-5s4.5 1.5 4.5 5" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255,255,255,0.2)' : 'none'} />
+      <path
+        d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+        stroke={c} strokeWidth="1.8" strokeLinecap="round"
+      />
     </svg>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 const TABS = [
-  { label: 'Summary',  href: '/dashboard',           exact: true,  Icon: SummaryIcon  },
-  { label: 'Habits',   href: '/dashboard/habits',    exact: false, Icon: HabitsIcon   },
-  { label: 'Workout',  href: '/dashboard/analytics', exact: false, Icon: WorkoutIcon  },
-  { label: 'Sharing',  href: '/dashboard/settings',  exact: false, Icon: SharingIcon  },
+  { label: 'Home',      tab: 'home',      Icon: HomeIcon      },
+  { label: 'Habits',    tab: 'habits',    Icon: HabitsIcon    },
+  { label: 'Analytics', tab: 'analytics', Icon: AnalyticsIcon },
+  { label: 'Settings',  tab: 'settings',  Icon: SettingsIcon  },
 ];
 
-export default function MobileNav() {
-  const pathname = usePathname();
-  const isActive = (href: string, exact: boolean) =>
-    exact ? pathname === href : pathname.startsWith(href);
+interface MobileNavProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
 
+export default function MobileNav({ activeTab, onTabChange }: MobileNavProps) {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
-      style={{
-        // Safe-area padding at bottom
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        // Transparent outer wrapper — the pill floats
-        background: 'transparent',
-        pointerEvents: 'none',
-      }}
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)', background: 'transparent', pointerEvents: 'none' }}
     >
-      {/* Floating pill */}
       <div
         style={{
-          margin: '0 12px 10px',
-          background: 'rgba(38,38,40,0.96)',
-          backdropFilter: 'blur(24px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          borderRadius: 22,
-          border: '0.5px solid rgba(255,255,255,0.1)',
+          margin: '0 16px 12px',
+          background: '#1E1B4B',
+          borderRadius: 26,
+          border: '1px solid rgba(124,58,237,0.25)',
           display: 'flex',
-          height: 60,
-          padding: '0 4px',
+          height: 64,
+          padding: '0 8px',
           pointerEvents: 'auto',
+          boxShadow: '0 8px 32px rgba(30,27,75,0.35)',
         }}
       >
-        {TABS.map(({ label, href, exact, Icon }) => {
-          const active = isActive(href, exact);
+        {TABS.map(({ label, tab, Icon }) => {
+          const active = activeTab === tab;
           return (
-            <Link key={href} href={href} style={{ flex: 1, textDecoration: 'none' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                  height: '100%',
-                  borderRadius: 18,
-                  // Active tab gets a lighter pill background
-                  background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
-                  transition: 'background 0.15s ease',
-                }}
-              >
-                <Icon active={active} />
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: active ? 600 : 400,
-                    color: active ? GREEN : GRAY,
-                    fontFamily: FONT,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1,
-                  }}
-                >
-                  {label}
-                </span>
-              </div>
-            </Link>
+            <button
+              key={tab}
+              onClick={() => onTabChange(tab)}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                height: '100%',
+                borderRadius: 20,
+                background: active ? 'rgba(124,58,237,0.30)' : 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background 0.15s ease',
+                padding: '0 4px',
+              }}
+            >
+              <Icon active={active} />
+              <span style={{
+                fontSize: 10,
+                fontWeight: active ? 700 : 500,
+                color: active ? ACTIVE_COLOR : MUTED_COLOR,
+                letterSpacing: '-0.01em',
+                lineHeight: 1,
+              }}>
+                {label}
+              </span>
+            </button>
           );
         })}
       </div>

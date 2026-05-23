@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, GripVertical } from 'lucide-react';
+import { Plus, GripVertical, Ban, Target } from 'lucide-react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import type { HabitWithEntry } from '@/types/habit';
 import HabitCard from '@/components/habits/HabitCard';
@@ -199,7 +199,7 @@ export default function HabitList({
               alignItems: 'center',
               gap: 5,
             }}>
-              <span>🚫</span>
+              <Ban size={11} />
               Bad Habits · {badAvoided.length}/{badHabits.length} avoided
             </span>
             <div style={{ flex: 1, height: 1, background: 'rgba(239,68,68,0.25)' }} />
@@ -220,7 +220,7 @@ export default function HabitList({
           {badAvoided.length > 0 && (
             <>
               {badPending.length > 0 && (
-                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(52,211,153,0.6)" textColor="#34D399" />
+                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(124,58,237,0.4)" textColor="#7C3AED" />
               )}
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Avoided bad habits">
                 {badAvoided.map((habit) => (
@@ -277,7 +277,7 @@ function SkeletonCard() {
 function EmptyStateWrapper({ onAdd }: { onAdd?: () => void }) {
   return (
     <EmptyState
-      emoji="🎯"
+      icon={<Target size={34} color="var(--accent-primary)" />}
       title="No habits yet"
       description="Your journey starts with one habit. Add something small — consistency beats intensity every time."
       accentColor="var(--accent-primary)"

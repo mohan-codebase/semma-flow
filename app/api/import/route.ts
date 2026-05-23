@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createServerClient } from '@/lib/supabase/server';
 import { habitSchema } from '@/lib/validations/habit';
-import { entrySchema, moodSchema } from '@/lib/validations/entry';
+import { entrySchema } from '@/lib/validations/entry';
 import { safeErrorMessage } from '@/lib/utils/api';
 
 // Size cap: 5 MB. Real backups are tiny — anything larger is suspicious.
@@ -11,7 +11,6 @@ const MAX_BODY_BYTES = 5 * 1024 * 1024;
 const importSchema = z.object({
   habits: z.array(habitSchema.extend({ id: z.string().optional() })).max(500),
   entries: z.array(entrySchema.extend({ habit_id: z.string() }).partial({ habit_id: true })).max(50_000).optional(),
-  moods: z.array(moodSchema).max(5000).optional(),
 });
 
 /**
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid backup format' }, { status: 422 });
     }
 
-    const { habits, entries, moods } = parsed.data;
+    const { habits, entries } = parsed.data;
     const idMap: Record<string, string> = {};
 
     // 1. Habits — match by name to avoid duplicates on repeated imports.
@@ -93,25 +92,10 @@ export async function POST(req: NextRequest) {
       entriesCount = entriesToInsert.length;
     }
 
-    // 3. Moods
-    let moodsCount = 0;
-    if (moods && moods.length > 0) {
-      const moodsToInsert = moods.map((m) => ({
-        user_id: user.id,
-        entry_date: m.entry_date,
-        mood_score: m.mood_score,
-        energy_level: m.energy_level ?? null,
-        note: m.note ?? null,
-      }));
-      await supabase.from('daily_moods').upsert(moodsToInsert, { onConflict: 'user_id,entry_date' });
-      moodsCount = moodsToInsert.length;
-    }
-
     return NextResponse.json({
       success: true,
       habitsCount: habits.length,
       entriesCount,
-      moodsCount,
     });
   } catch (e) {
     return NextResponse.json({ error: safeErrorMessage(e) }, { status: 500 });

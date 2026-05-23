@@ -32,22 +32,19 @@ function SignupContent() {
     if (password.length < 8) { setError('Password must be at least 8 characters'); return; }
     setLoading(true);
     setError('');
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-        emailRedirectTo: `${getSiteUrl()}/dashboard`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${getSiteUrl()}/dashboard`,
+        },
+      });
+      if (error) { setError(error.message); }
+      else { setSuccess(true); setTimeout(() => router.push('/dashboard'), 1800); }
+    } finally {
       setLoading(false);
-    } else {
-      setSuccess(true);
-      setTimeout(() => router.push('/dashboard'), 1800);
     }
   };
 

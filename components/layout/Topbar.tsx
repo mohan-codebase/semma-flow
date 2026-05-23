@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, Menu, X, Wallet, Target, BookOpen, Timer, ClipboardList, Compass, TrendingUp } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect, useState, useMemo } from 'react';
+import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import CommandPalette from '@/components/layout/CommandPalette';
@@ -11,62 +10,33 @@ import NotificationBell from '@/components/layout/NotificationBell';
 import ThemeToggle from '@/components/layout/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const NAV_HABIT = [
-  { label: 'Dashboard',     href: '/dashboard',               icon: LayoutDashboard, exact: true,  color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
-  { label: 'Habits',        href: '/dashboard/habits',        icon: Dumbbell,        exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
-  { label: 'Goals',         href: '/dashboard/goals',         icon: Target,          exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
-  { label: 'Journal',       href: '/dashboard/journal',       icon: BookOpen,        exact: false, color: '#8B5CF6',                glow: 'rgba(139,92,246,0.15)' },
-  { label: 'Focus',         href: '/dashboard/focus',         icon: Timer,           exact: false, color: '#EF4444',                glow: 'rgba(239,68,68,0.12)' },
-  { label: 'Weekly Review', href: '/dashboard/weekly-review', icon: ClipboardList,   exact: false, color: '#F59E0B',                glow: 'rgba(245,158,11,0.15)' },
-  { label: 'Life Wheel',    href: '/dashboard/life-wheel',    icon: Compass,         exact: false, color: '#06B6D4',                glow: 'rgba(6,182,212,0.15)' },
-  { label: 'Analytics',     href: '/dashboard/analytics',     icon: BarChart2,       exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
-  { label: 'Achievements',  href: '/dashboard/achievements',  icon: Trophy,          exact: false, color: '#F59E0B',                glow: 'rgba(245,158,11,0.15)' },
-  { label: 'Settings',      href: '/dashboard/settings',      icon: Settings2,       exact: false, color: 'var(--accent-primary)',  glow: 'rgba(16,185,129,0.15)' },
+const NAV = [
+  { label: 'Dashboard',    tab: 'home',         icon: LayoutDashboard, color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
+  { label: 'Habits',       tab: 'habits',       icon: Dumbbell,        color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
+  { label: 'Analytics',    tab: 'analytics',    icon: BarChart2,       color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
+  { label: 'Achievements', tab: 'achievements', icon: Trophy,          color: '#F59E0B',               glow: 'rgba(245,158,11,0.15)' },
+  { label: 'Settings',     tab: 'settings',     icon: Settings2,       color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
 ];
 
-const NAV_EXPENSE = [
-  { label: 'Expenses',  href: '/dashboard/expenses',  icon: Wallet,     exact: true,  color: 'var(--indigo)', glow: 'rgba(99,102,241,0.15)' },
-  { label: 'Net Worth', href: '/dashboard/net-worth', icon: TrendingUp, exact: false, color: '#10B981',       glow: 'rgba(16,185,129,0.15)' },
-];
+interface TopbarProps {
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+}
 
-const NAV = [...NAV_HABIT, ...NAV_EXPENSE];
-
-export default function Topbar() {
+export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps) {
   const supabase = useMemo(() => createClient(), []);
   const router      = useRouter();
-  const pathname    = usePathname();
   const [user, setUser]           = useState<User | null>(null);
   const [paletteOpen, setPalette] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mounted, setMounted]     = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, [supabase]);
 
-  useEffect(() => {
-    for (const item of NAV) {
-      router.prefetch(item.href);
-    }
-  }, [router]);
-
-  const handleNavHover = useCallback((href: string) => {
-    router.prefetch(href);
-  }, [router]);
-
   const handleAddHabit = () => {
-    if (pathname === '/dashboard') {
-      window.dispatchEvent(new Event('semma-flow:open-add'));
-    } else {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('semma_flow_open_form', '1');
-      }
-      router.push('/dashboard');
-    }
+    window.dispatchEvent(new Event('semma-flow:open-add'));
+    onTabChange?.('habits');
   };
 
   const handleLogout = async () => {
@@ -81,9 +51,6 @@ export default function Topbar() {
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, []);
-
-  const isActive = (href: string, exact: boolean) =>
-    exact ? pathname === href : pathname.startsWith(href);
 
   const displayName =
     (user?.user_metadata?.full_name as string | undefined) ??
@@ -242,46 +209,25 @@ export default function Topbar() {
 
               {/* All nav pages */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1, overflowY: 'auto' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0 14px 6px' }}>
-                  Habit Tracker
-                </div>
-                {NAV_HABIT.map(({ label, href, icon: Icon, exact, color, glow }) => {
-                  const active = isActive(href, exact);
+                {NAV.map(({ label, tab, icon: Icon, color, glow }) => {
+                  const active = activeTab === tab;
                   return (
-                    <Link key={href} href={href} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
-                      <div style={{
+                    <button
+                      key={tab}
+                      onClick={() => { onTabChange?.(tab); setSidebarOpen(false); }}
+                      style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
                         background: active ? glow : 'transparent',
                         border: active ? `1px solid ${color}44` : '1px solid transparent',
                         color: active ? color : 'var(--text-secondary)',
                         fontWeight: active ? 600 : 400,
-                      }}>
-                        <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
-                        <span style={{ fontSize: 13 }}>{label}</span>
-                      </div>
-                    </Link>
-                  );
-                })}
-                <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--indigo)', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '12px 14px 6px' }}>
-                  Expense Tracker
-                </div>
-                {NAV_EXPENSE.map(({ label, href, icon: Icon, exact, color, glow }) => {
-                  const active = isActive(href, exact);
-                  return (
-                    <Link key={href} href={href} onClick={() => setSidebarOpen(false)} style={{ textDecoration: 'none' }}>
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '9px 14px', borderRadius: 10, cursor: 'pointer',
-                        background: active ? glow : 'transparent',
-                        border: active ? `1px solid ${color}44` : '1px solid transparent',
-                        color: active ? color : 'var(--text-secondary)',
-                        fontWeight: active ? 600 : 400,
-                      }}>
-                        <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
-                        <span style={{ fontSize: 13 }}>{label}</span>
-                      </div>
-                    </Link>
+                        width: '100%', textAlign: 'left',
+                      }}
+                    >
+                      <Icon size={17} strokeWidth={active ? 2.2 : 1.6} />
+                      <span style={{ fontSize: 13 }}>{label}</span>
+                    </button>
                   );
                 })}
               </div>
@@ -380,7 +326,7 @@ export default function Topbar() {
                 marginTop: 1,
               }}
             >
-              Habits & Finance
+              Habit Tracker
             </span>
           </div>
         </div>
@@ -394,11 +340,13 @@ export default function Topbar() {
             maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
           }}
         >
-          {NAV_HABIT.map(({ label, href, icon: Icon, exact, color, glow }) => {
-            const active = exact ? pathname === href : pathname.startsWith(href);
+          {NAV.map(({ label, tab, icon: Icon, color, glow }) => {
+            const active = activeTab === tab;
             return (
-              <Link key={href} href={href} style={{ textDecoration: 'none', flexShrink: 0 }} onMouseEnter={() => handleNavHover(href)}>
-                <div style={{
+              <button
+                key={tab}
+                onClick={() => onTabChange?.(tab)}
+                style={{
                   display: 'flex', alignItems: 'center', gap: 6,
                   padding: '7px 13px', borderRadius: 10, cursor: 'pointer',
                   transition: 'all 0.15s ease',
@@ -407,35 +355,12 @@ export default function Topbar() {
                   color: active ? color : 'var(--text-muted)',
                   fontWeight: active ? 700 : 500,
                   boxShadow: active ? `0 0 12px ${glow}` : 'none',
-                }}>
-                  <Icon size={14} strokeWidth={active ? 2.4 : 1.8} />
-                  <span style={{ fontSize: 12.5 }}>{label}</span>
-                </div>
-              </Link>
-            );
-          })}
-
-          {/* Section divider */}
-          <div style={{ width: 1, height: 20, background: 'var(--border-subtle)', flexShrink: 0, margin: '0 6px' }} />
-
-          {NAV_EXPENSE.map(({ label, href, icon: Icon, exact, color, glow }) => {
-            const active = exact ? pathname === href : pathname.startsWith(href);
-            return (
-              <Link key={href} href={href} style={{ textDecoration: 'none', flexShrink: 0 }} onMouseEnter={() => handleNavHover(href)}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '7px 13px', borderRadius: 10, cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  background: active ? glow : 'transparent',
-                  border: `1px solid ${active ? color + '55' : 'transparent'}`,
-                  color: active ? color : 'var(--text-muted)',
-                  fontWeight: active ? 700 : 500,
-                  boxShadow: active ? `0 0 12px ${glow}` : 'none',
-                }}>
-                  <Icon size={14} strokeWidth={active ? 2.4 : 1.8} />
-                  <span style={{ fontSize: 12.5 }}>{label}</span>
-                </div>
-              </Link>
+                  flexShrink: 0,
+                }}
+              >
+                <Icon size={14} strokeWidth={active ? 2.4 : 1.8} />
+                <span style={{ fontSize: 12.5 }}>{label}</span>
+              </button>
             );
           })}
         </nav>

@@ -4,8 +4,8 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 interface EmptyStateProps {
-  /** Large emoji or icon used as the illustration (e.g. "🔥", "📊", "🏆") */
-  emoji: string;
+  /** Icon illustration — pass a Lucide icon element */
+  icon: React.ReactNode;
   /** Bold headline */
   title: string;
   /** Softer explanation text — 1–2 sentences */
@@ -25,7 +25,7 @@ interface EmptyStateProps {
  * Animates in from below on first render.
  */
 export default function EmptyState({
-  emoji,
+  icon,
   title,
   description,
   cta,
@@ -78,12 +78,10 @@ export default function EmptyState({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: compact ? 26 : 34,
-            lineHeight: 1,
             position: 'relative',
           }}
         >
-          {emoji}
+          {icon}
         </motion.div>
       </div>
 

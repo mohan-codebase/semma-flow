@@ -1,14 +1,10 @@
-import React from 'react';
 import { createServerClient } from '@/lib/supabase/server';
-import { todayString, toLocalDateString } from '@/lib/utils/dates';
+import { todayString } from '@/lib/utils/dates';
+import { formatInTimeZone } from 'date-fns-tz';
 import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
 import type { HabitWithEntry } from '@/types/habit';
 import type { HabitEntry } from '@/types/entry';
-import FitnessSummary from '@/components/dashboard/FitnessSummary';
-import OverviewStats from '@/components/dashboard/OverviewStats';
-import TodayHabits from '@/components/dashboard/TodayHabits';
-import WeeklyOverview from '@/components/dashboard/WeeklyOverview';
-import DashboardShell from '@/components/dashboard/DashboardShell';
+import DashboardApp from '@/components/dashboard/DashboardApp';
 
 // -----------------------------------------------------------------------
 // Server-side data fetching helpers
@@ -17,13 +13,14 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 async function fetchOverviewStats(
   supabase: Awaited<ReturnType<typeof createServerClient>>,
   userId: string,
-  today: string
+  today: string,
+  userTz: string
 ): Promise<OverviewStatsType | null> {
   try {
     // Week start date (computed once, used below)
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - 6);
-    const weekStartStr = toLocalDateString(weekStart);
+    const weekStartStr = formatInTimeZone(weekStart, userTz, 'yyyy-MM-dd');
 
     // All 3 queries run in parallel instead of sequentially
     const [{ data: habits }, { data: todayEntries }, { data: weekEntries }] = await Promise.all([
@@ -129,7 +126,8 @@ async function fetchTodayHabits(
 async function fetchWeekData(
   supabase: Awaited<ReturnType<typeof createServerClient>>,
   userId: string,
-  today: string
+  today: string,
+  userTz: string
 ): Promise<{ date: string; percentage: number; isToday: boolean }[]> {
   try {
     const days: { date: string; percentage: number; isToday: boolean }[] = [];
@@ -137,7 +135,7 @@ async function fetchWeekData(
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const dateStr = toLocalDateString(d);
+      const dateStr = formatInTimeZone(d, userTz, 'yyyy-MM-dd');
       days.push({
         date: dateStr,
         percentage: 0,
@@ -185,7 +183,7 @@ async function fetchWeekData(
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
-      const dateStr = toLocalDateString(d);
+      const dateStr = formatInTimeZone(d, userTz, 'yyyy-MM-dd');
       return { date: dateStr, percentage: 0, isToday: dateStr === today };
     });
   }
@@ -199,19 +197,26 @@ export default async function DashboardPage() {
   const supabase = await createServerClient();
   const { data } = await supabase.auth.getUser();
   const user = data?.user;
-
-  const today = todayString();
   const userId = user?.id ?? '';
+
+  // Fetch timezone so date boundaries match the user's local calendar
+  let userTz = 'Asia/Kolkata';
+  if (userId) {
+    const { data: profile } = await supabase.from('profiles').select('timezone').eq('id', userId).maybeSingle();
+    userTz = profile?.timezone ?? 'Asia/Kolkata';
+  }
+
+  const today = userId ? formatInTimeZone(new Date(), userTz, 'yyyy-MM-dd') : todayString();
 
   // Parallel fetches
   const [stats, habits, weekData] = await Promise.all([
-    userId ? fetchOverviewStats(supabase, userId, today) : Promise.resolve(null),
+    userId ? fetchOverviewStats(supabase, userId, today, userTz) : Promise.resolve(null),
     userId ? fetchTodayHabits(supabase, userId, today) : Promise.resolve([]),
-    userId ? fetchWeekData(supabase, userId, today) : Promise.resolve(
+    userId ? fetchWeekData(supabase, userId, today, userTz) : Promise.resolve(
       Array.from({ length: 7 }, (_, i) => {
         const d = new Date();
         d.setDate(d.getDate() - (6 - i));
-        const dateStr = toLocalDateString(d);
+        const dateStr = formatInTimeZone(d, userTz, 'yyyy-MM-dd');
         return { date: dateStr, percentage: 0, isToday: dateStr === today };
       })
     ),
@@ -248,82 +253,18 @@ export default async function DashboardPage() {
   const dateStr = new Date().toLocaleDateString(undefined, { month: 'long', day: 'numeric' });
 
   return (
-    <DashboardShell>
-      {/* ── Mobile: Apple Fitness Summary UI ── */}
-      <div className="lg:hidden">
-        <FitnessSummary
-          stats={stats}
-          habits={habits}
-          weekData={weekData}
-          displayName={displayName}
-          initials={initials}
-        />
-      </div>
-
-      {/* ── Desktop: Original habit tracker UI ── */}
-      <div
-        className="hidden lg:flex"
-        style={{
-          flexDirection: 'column',
-          gap: 'clamp(16px, 2vw, 24px)',
-          padding: 'clamp(12px, 2.5vw, 32px) clamp(12px, 2.5vw, 32px) clamp(32px, 4vw, 48px)',
-          maxWidth: 1280,
-          margin: '0 auto',
-        }}
-      >
-        {/* Hero header */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <span style={{
-              fontSize: 11, fontWeight: 600, letterSpacing: '0.1em',
-              textTransform: 'uppercase', color: 'var(--accent-primary)',
-              fontFamily: "'IBM Plex Mono', monospace", opacity: 0.85,
-            }}>
-              {dayName} · {dateStr}
-            </span>
-            <h1 style={{
-              fontSize: 'clamp(22px, 2.4vw, 28px)', fontWeight: 700,
-              color: 'var(--text-primary)', margin: 0,
-              fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em', maxWidth: 640,
-            }}>
-              {greeting} — {heroLine}
-            </h1>
-          </div>
-          {stats && stats.todayTotal > 0 && (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10,
-              padding: '10px 16px',
-              background: heroPct === 100 ? 'var(--accent-glow-md)' : 'var(--bg-card)',
-              border: `1px solid ${heroPct === 100 ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
-              borderRadius: 12, flexShrink: 0,
-            }}>
-              <div style={{
-                width: 8, height: 8, borderRadius: '50%',
-                background: heroPct === 100 ? 'var(--accent-primary)' : heroPct >= 50 ? 'var(--warm)' : 'var(--text-dimmed)',
-                boxShadow: heroPct === 100 ? '0 0 8px var(--accent-primary)' : 'none',
-              }} />
-              <span style={{
-                fontSize: 13, fontWeight: 700,
-                color: heroPct === 100 ? 'var(--accent-primary)' : 'var(--text-secondary)',
-                fontFamily: "'IBM Plex Mono'", letterSpacing: '-0.01em',
-              }}>
-                {stats.todayCompleted}/{stats.todayTotal} done
-              </span>
-            </div>
-          )}
-        </div>
-
-        <OverviewStats stats={stats} loading={false} />
-
-        <div className="hf-dashboard-grid">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
-            <TodayHabits habits={habits} loading={false} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-            <WeeklyOverview weekData={weekData} />
-          </div>
-        </div>
-      </div>
-    </DashboardShell>
+    <DashboardApp
+      stats={stats}
+      habits={habits}
+      weekData={weekData}
+      displayName={displayName}
+      initials={initials}
+      email={user?.email ?? ''}
+      greeting={greeting}
+      heroLine={heroLine}
+      heroPct={heroPct}
+      dayName={dayName}
+      dateStr={dateStr}
+    />
   );
 }

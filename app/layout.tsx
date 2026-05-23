@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 // and is a WCAG 1.4.4 violation. Default initialScale=1 is enough — we don't
 // need to lock zoom for a habit tracker.
 export const viewport: Viewport = {
-  themeColor: "#771828ff",
+  themeColor: "#7C3AED",
   width: "device-width",
   initialScale: 1,
 };
@@ -65,17 +65,12 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${outfit.variable} ${plexMono.variable} h-full`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <head>
         <link rel="icon" href="/icon.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
         <link rel="shortcut icon" href="/icon.png" />
-        <script
-          // Prevent flash of wrong theme — runs before paint.
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='semma_flow_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
-          }}
-        />
         <script
           // Prevent flash of wrong theme — runs before paint.
           dangerouslySetInnerHTML={{
