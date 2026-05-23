@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
+import { todayString } from '@/lib/utils/dates';
 
 function DynamicIcon({ name, size = 20, color }: { name: string; size?: number; color?: string }) {
   const pascal = (name ?? 'circle-check')
@@ -1388,11 +1389,18 @@ export default function FitnessSummary({
       )
     );
     try {
-      await fetch('/api/entries', {
+      const res = await fetch('/api/entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ habit_id: id, is_completed: !currentDone }),
+        body: JSON.stringify({
+          habit_id: id,
+          entry_date: todayString(),
+          is_completed: !currentDone,
+        }),
       });
+      if (!res.ok) {
+        throw new Error('Failed to save entry');
+      }
     } catch {
       // revert on failure
       setLocalHabits((prev) =>

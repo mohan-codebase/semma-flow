@@ -7,7 +7,7 @@ const supabase = createClient(
 
 async function test() {
   // 1. Create a mock user
-  const email = `test_${Date.now()}@example.com`;
+  const email = `test_${Date.now()}@gmail.com`;
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password: 'Password123!',
