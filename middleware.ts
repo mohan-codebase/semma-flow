@@ -78,5 +78,10 @@ export default async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    // Exclude Next internals, static assets, and PWA files (sw.js, manifest,
+    // icons) so the service worker script is served directly (200) instead of
+    // being redirected — a redirected SW script fails registration.
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|icons/|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|js|json|webmanifest)$).*)',
+  ],
 };
