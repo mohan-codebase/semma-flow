@@ -54,25 +54,32 @@ export async function PATCH(req: NextRequest) {
   try {
     const supabase = await createServerClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return err('Unauthorized', 401);
+    if (!user) {
+      console.error('[entries] DIAG: no user (401) — session cookie invalid/missing');
+      return err('Unauthorized', 401);
+    }
 
     const body = await req.json();
     const parsed = entrySchema.safeParse(body);
     if (!parsed.success) {
+      console.error('[entries] DIAG: payload failed validation (422):', JSON.stringify(body), parsed.error.issues);
       return err('Invalid entry payload', 422);
     }
 
     const { habit_id, entry_date, is_completed, value, notes } = parsed.data;
 
     // Verify the habit belongs to this user
-    const { data: habit } = await supabase
+    const { data: habit, error: habitErr } = await supabase
       .from('habits')
       .select('id, total_completions, current_streak, longest_streak')
       .eq('id', habit_id)
       .eq('user_id', user.id)
       .single();
 
-    if (!habit) return err('Habit not found', 404);
+    if (habitErr || !habit) {
+      console.error('[entries] DIAG: habit lookup failed (404). user:', user.id, 'habit_id:', habit_id, 'err:', habitErr);
+      return err('Habit not found', 404);
+    }
 
     const now = new Date().toISOString();
     interface EntryPayload {
