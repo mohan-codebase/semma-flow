@@ -42,12 +42,12 @@ const CATEGORIES = [
 const TEMPLATES: Record<string, Template[]> = {
   health:       [
     { name: 'Drink 8 glasses of water', icon: 'glass-water',   color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Take vitamins',             icon: 'pill',           color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Take vitamins',             icon: 'pill',           color: '#7C3AED', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Sleep 8 hours',            icon: 'moon',           color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'No alcohol',               icon: 'ban',            color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   fitness:      [
-    { name: 'Morning run',              icon: 'footprints',     color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Morning run',              icon: 'footprints',     color: '#7C3AED', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Workout 30 mins',          icon: 'dumbbell',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: '10,000 steps',             icon: 'activity',       color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Stretch / mobility',       icon: 'wind',           color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
@@ -59,20 +59,20 @@ const TEMPLATES: Record<string, Template[]> = {
     { name: 'Evening reflection',       icon: 'moon',           color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   learning:     [
-    { name: 'Read 30 minutes',          icon: 'book-open',      color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Read 30 minutes',          icon: 'book-open',      color: '#7C3AED', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Practice a language',      icon: 'globe',          color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Write 500 words',          icon: 'pen-tool',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Watch a tutorial',         icon: 'graduation-cap', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   productivity: [
-    { name: 'Plan the day (5 min)',     icon: 'calendar-check', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Plan the day (5 min)',     icon: 'calendar-check', color: '#7C3AED', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: '2-hour deep work block',  icon: 'target',          color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Weekly review',           icon: 'refresh-cw',      color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Inbox zero',              icon: 'inbox',           color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
 };
 
-const PRESET_COLORS = ['var(--accent-primary)','#3B82F6','#8B7FE8','#EC4899','#F59E0B','#F07272','#5BC7DA','var(--accent-primary)','#F4B740','#6366F1'];
+const PRESET_COLORS = ['#7C3AED','#3B82F6','#8B7FE8','#EC4899','#F59E0B','#F07272','#5BC7DA','#A78BFA','#F4B740','#6366F1'];
 
 /* ─── Mini confetti burst (CSS only, no dep) ────────────────── */
 function Confetti() {
@@ -134,7 +134,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
   const [categoryId, setCategoryId] = useState('');
   const [template, setTemplate] = useState<Template | null>(null);
   const [habitName, setHabitName] = useState('');
-  const [habitColor, setHabitColor] = useState('var(--accent-primary)');
+  const [habitColor, setHabitColor] = useState('#7C3AED');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [createdHabit, setCreatedHabit] = useState<Habit | null>(null);

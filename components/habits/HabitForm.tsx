@@ -21,7 +21,7 @@ interface HabitFormProps {
 }
 
 const PRESET_COLORS = [
-  'var(--accent-primary)', '#3B82F6', '#8B5CF6', '#EC4899',
+  '#7C3AED', '#3B82F6', '#8B5CF6', '#EC4899',
   '#F59E0B', '#EF4444', '#06B6D4', '#84CC16',
   '#F97316', '#6366F1',
 ];
@@ -379,7 +379,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                         type="text"
                         value={field.value}
                         onChange={(e) => field.onChange(e.target.value)}
-                        placeholder="var(--accent-primary)"
+                        placeholder="#7C3AED"
                         style={{
                           width: 90,
                           background: 'var(--bg-tertiary)',
@@ -396,6 +396,11 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                   </div>
                 )}
               />
+              {errors.color && (
+                <span style={{ fontSize: 12, color: 'var(--danger)', marginTop: 4 }}>
+                  {errors.color.message}
+                </span>
+              )}
             </div>
 
             {/* Icon */}
