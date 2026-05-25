@@ -1502,9 +1502,12 @@ export default function FitnessSummary({
         }),
       });
       if (!res.ok) {
-        throw new Error('Failed to save entry');
+        const body = await res.json().catch(() => ({}));
+        console.error('[handleToggle] API error', res.status, body);
+        throw new Error(`Failed to save entry: ${res.status} ${JSON.stringify(body)}`);
       }
-    } catch {
+    } catch (err) {
+      console.error('[handleToggle] toggle failed, reverting:', err);
       // revert on failure
       setLocalHabits((prev) =>
         prev.map((h) =>
