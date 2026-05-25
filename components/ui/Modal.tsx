@@ -146,8 +146,6 @@ export default function Modal({
             className="hf-modal-panel"
             style={{
               background: 'var(--glass-bg)',
-              backdropFilter: 'var(--glass-blur)',
-              WebkitBackdropFilter: 'var(--glass-blur)',
               boxShadow: 'var(--glass-shadow)',
               borderRadius: 18,
               width: '100%',

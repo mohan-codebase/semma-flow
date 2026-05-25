@@ -38,25 +38,16 @@ const PURPLE_HEX    = '#7C3AED';
 // Liquid glass helpers (inline style objects)
 const GLASS: React.CSSProperties = {
   background: 'var(--glass-bg)',
-  backdropFilter: 'var(--glass-blur)',
-  WebkitBackdropFilter: 'var(--glass-blur)',
   boxShadow: 'var(--glass-shadow)',
 };
 const GLASS_SM: React.CSSProperties = {
   background: 'var(--glass-bg)',
-  backdropFilter: 'var(--glass-blur)',
-  WebkitBackdropFilter: 'var(--glass-blur)',
   boxShadow: 'var(--glass-shadow-sm)',
 };
 const GLASS_PURPLE: React.CSSProperties = {
   background: 'var(--glass-bg-purple)',
-  backdropFilter: 'var(--glass-blur)',
-  WebkitBackdropFilter: 'var(--glass-blur)',
   boxShadow: 'var(--glass-shadow-purple)',
 };
-// Nested glass — for cards INSIDE a bottom sheet that already blurs.
-// No own backdrop-filter (avoids nested-blur rendering glitches); relies on
-// the parent sheet's blur and only carries the translucent tint + edge highlight.
 const GLASS_NESTED: React.CSSProperties = {
   background: 'var(--glass-bg)',
   boxShadow: 'var(--glass-shadow-sm)',
@@ -437,7 +428,6 @@ function HabitDetailSheet({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(30,27,75,0.55)', backdropFilter: 'blur(4px)', zIndex: 200 }}
       />
 
       {/* Sheet */}
@@ -454,8 +444,6 @@ function HabitDetailSheet({
           marginRight: 'auto',
           zIndex: 201,
           background: 'var(--glass-bg-sheet)',
-          backdropFilter: 'blur(40px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
           borderRadius: '24px 24px 0 0',
           maxHeight: '88dvh',
           overflowY: 'auto',
@@ -872,7 +860,6 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, background: 'rgba(30,27,75,0.55)', backdropFilter: 'blur(4px)', zIndex: 200 }}
       />
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
@@ -882,8 +869,6 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
           maxWidth: 480, marginLeft: 'auto', marginRight: 'auto',
           zIndex: 201,
           background: 'var(--glass-bg-sheet)',
-          backdropFilter: 'blur(40px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(40px) saturate(200%)',
           borderRadius: '24px 24px 0 0',
           maxHeight: '92dvh', overflowY: 'auto',
           padding: '0 16px 44px',
@@ -1171,11 +1156,7 @@ function ProfileMenu({
       transition={{ duration: 0.2 }}
       style={{
         position: 'fixed', inset: 0, zIndex: 400,
-        backdropFilter: 'blur(32px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(32px) saturate(200%)',
-        background: isDark
-          ? 'linear-gradient(160deg, rgba(10,6,28,0.82) 0%, rgba(20,10,50,0.78) 100%)'
-          : 'linear-gradient(160deg, rgba(220,210,255,0.48) 0%, rgba(240,235,255,0.38) 100%)',
+        background: 'var(--bg-primary)',
         fontFamily: "system-ui, -apple-system, sans-serif",
         overflowY: 'auto',
       }}
@@ -1215,8 +1196,6 @@ function ProfileMenu({
             background: isDark
               ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
               : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: 28,
             padding: '28px 24px 24px',
             boxShadow: isDark
@@ -1284,8 +1263,6 @@ function ProfileMenu({
             background: isDark
               ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
               : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: 24, padding: '16px 20px',
             boxShadow: isDark
               ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
@@ -1311,8 +1288,6 @@ function ProfileMenu({
             background: isDark
               ? 'linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(167,85,247,0.35) 100%)'
               : 'linear-gradient(135deg, rgba(196,181,253,0.45) 0%, rgba(221,214,254,0.30) 100%)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
             boxShadow: isDark
               ? '0 0 0 1px rgba(167,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(124,58,237,0.45)'
               : '0 0 0 1px rgba(196,181,253,0.6), inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 8px rgba(124,58,237,0.15)',
@@ -1325,8 +1300,6 @@ function ProfileMenu({
               background: isDark
                 ? 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(237,233,254,0.85) 100%)'
                 : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.80) 100%)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
               boxShadow: isDark
                 ? '0 0 0 1px rgba(255,255,255,0.25), 0 2px 8px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.9)'
                 : '0 0 0 1px rgba(196,181,253,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)',
@@ -1352,8 +1325,6 @@ function ProfileMenu({
             background: isDark
               ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
               : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
             borderRadius: 24, overflow: 'hidden',
             boxShadow: isDark
               ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
@@ -1400,8 +1371,6 @@ function ProfileMenu({
               background: isDark
                 ? 'linear-gradient(155deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.10) 100%)'
                 : 'linear-gradient(155deg, rgba(255,255,255,0.80) 0%, rgba(255,230,230,0.60) 100%)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
               color: isDark ? '#F87171' : '#DC2626',
               fontSize: 15, fontWeight: 700,
               cursor: signingOut ? 'default' : 'pointer',
@@ -1526,12 +1495,6 @@ export default function FitnessSummary({
     }
   };
 
-  const bestInsight =
-    completedCount === totalCount && totalCount > 0
-      ? `All ${totalCount} habits done today. Excellent streak!`
-      : stats?.weekPercentage && stats.weekPercentage >= 80
-        ? `You're ${stats.weekPercentage}% consistent this week. Keep it up!`
-        : `${totalCount - completedCount} habit${totalCount - completedCount !== 1 ? 's' : ''} left today — you've got this.`;
 
   return (
     <div style={{
@@ -1542,26 +1505,7 @@ export default function FitnessSummary({
       position: 'relative',
       minHeight: '100dvh',
     }}>
-      {/* Ambient color orbs — give liquid glass something to refract */}
-      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div style={{
-          position: 'absolute', top: '-8%', left: '-12%', width: '70%', height: '46%',
-          background: 'radial-gradient(circle at 30% 30%, rgba(124,58,237,0.45) 0%, transparent 65%)',
-          filter: 'blur(36px)',
-        }} />
-        <div style={{
-          position: 'absolute', top: '34%', right: '-18%', width: '64%', height: '44%',
-          background: 'radial-gradient(circle at 70% 50%, rgba(168,85,247,0.36) 0%, transparent 65%)',
-          filter: 'blur(40px)',
-        }} />
-        <div style={{
-          position: 'absolute', bottom: '-12%', left: '8%', width: '72%', height: '46%',
-          background: 'radial-gradient(circle at 40% 70%, rgba(91,123,250,0.30) 0%, transparent 65%)',
-          filter: 'blur(44px)',
-        }} />
-      </div>
-
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px' }}>
 
         {/* ── Header ── */}
         <motion.div
@@ -1745,47 +1689,6 @@ export default function FitnessSummary({
         {/* ── Circular Progress ── */}
         <CircularProgress completed={completedCount} total={totalCount} />
 
-        {/* ── Insight Card ── */}
-        {stats && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.3 }}
-            style={{
-              marginTop: 20,
-              padding: '16px 18px',
-              ...GLASS_PURPLE,
-              borderRadius: 18,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-            }}
-          >
-            <div style={{
-              width: 44,
-              height: 44,
-              borderRadius: 14,
-              background: PURPLE,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M11 3L13.5 8.5L19.5 9.3L15 13.5L16.2 19.5L11 16.5L5.8 19.5L7 13.5L2.5 9.3L8.5 8.5L11 3Z"
-                  fill="white" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: PURPLE, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                New Insight
-              </p>
-              <p style={{ margin: '3px 0 0', fontSize: 13, fontWeight: 600, color: TEXT_DARK, lineHeight: 1.4 }}>
-                {bestInsight}
-              </p>
-            </div>
-          </motion.div>
-        )}
 
       </div>
 

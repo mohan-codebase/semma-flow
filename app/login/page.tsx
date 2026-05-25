@@ -105,8 +105,6 @@ function LoginContent() {
         <div
           style={{
             background: 'var(--glass-bg)',
-            backdropFilter: 'var(--glass-blur)',
-            WebkitBackdropFilter: 'var(--glass-blur)',
             boxShadow: 'var(--glass-shadow)',
             borderRadius: 'var(--r-xl)',
             padding: 'var(--space-6)',

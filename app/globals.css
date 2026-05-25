@@ -193,14 +193,14 @@
   --input-bg:           rgba(255, 255, 255, 0.05);
   --input-border:       rgba(124, 58, 237, 0.30);
 
-  /* ── Liquid glass tokens ── */
-  --glass-bg:           linear-gradient(155deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 100%);
-  --glass-bg-purple:    linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(167,85,247,0.09) 100%);
-  --glass-bg-sheet:     linear-gradient(160deg, rgba(15,12,40,0.82) 0%, rgba(25,18,60,0.78) 100%);
-  --glass-blur:         blur(28px) saturate(180%);
-  --glass-shadow:       0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(255,255,255,0.08);
-  --glass-shadow-sm:    0 4px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10), 0 0 0 1px rgba(255,255,255,0.07);
-  --glass-shadow-purple:0 8px 28px rgba(124,58,237,0.30), inset 0 1px 0 rgba(255,255,255,0.18), 0 0 0 1px rgba(124,58,237,0.30);
+  /* ── Card tokens (formerly liquid glass) ── */
+  --glass-bg:           var(--bg-secondary);
+  --glass-bg-purple:    rgba(124, 58, 237, 0.10);
+  --glass-bg-sheet:     var(--bg-secondary);
+  --glass-blur:         none;
+  --glass-shadow:       0 1px 3px rgba(0,0,0,0.20), 0 0 0 1px var(--border-subtle);
+  --glass-shadow-sm:    0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border-subtle);
+  --glass-shadow-purple:0 2px 8px rgba(124,58,237,0.15), 0 0 0 1px rgba(124,58,237,0.20);
   --glass-border:       none;
 
   /* Legacy aliases */
@@ -277,14 +277,14 @@
   --input-bg:           rgba(255, 255, 255, 0.85);
   --input-border:       #DDD6FE;
 
-  /* ── Liquid glass tokens — light ── */
-  --glass-bg:           linear-gradient(155deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.60) 100%);
-  --glass-bg-purple:    linear-gradient(135deg, rgba(124,58,237,0.10) 0%, rgba(167,85,247,0.05) 100%);
-  --glass-bg-sheet:     linear-gradient(160deg, rgba(220,210,255,0.50) 0%, rgba(240,235,255,0.40) 100%);
-  --glass-blur:         blur(28px) saturate(180%);
-  --glass-shadow:       0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90);
-  --glass-shadow-sm:    0 2px 12px rgba(100,80,200,0.08), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.85);
-  --glass-shadow-purple:0 4px 20px rgba(124,58,237,0.18), inset 0 1px 0 rgba(255,255,255,0.90), 0 0 0 1px rgba(124,58,237,0.16);
+  /* ── Card tokens — light ── */
+  --glass-bg:           var(--bg-secondary);
+  --glass-bg-purple:    rgba(124, 58, 237, 0.06);
+  --glass-bg-sheet:     var(--bg-secondary);
+  --glass-blur:         none;
+  --glass-shadow:       0 1px 3px rgba(100,80,200,0.10), 0 0 0 1px var(--border-subtle);
+  --glass-shadow-sm:    0 1px 2px rgba(100,80,200,0.08), 0 0 0 1px var(--border-subtle);
+  --glass-shadow-purple:0 2px 8px rgba(124,58,237,0.12), 0 0 0 1px rgba(124,58,237,0.16);
   --glass-border:       none;
 }
 
@@ -381,29 +381,20 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: none;
 }
 
-/* ── Liquid glass utilities ─────────────────────────────────────────────── */
+/* ── Card utilities (formerly liquid glass) ─────────────────────────────── */
 .liquid-glass {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow);
-  border: var(--glass-border);
 }
 
 .liquid-glass-sm {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow-sm);
-  border: var(--glass-border);
 }
 
 .liquid-glass-purple {
   background: var(--glass-bg-purple);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   box-shadow: var(--glass-shadow-purple);
-  border: var(--glass-border);
 }
 
 /* Gradient text — purple to violet */

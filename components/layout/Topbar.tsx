@@ -282,9 +282,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
         style={{
           height: 64,
           padding: '0 24px',
-          background: 'color-mix(in srgb, var(--bg-card) 82%, transparent)',
-          backdropFilter: 'blur(20px) saturate(1.6)',
-          WebkitBackdropFilter: 'blur(20px) saturate(1.6)',
+          background: 'var(--bg-card)',
           borderBottom: '1px solid color-mix(in srgb, var(--border-default) 70%, transparent)',
           position: 'sticky',
           top: 0,

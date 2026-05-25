@@ -60,15 +60,15 @@ export default async function middleware(request: NextRequest) {
   const authPaths = ['/login', '/signup'];
   const isAuthPath = authPaths.some(p => pathname.startsWith(p));
 
-  // If no user and trying to access protected route (anything not auth or landing)
-  if (!user && !isAuthPath && pathname !== '/') {
+  // If no user and trying to access a protected route, send to login
+  if (!user && !isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in, don't let them stay on login/signup or landing page
-  if (user && (isAuthPath || pathname === '/')) {
+  // If user is logged in, don't let them stay on login/signup
+  if (user && isAuthPath) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
