@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 client_secret_*.json
+
+# scratch / local debugging artifacts (may contain secrets)
+scratch/
