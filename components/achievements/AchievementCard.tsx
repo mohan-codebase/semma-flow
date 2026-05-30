@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
 import { Lock } from 'lucide-react';
+import { DynamicIcon } from '@/lib/icons';
 import type { AchievementDef } from '@/types/achievement';
 import { format } from 'date-fns';
 
@@ -27,19 +27,6 @@ const RARITY_STYLES: Record<string, { border: string; glow: string; label: strin
   legendary: { border: 'rgba(234,179,8,0.4)',     glow: 'rgba(234,179,8,0.1)',    label: '#EAB308' },
 };
 
-function DynamicIcon({ name, size = 22, color }: { name: string; size?: number; color: string }) {
-  const pascalName = name
-    .split(/[-_]/)
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; color?: string }>>)[pascalName];
-  if (IconComponent) return <IconComponent size={size} color={color} />;
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" fill={color} opacity={0.6} />
-    </svg>
-  );
-}
 
 export default function AchievementCard({ achievement, onNewUnlock = false }: Props) {
   const rarityStyle = RARITY_STYLES[achievement.rarity] ?? RARITY_STYLES.common;

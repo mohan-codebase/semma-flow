@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoreHorizontal, Pencil, Archive, Trash2, Flame, Link, Shield } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { DynamicIcon } from '@/lib/icons';
 import type { HabitWithEntry } from '@/types/habit';
 import HabitCheckbox from '@/components/habits/HabitCheckbox';
 import NextLink from 'next/link';
@@ -38,20 +38,6 @@ function freqLabel(habit: HabitWithEntry): string {
   return '';
 }
 
-function DynamicIcon({ name, size = 18, color }: { name: string; size?: number; color: string }) {
-  const pascal = name
-    .split(/[-_]/)
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; color?: string }> | undefined>)[pascal];
-  return Icon ? (
-    <Icon size={size} color={color} />
-  ) : (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <circle cx="12" cy="12" r="9" fill={hexToRgba(color, 0.6)} />
-    </svg>
-  );
-}
 
 function MenuItem({ icon, label, onClick, danger = false }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }) {
   const [hov, setHov] = useState(false);

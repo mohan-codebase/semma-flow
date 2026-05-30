@@ -2,16 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Sparkles, Check, X, Heart, Dumbbell, Brain, BookOpen, Target, GlassWater, Pill, Moon, Footprints, Wind, PenTool, Globe, GraduationCap, CalendarCheck, Inbox, RefreshCw, Ban, Timer } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-
-function OWIcon({ name, size = 20, color }: { name: string; size?: number; color?: string }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const icons = LucideIcons as any;
-  const pascal = name.split(/[-_]/).map((s: string) => s.charAt(0).toUpperCase() + s.slice(1)).join('');
-  const Comp = icons[pascal] ?? icons['Circle'];
-  return <Comp size={size} color={color} strokeWidth={2} />;
-}
+import { ArrowRight, ArrowLeft, Sparkles, Check, X } from 'lucide-react';
+import { DynamicIcon as OWIcon } from '@/lib/icons';
 import type { Habit } from '@/types/habit';
 
 /* ─── Types ─────────────────────────────────────────────────── */

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Flame, CheckCircle2, Target, Calendar, TrendingUp, Clock } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { DynamicIcon } from '@/lib/icons';
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import CalendarHeatmap from '@/components/analytics/CalendarHeatmap';
@@ -21,19 +21,6 @@ interface HabitDetailData extends Omit<Habit, 'category'> {
   category?: { id?: string; name: string; color: string; user_id?: string; icon?: string; sort_order?: number; created_at?: string } | null;
 }
 
-function DynamicIcon({ name, size = 22, color }: { name: string; size?: number; color: string }) {
-  const pascalName = name
-    .split(/[-_]/)
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; color?: string }>>)[pascalName];
-  if (IconComponent) return <IconComponent size={size} color={color} />;
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" fill={color} opacity={0.6} />
-    </svg>
-  );
-}
 
 function hexToRgba(hex: string, alpha: number): string {
   if (hex === 'var(--accent-primary)') return `color-mix(in srgb, var(--accent-primary) ${alpha * 100}%, transparent)`;

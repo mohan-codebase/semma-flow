@@ -654,6 +654,13 @@ h1, h2, h3, h4, h5, h6 {
     grid-template-columns: minmax(0, 1fr) !important;
   }
 
+  /* …but small fixed-size pickers (icon swatches, etc.) must keep their
+     multi-column layout — the rule above would otherwise collapse them to a
+     single column and blow each cell up to full width via aspect-ratio. */
+  .hf-icon-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+
   /* WeeklyOverview 7-day bars: stay in a row but compress */
   .hf-weekly-grid {
     grid-template-columns: repeat(7, minmax(0, 1fr)) !important;

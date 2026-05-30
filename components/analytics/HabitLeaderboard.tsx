@@ -2,27 +2,14 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
 import { Flame } from 'lucide-react';
+import { DynamicIcon } from '@/lib/icons';
 import type { HabitLeaderboardItem } from '@/types/analytics';
 
 interface Props {
   data: HabitLeaderboardItem[];
 }
 
-function DynamicIcon({ name, size = 16, color }: { name: string; size?: number; color: string }) {
-  const pascalName = name
-    .split(/[-_]/)
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  const IconComponent = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; color?: string }>>)[pascalName];
-  if (IconComponent) return <IconComponent size={size} color={color} />;
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" fill={color} opacity={0.6} />
-    </svg>
-  );
-}
 
 function hexToRgba(hex: string, alpha: number): string {
   if (!hex.startsWith('#')) return `rgba(var(--accent-primary-rgb),${alpha})`;

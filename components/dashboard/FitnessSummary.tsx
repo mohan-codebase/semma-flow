@@ -2,21 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
+import { User, Plus } from 'lucide-react';
+import { DynamicIcon } from '@/lib/icons';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
 import { todayString } from '@/lib/utils/dates';
-
-function DynamicIcon({ name, size = 20, color }: { name: string; size?: number; color?: string }) {
-  const pascal = (name ?? 'circle-check')
-    .split(/[-_]/)
-    .map((s: string) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const icons = LucideIcons as any;
-  const Comp = icons[pascal] ?? icons['Circle'];
-  return <Comp size={size} color={color} strokeWidth={2} />;
-}
 
 interface FitnessSummaryProps {
   stats: OverviewStats | null;
@@ -57,8 +47,8 @@ const GLASS_NESTED_PURPLE: React.CSSProperties = {
   boxShadow: 'var(--glass-shadow-purple)',
 };
 
-const RADIUS = 72;
-const STROKE = 10;
+const RADIUS = 100;
+const STROKE = 9;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function CircularProgress({
@@ -79,30 +69,32 @@ function CircularProgress({
       transition={{ duration: 0.4, delay: 0.35 }}
       style={{
         marginTop: 24,
-        padding: '24px 20px',
-        borderRadius: 22,
+        padding: '24px 20px 28px',
+        borderRadius: 24,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 20,
-        ...GLASS,
+        gap: 0,
+        background: 'rgba(124,58,237,0.05)',
+        border: '1px solid rgba(124,58,237,0.10)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', marginBottom: 24 }}>
         <div>
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: TEXT_MUTED, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Today's Progress
+          <p style={{ margin: 0, fontSize: 10, fontWeight: 800, color: TEXT_MUTED, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            Today&apos;s Progress
           </p>
-          <p style={{ margin: '3px 0 0', fontSize: 16, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+          <p style={{ margin: '5px 0 0', fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.03em' }}>
             {completed} of {total} done
           </p>
         </div>
         <div style={{
-          padding: '4px 12px',
+          padding: '6px 14px',
           borderRadius: 20,
-          background: pct === 100 ? 'rgba(124,58,237,0.12)' : PURPLE_LIGHT,
+          background: 'rgba(124,58,237,0.10)',
         }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE }}>{pct}%</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{pct}%</span>
         </div>
       </div>
 
@@ -115,7 +107,7 @@ function CircularProgress({
             cy={size / 2}
             r={RADIUS}
             fill="none"
-            stroke={PURPLE_LIGHT}
+            stroke="rgba(124,58,237,0.10)"
             strokeWidth={STROKE}
           />
           {/* Progress arc */}
@@ -124,7 +116,7 @@ function CircularProgress({
             cy={size / 2}
             r={RADIUS}
             fill="none"
-            stroke={pct === 100 ? PURPLE_HEX : 'url(#progressGrad)'}
+            stroke={PURPLE_HEX}
             strokeWidth={STROKE}
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
@@ -132,12 +124,6 @@ function CircularProgress({
             animate={{ strokeDashoffset: offset }}
             transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
           />
-          <defs>
-            <linearGradient id="progressGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#7C3AED" />
-              <stop offset="100%" stopColor="#A855F7" />
-            </linearGradient>
-          </defs>
         </svg>
         {/* Centre label */}
         <div style={{
@@ -147,12 +133,12 @@ function CircularProgress({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 2,
+          gap: 3,
         }}>
-          <span style={{ fontSize: 30, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.04em', lineHeight: 1 }}>
+          <span style={{ fontSize: 36, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.04em', lineHeight: 1 }}>
             {pct}%
           </span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: TEXT_MUTED, letterSpacing: '0.03em' }}>
             complete
           </span>
         </div>
@@ -160,7 +146,7 @@ function CircularProgress({
 
       {/* Per-habit dots */}
       {total > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', width: '100%' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center', width: '100%', marginTop: 28 }}>
           {Array.from({ length: total }, (_, i) => (
             <motion.div
               key={i}
@@ -168,11 +154,11 @@ function CircularProgress({
               animate={{ scale: 1 }}
               transition={{ duration: 0.2, delay: 0.6 + i * 0.05 }}
               style={{
-                width: 10,
-                height: 10,
+                width: 12,
+                height: 12,
                 borderRadius: '50%',
-                background: i < completed ? PURPLE : PURPLE_LIGHT,
-                border: `2px solid ${i < completed ? PURPLE : 'var(--drag-handle)'}`,
+                background: i < completed ? PURPLE_HEX : 'transparent',
+                border: `2px solid ${i < completed ? PURPLE_HEX : 'rgba(124,58,237,0.25)'}`,
               }}
             />
           ))}
@@ -363,6 +349,8 @@ function HabitDetailSheet({
       if (res.ok) {
         onDelete(habit.id);
         onClose();
+      } else {
+        setDeleting(false);
       }
     } catch {
       setDeleting(false);
@@ -415,7 +403,7 @@ function HabitDetailSheet({
 
   // For stat pills — last 30-day rate
   const completedCount = entries.filter((e) => e.is_completed).length;
-  const rate = Math.round((completedCount / 30) * 100);
+  const rate = Math.min(100, Math.round((completedCount / 30) * 100));
 
   const canGoBack    = monthOffset > -3;
   const canGoForward = monthOffset < 0;
@@ -428,6 +416,7 @@ function HabitDetailSheet({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
+        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
       />
 
       {/* Sheet */}
@@ -527,7 +516,7 @@ function HabitDetailSheet({
             <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
               Choose icon
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 8, marginBottom: 16 }}>
+            <div className="hf-icon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 16 }}>
               {HABIT_ICONS.map((ic) => {
                 const active = editIcon === ic;
                 return (
@@ -860,6 +849,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
+        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
       />
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
@@ -911,8 +901,8 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         {/* ── Icon + Color ── */}
         <SectionCard>
           <FieldLabel>Icon</FieldLabel>
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 8, marginBottom: 18,
+          <div className="hf-icon-grid" style={{
+            display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 18,
             maxHeight: 180, overflowY: 'auto', paddingRight: 2,
           }}>
             {HABIT_ICONS.map((ic) => {
@@ -1149,42 +1139,61 @@ function ProfileMenu({
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 400,
-        background: 'var(--bg-primary)',
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        overflowY: 'auto',
-      }}
-    >
-      {/* Inner centred column */}
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 48px', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+    <>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={onClose}
+        style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0,0,0,0.45)' }}
+      />
 
-        {/* Top bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, paddingBottom: 8 }}
-        >
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.60)' : 'rgba(60,40,120,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            Profile
-          </p>
-          <button onClick={onClose} style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.65)',
-            boxShadow: isDark ? 'inset 0 1px 0 rgba(255,255,255,0.15)' : 'inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(124,58,237,0.12)',
-            border: 'none',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer',
-          }}>
-            <DynamicIcon name="x" size={18} color={PURPLE} />
-          </button>
-        </motion.div>
+      {/* Sheet — slides up from bottom */}
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+        style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 400,
+          maxHeight: '93dvh',
+          background: 'var(--bg-primary)',
+          borderRadius: '24px 24px 0 0',
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          overflowY: 'auto',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
+        {/* Inner centred column */}
+        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 48px', display: 'flex', flexDirection: 'column' }}>
+
+          {/* Drag handle */}
+          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
+            <div style={{ width: 40, height: 4, borderRadius: 999, background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />
+          </div>
+
+          {/* Top bar */}
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.08 }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 8 }}
+          >
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.60)' : 'rgba(60,40,120,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Profile
+            </p>
+            <button onClick={onClose} style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(124,58,237,0.08)',
+              border: 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+            }}>
+              <DynamicIcon name="x" size={18} color={PURPLE} />
+            </button>
+          </motion.div>
 
         {/* Profile card */}
         <motion.div
@@ -1280,38 +1289,52 @@ function ProfileMenu({
               <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>Premium theme</p>
             </div>
           </div>
-          <button onClick={toggleTheme} style={{
-            width: 58, height: 32, borderRadius: 999, border: 'none',
-            cursor: 'pointer', position: 'relative', flexShrink: 0,
-            padding: 0,
-            /* liquid glass track */
-            background: isDark
-              ? 'linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(167,85,247,0.35) 100%)'
-              : 'linear-gradient(135deg, rgba(196,181,253,0.45) 0%, rgba(221,214,254,0.30) 100%)',
-            boxShadow: isDark
-              ? '0 0 0 1px rgba(167,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(124,58,237,0.45)'
-              : '0 0 0 1px rgba(196,181,253,0.6), inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 8px rgba(124,58,237,0.15)',
-            transition: 'all 0.3s ease',
-          }}>
-            {/* Glass thumb */}
-            <div style={{
-              position: 'absolute', top: 4, left: isDark ? 28 : 4,
-              width: 24, height: 24, borderRadius: '50%',
+          <button
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-pressed={isDark}
+            style={{
+              // Transparent hit-target wrapper. The global mobile rule forces a
+              // ≥36px min-height on buttons; keeping the visual pill in an inner
+              // element lets the tap area grow without stretching the track (which
+              // previously inflated to 44px and shoved the thumb off-centre).
+              border: 'none', background: 'transparent', padding: 0, margin: 0,
+              cursor: 'pointer', flexShrink: 0,
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            {/* liquid glass track */}
+            <span style={{
+              display: 'block', position: 'relative',
+              width: 58, height: 32, borderRadius: 999,
               background: isDark
-                ? 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(237,233,254,0.85) 100%)'
-                : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.80) 100%)',
+                ? 'linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(167,85,247,0.35) 100%)'
+                : 'linear-gradient(135deg, rgba(196,181,253,0.45) 0%, rgba(221,214,254,0.30) 100%)',
               boxShadow: isDark
-                ? '0 0 0 1px rgba(255,255,255,0.25), 0 2px 8px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.9)'
-                : '0 0 0 1px rgba(196,181,253,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)',
-              transition: 'left 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                ? '0 0 0 1px rgba(167,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(124,58,237,0.45)'
+                : '0 0 0 1px rgba(196,181,253,0.6), inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 8px rgba(124,58,237,0.15)',
+              transition: 'all 0.3s ease',
             }}>
-              <DynamicIcon
-                name={isDark ? 'moon' : 'sun'}
-                size={12}
-                color={isDark ? PURPLE_HEX : '#F59E0B'}
-              />
-            </div>
+              {/* Glass thumb */}
+              <span style={{
+                position: 'absolute', top: 4, left: isDark ? 30 : 4,
+                width: 24, height: 24, borderRadius: '50%',
+                background: isDark
+                  ? 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(237,233,254,0.85) 100%)'
+                  : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.80) 100%)',
+                boxShadow: isDark
+                  ? '0 0 0 1px rgba(255,255,255,0.25), 0 2px 8px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.9)'
+                  : '0 0 0 1px rgba(196,181,253,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)',
+                transition: 'left 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <DynamicIcon
+                  name={isDark ? 'moon' : 'sun'}
+                  size={12}
+                  color={isDark ? PURPLE_HEX : '#F59E0B'}
+                />
+              </span>
+            </span>
           </button>
         </motion.div>
 
@@ -1387,11 +1410,12 @@ function ProfileMenu({
         </motion.div>
 
         {/* Version */}
-        <p style={{ margin: 'auto 0 0', paddingTop: 32, textAlign: 'center', fontSize: 11, color: TEXT_MUTED }}>
+        <p style={{ paddingTop: 32, textAlign: 'center', fontSize: 11, color: TEXT_MUTED, margin: 0 }}>
           Semma Flow · v1.0
         </p>
       </div>
     </motion.div>
+    </>
   );
 }
 
@@ -1403,10 +1427,34 @@ export default function FitnessSummary({
   initials = '?',
   email = '',
 }: FitnessSummaryProps) {
-  const [localHabits, setLocalHabits] = useState<HabitWithEntry[]>(habits);
-  const [selectedId, setSelectedId]   = useState<string | null>(null);
-  const [addOpen, setAddOpen]         = useState(false);
-  const [menuOpen, setMenuOpen]       = useState(false);
+  const [localHabits, setLocalHabits]   = useState<HabitWithEntry[]>(habits);
+  const [selectedId, setSelectedId]     = useState<string | null>(null);
+  const [addOpen, setAddOpen]           = useState(false);
+  const [menuOpen, setMenuOpen]         = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>(todayString());
+  const [dateEntries, setDateEntries]   = useState<Record<string, boolean>>({});
+  const [loadingDate, setLoadingDate]   = useState(false);
+
+  const isViewingToday = selectedDate === todayString();
+
+  const selectDate = async (date: string) => {
+    if (date === selectedDate) return;
+    setSelectedDate(date);
+    if (date === todayString()) { setDateEntries({}); return; }
+    setLoadingDate(true);
+    try {
+      const res = await fetch(`/api/entries?date=${date}`);
+      if (res.ok) {
+        const json = await res.json();
+        const map: Record<string, boolean> = {};
+        (json.data ?? []).forEach((e: { habit_id: string; is_completed: boolean }) => {
+          map[e.habit_id] = e.is_completed;
+        });
+        setDateEntries(map);
+      }
+    } catch {}
+    setLoadingDate(false);
+  };
 
   const handleAddSuccess = (saved: Habit) => {
     setLocalHabits((prev) => [...prev, { ...saved, todayEntry: null, completionRate: 0 } as HabitWithEntry]);
@@ -1422,53 +1470,62 @@ export default function FitnessSummary({
     setSelectedId(null);
   };
 
-  const goodHabits   = localHabits.filter((h) => !h.is_bad_habit);
-  const completedCount = goodHabits.filter((h) => h.todayEntry?.is_completed).length;
-  const totalCount     = goodHabits.length;
-  const todayPct       = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-  const weekPct        = stats?.weekPercentage ?? 0;
-  const prevWeekDiff   = weekPct >= 0 ? `+${Math.min(weekPct, 12)}%` : `${weekPct}%`;
+  const goodHabits = localHabits.filter((h) => !h.is_bad_habit);
 
-  // Header date
+  // Habits displayed with the selected date's completion state
+  const displayHabits = isViewingToday
+    ? goodHabits
+    : goodHabits.map((h) => ({
+        ...h,
+        todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
+      }));
+
+  const completedCount = displayHabits.filter((h) => h.todayEntry?.is_completed).length;
+  const totalCount     = displayHabits.length;
+  const todayPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
   const now     = new Date();
-  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).toUpperCase();
+  const hour    = now.getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' });
 
-  // Day labels for weekly card
-  // Mon-first order: 1=Mon…6=Sat, 0=Sun
-  const MON_FIRST_DOW = [1, 2, 3, 4, 5, 6, 0];
-  const DAY_SHORT     = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  const todayDow      = now.getDay();
+  // Week date strip — sorted 7 days with actual calendar numbers
+  const weekDates = [...weekData]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(({ date, percentage }) => {
+      const d = new Date(date + 'T00:00:00');
+      const LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const isToday = date === todayString();
+      return { date, dayNum: d.getDate(), dayLabel: LABELS[d.getDay()], isToday, pct: percentage };
+    });
 
-  // For each Mon-first slot, find the matching weekData entry
-  const weekBars = MON_FIRST_DOW.map((dow) => {
-    const entry = weekData.find((d) => new Date(d.date + 'T00:00:00').getDay() === dow);
-    return { dow, pct: entry?.percentage ?? 0, isToday: entry?.isToday ?? false };
-  });
+  // Consistency score bars — same 7 days as the week strip, oldest→today left→right.
+  // Override today's pct with the live todayPct so bars update as the user checks habits.
+  const weekBars = weekDates.map((wd) =>
+    wd.isToday ? { ...wd, pct: todayPct } : wd
+  );
+  const avgPct = weekBars.length
+    ? Math.round(weekBars.reduce((s, b) => s + b.pct, 0) / weekBars.length)
+    : 0;
 
   const handleToggle = async (id: string, currentDone: boolean) => {
-    setLocalHabits((prev) =>
-      prev.map((h) =>
-        h.id === id
-          ? {
-              ...h,
-              todayEntry: {
-                ...(h.todayEntry ?? {}),
-                habit_id: id,
-                is_completed: !currentDone,
-              } as HabitWithEntry['todayEntry'],
-            }
-          : h
-      )
-    );
+    // Optimistic update
+    if (isViewingToday) {
+      setLocalHabits((prev) =>
+        prev.map((h) =>
+          h.id === id
+            ? { ...h, todayEntry: { ...(h.todayEntry ?? {}), habit_id: id, is_completed: !currentDone } as HabitWithEntry['todayEntry'] }
+            : h
+        )
+      );
+    } else {
+      setDateEntries((prev) => ({ ...prev, [id]: !currentDone }));
+    }
     try {
       const res = await fetch('/api/entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          habit_id: id,
-          entry_date: todayString(),
-          is_completed: !currentDone,
-        }),
+        body: JSON.stringify({ habit_id: id, entry_date: selectedDate, is_completed: !currentDone }),
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -1477,21 +1534,17 @@ export default function FitnessSummary({
       }
     } catch (err) {
       console.error('[handleToggle] toggle failed, reverting:', err);
-      // revert on failure
-      setLocalHabits((prev) =>
-        prev.map((h) =>
-          h.id === id
-            ? {
-                ...h,
-                todayEntry: {
-                  ...(h.todayEntry ?? {}),
-                  habit_id: id,
-                  is_completed: currentDone,
-                } as HabitWithEntry['todayEntry'],
-              }
-            : h
-        )
-      );
+      if (isViewingToday) {
+        setLocalHabits((prev) =>
+          prev.map((h) =>
+            h.id === id
+              ? { ...h, todayEntry: { ...(h.todayEntry ?? {}), habit_id: id, is_completed: currentDone } as HabitWithEntry['todayEntry'] }
+              : h
+          )
+        );
+      } else {
+        setDateEntries((prev) => ({ ...prev, [id]: currentDone }));
+      }
     }
   };
 
@@ -1512,159 +1565,201 @@ export default function FitnessSummary({
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            paddingTop: 20,
-            paddingBottom: 4,
-          }}
+          style={{ paddingTop: 24, paddingBottom: 4 }}
         >
-          <div>
-            <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: TEXT_MUTED, letterSpacing: '0.08em' }}>
-              {dateStr}
-            </p>
-            <h1 style={{
-              margin: '4px 0 0',
-              fontSize: 28,
-              fontWeight: 800,
-              color: TEXT_DARK,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.1,
-            }}>
-              Hi, {displayName.split(' ')[0]}!
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+              {greeting},<br />{displayName.split(' ')[0]} 👋
             </h1>
+            <button
+              onClick={() => setMenuOpen(true)}
+              style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', flexShrink: 0, marginTop: 4,
+              }}
+            >
+              <User size={19} color={TEXT_MUTED} />
+            </button>
           </div>
-          <button
-            onClick={() => setMenuOpen(true)}
-            style={{
-              width: 44, height: 44, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 16, fontWeight: 700,
-              marginTop: 8, flexShrink: 0,
-              boxShadow: '0 4px 14px rgba(124,58,237,0.4)',
-            }}
-          >
-            {initials}
-          </button>
+
+          {/* Date + Add */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+            <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: TEXT_DARK }}>{dateStr}</p>
+            <button
+              onClick={() => setAddOpen(true)}
+              style={{
+                width: 38, height: 38, borderRadius: '50%',
+                background: 'var(--bg-secondary)',
+                border: '1.5px solid var(--border-default)',
+                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', flexShrink: 0,
+              }}
+            >
+              <Plus size={20} color={PURPLE} strokeWidth={2.5} />
+            </button>
+          </div>
         </motion.div>
 
-        {/* ── Weekly Analytics Card ── */}
+        {/* ── Week Date Strip ── */}
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.08 }}
-          style={{
-            marginTop: 20,
-            borderRadius: 22,
-            background: 'linear-gradient(135deg, #7C3AED 0%, #9F67FF 60%, #B794F4 100%)',
-            padding: '20px 20px 16px',
-            boxShadow: '0 8px 28px rgba(124,58,237,0.35)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
+          transition={{ duration: 0.3, delay: 0.08 }}
+          style={{ marginTop: 22 }}
         >
-          {/* Decorative circle */}
-          <div style={{
-            position: 'absolute',
-            top: -30,
-            right: -30,
-            width: 130,
-            height: 130,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.07)',
-            pointerEvents: 'none',
-          }} />
-
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <div>
-              <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.02em' }}>
-                Weekly Analytics
-              </p>
-              <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.65)' }}>
-                Goal: 90% completion
-              </p>
-            </div>
-            <div style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: 20,
-              padding: '5px 10px',
-              flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                {todayPct >= 80 ? '+' : ''}{todayPct}% today
-              </span>
-            </div>
-          </div>
-
-          {/* Day labels */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            marginTop: 28,
-            paddingTop: 12,
-            borderTop: '1px solid rgba(255,255,255,0.15)',
-          }}>
-            {weekBars.map(({ dow, pct, isToday }, i) => {
-              const barH = Math.max(4, Math.round((pct / 100) * 32));
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {weekDates.map(({ date, dayNum, dayLabel, isToday, pct }) => {
+              const R = 19, CIRC = 2 * Math.PI * R;
+              const isSelected = date === selectedDate;
               return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  {/* bar track */}
-                  <div style={{ width: 6, height: 32, borderRadius: 3, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'flex-end' }}>
-                    <div style={{
-                      width: '100%',
-                      height: barH,
-                      borderRadius: 3,
-                      background: pct > 0
-                        ? `rgba(255,255,255,${0.45 + (pct / 100) * 0.55})`
-                        : 'transparent',
-                      transition: 'height 0.4s ease',
-                    }} />
-                  </div>
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: isToday ? 800 : 500,
-                    color: isToday ? '#fff' : 'rgba(255,255,255,0.55)',
-                    letterSpacing: '0.02em',
-                  }}>
-                    {DAY_SHORT[i]}
+                <div
+                  key={date}
+                  onClick={() => selectDate(date)}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                >
+                  <span style={{ fontSize: 11, fontWeight: 600, color: isSelected ? PURPLE : TEXT_MUTED }}>
+                    {dayLabel}
                   </span>
+                  <div style={{ position: 'relative', width: 42, height: 42 }}>
+                    {isToday ? (
+                      <>
+                        <svg width="42" height="42" style={{ position: 'absolute', inset: 0 }}>
+                          <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="2.5" />
+                          <circle cx="21" cy="21" r={R} fill="none" stroke={PURPLE_HEX}
+                            strokeWidth="2.5" strokeLinecap="round"
+                            strokeDasharray={CIRC}
+                            strokeDashoffset={CIRC * (1 - todayPct / 100)}
+                            transform="rotate(-90 21 21)"
+                            style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                          />
+                        </svg>
+                        <div style={{
+                          position: 'absolute', inset: 5, borderRadius: '50%',
+                          background: PURPLE, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{dayNum}</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{
+                        width: 42, height: 42, borderRadius: '50%',
+                        background: isSelected
+                          ? PURPLE
+                          : pct > 0 ? 'var(--glass-bg-purple)' : 'var(--bg-secondary)',
+                        border: isSelected
+                          ? 'none'
+                          : `1px solid ${pct > 0 ? 'rgba(124,58,237,0.2)' : 'var(--border-subtle)'}`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        transition: 'background 0.18s ease',
+                      }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: isSelected ? '#fff' : pct > 0 ? PURPLE : TEXT_MUTED }}>
+                          {dayNum}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
           </div>
         </motion.div>
 
-        {/* ── Today's Habits ── */}
-        <div style={{ marginTop: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
-              Today's Habits
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: PURPLE }}>
-                {completedCount}/{totalCount} done
-              </span>
-              <button
-                onClick={() => setAddOpen(true)}
-                style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: PURPLE, border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', color: '#fff',
-                  fontSize: 22, fontWeight: 400, lineHeight: 1,
-                  boxShadow: '0 3px 10px rgba(124,58,237,0.4)',
-                  flexShrink: 0,
-                }}
-              >
-                +
-              </button>
+        {/* ── Consistency Score ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.15 }}
+          style={{ marginTop: 32 }}
+        >
+          <h2 style={{ margin: '0 0 14px', fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+            Consistency score
+          </h2>
+          <div style={{ ...GLASS, borderRadius: 20, padding: '20px 14px 14px' }}>
+            {/* Bar chart — fixed 88px track height, avg line overlaid */}
+            <div style={{ position: 'relative' }}>
+              {/* Bars row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 5 }}>
+                {weekBars.map(({ date, dayLabel, dayNum, pct, isToday }, i) => {
+                  const TRACK_H = 88;
+                  const barH = Math.max(pct > 0 ? 8 : 0, Math.round((pct / 100) * TRACK_H));
+                  return (
+                    <div key={date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                      <div style={{
+                        width: '100%', height: TRACK_H, borderRadius: 10,
+                        background: 'rgba(124,58,237,0.10)',
+                        position: 'relative', overflow: 'hidden',
+                      }}>
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: barH }}
+                          transition={{ duration: 0.5, delay: 0.08 + i * 0.05, ease: 'easeOut' }}
+                          style={{
+                            position: 'absolute', bottom: 0, left: 0, right: 0,
+                            borderRadius: '8px 8px 0 0',
+                            background: isToday ? PURPLE_HEX : 'rgba(124,58,237,0.55)',
+                          }}
+                        />
+                      </div>
+                      {/* Label: day name + date number */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                        <span style={{ fontSize: 9, fontWeight: 500, color: isToday ? PURPLE : TEXT_MUTED }}>
+                          {dayLabel}
+                        </span>
+                        <span style={{ fontSize: 11, fontWeight: isToday ? 800 : 500, color: isToday ? PURPLE : TEXT_DARK }}>
+                          {dayNum}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Avg line — positioned absolutely over the bars (88px track, 8px gap, label row) */}
+              {avgPct > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  left: 0, right: 0,
+                  top: 88 - Math.round((avgPct / 100) * 88),
+                  borderTop: '1.5px dashed rgba(124,58,237,0.40)',
+                  pointerEvents: 'none', zIndex: 2,
+                }}>
+                  <span style={{
+                    position: 'absolute', left: 0, top: -9,
+                    fontSize: 10, fontWeight: 700, color: TEXT_MUTED,
+                    background: 'var(--glass-bg)', padding: '1px 5px', borderRadius: 4,
+                  }}>
+                    Avg.{avgPct}%
+                  </span>
+                </div>
+              )}
             </div>
+            {todayPct > 0 && (
+              <div style={{
+                marginTop: 14, paddingTop: 14,
+                borderTop: '1px solid var(--border-subtle)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <span style={{ fontSize: 13, color: TEXT_MUTED }}>Today&apos;s score</span>
+                <span style={{ fontSize: 15, fontWeight: 800, color: PURPLE }}>{todayPct}%</span>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ── Today's Habits ── */}
+        <div style={{ marginTop: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+              {isViewingToday ? "Today's Habits" : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </h2>
+            <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? TEXT_MUTED : PURPLE }}>
+              {loadingDate ? 'Loading…' : `${completedCount}/${totalCount} done`}
+            </span>
           </div>
 
-          {goodHabits.length === 0 ? (
+          {displayHabits.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -1679,16 +1774,15 @@ export default function FitnessSummary({
             </motion.div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {goodHabits.map((h, i) => (
+              {displayHabits.map((h, i) => (
                 <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} />
               ))}
             </div>
           )}
         </div>
 
-        {/* ── Circular Progress ── */}
-        <CircularProgress completed={completedCount} total={totalCount} />
-
+        {/* ── Today's Progress Ring ── */}
+        {isViewingToday && <CircularProgress completed={completedCount} total={totalCount} />}
 
       </div>
 

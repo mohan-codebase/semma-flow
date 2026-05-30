@@ -1,63 +1,25 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import * as LucideIcons from 'lucide-react';
 import { Search, X } from 'lucide-react';
+import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
 
 interface IconPickerProps {
   value: string;
-  onChange: (iconName: string) => void;
+  onChange: (icon: string) => void;
   color?: string;
-}
-
-// Curated list of habit-relevant icons to show by default
-const COMMON_ICONS = [
-  'Zap', 'Flame', 'Target', 'Check-Circle-2', 'Activity', 'Award', 'Trophy',
-  'Heart', 'Smile', 'Sun', 'Moon', 'Coffee', 'Utensils', 'Glass-Water', 'Apple',
-  'Dumbbell', 'Footprints', 'Bicycle', 'Timer', 'Clock', 'Calendar', 'Brain',
-  'Book', 'Book-Open', 'Pen-Tool', 'Music', 'Camera', 'Code', 'Terminal',
-  'Medal', 'Star', 'Shield', 'Lock', 'Bell', 'Smartphone', 'Mail', 'Cloud',
-  'Wind', 'Droplets', 'Tree-Pine', 'Mountain', 'Leaf', 'Flower-2', 'Palette',
-  'Wallet', 'Coins', 'Briefcase', 'Graduation-Cap', 'Mic', 'Headphones', 'Video',
-  'Gamepad-2', 'ShoppingCart', 'Plane', 'Map', 'Navigation', 'Compass'
-];
-
-function DynamicIcon({ name, size = 18, color }: { name: string; size?: number; color?: string }) {
-  const pascal = name
-    .split(/[-_]/)
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join('');
-  const Icon = (LucideIcons as any)[pascal];
-  return Icon ? <Icon size={size} color={color} /> : <LucideIcons.Circle size={size} color={color} />;
 }
 
 export default function IconPicker({ value, onChange, color = 'var(--accent-primary)' }: IconPickerProps) {
   const [search, setSearch] = useState('');
-  
-  const filteredIcons = useMemo(() => {
-    if (!search) return COMMON_ICONS;
-    
-    // Search through all Lucide icons if user types something
-    const query = search.toLowerCase().replace(/[-_]/g, '');
-    const all = Object.keys(LucideIcons).filter(name => {
-      // Filter out internal lucide components
-      if (name.length < 3) return false;
-      if (['createLucideIcon', 'LucideProps'].includes(name)) return false;
-      return name.toLowerCase().includes(query);
-    });
-    
-    // Sort results: common ones first, then alphabetical
-    return all.sort((a, b) => {
-      const aCommon = COMMON_ICONS.includes(a);
-      const bCommon = COMMON_ICONS.includes(b);
-      if (aCommon && !bCommon) return -1;
-      if (!aCommon && bCommon) return 1;
-      return a.localeCompare(b);
-    }).slice(0, 60); // Limit results for performance
-  }, [search]);
 
-  // Convert kebab-case value back to TitleCase for display if needed
-  const selectedDisplay = value;
+  // Search is scoped to the curated, bundled set — no full-Lucide load, so
+  // every result is guaranteed to render the same icon downstream.
+  const filteredIcons = useMemo(() => {
+    if (!search) return HABIT_ICON_NAMES;
+    const query = search.toLowerCase().replace(/[-_]/g, '');
+    return HABIT_ICON_NAMES.filter((n) => n.replace(/[-_]/g, '').includes(query));
+  }, [search]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -119,15 +81,13 @@ export default function IconPicker({ value, onChange, color = 'var(--accent-prim
         className="hf-custom-scrollbar"
       >
         {filteredIcons.map((name) => {
-          // Normalize names for comparison (kebab-case vs PascalCase)
-          const normalized = name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-          const active = value === normalized;
-          
+          const active = value === name;
+
           return (
             <button
               key={name}
               type="button"
-              onClick={() => onChange(normalized)}
+              onClick={() => onChange(name)}
               title={name}
               style={{
                 width: 36,
@@ -155,7 +115,7 @@ export default function IconPicker({ value, onChange, color = 'var(--accent-prim
                 }
               }}
             >
-              <DynamicIcon name={name} size={18} />
+              <DynamicIcon name={name} size={18} color="currentColor" />
             </button>
           );
         })}
@@ -169,8 +129,8 @@ export default function IconPicker({ value, onChange, color = 'var(--accent-prim
       {/* Selected Preview */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px' }}>
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Selected:</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: color, fontWeight: 600, fontSize: 13 }}>
-          <DynamicIcon name={value} size={16} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, color, fontWeight: 600, fontSize: 13 }}>
+          <DynamicIcon name={value} size={16} color="currentColor" />
           <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{value}</span>
         </div>
       </div>

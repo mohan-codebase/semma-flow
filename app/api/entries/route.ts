@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       return err('Provide date or habit_id', 400);
     }
 
-    query = query.order('entry_date', { ascending: false });
+    query = query.order('entry_date', { ascending: false }).limit(400);
     const { data, error } = await query;
     if (error) return err(safeErrorMessage(error, 'Failed to load entries'), 500);
     return ok(data ?? []);
