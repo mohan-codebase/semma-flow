@@ -41,7 +41,7 @@ export default function HabitStreak({ streak, size = 'md' }: HabitStreakProps) {
           alignItems: 'center',
           gap: cfg.gap + 2,
           padding: cfg.padding,
-          borderRadius: '999px',
+          borderRadius: 'var(--r-pill)',
           background: isActive
             ? `rgba(${isGolden ? '245,158,11' : streak > 3 ? '249,115,22' : '71,85,105'}, 0.12)`
             : 'transparent',

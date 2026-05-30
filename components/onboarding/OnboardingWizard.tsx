@@ -102,7 +102,7 @@ function StepDots({ current, total }: { current: number; total: number }) {
         <div key={i} style={{
           width: i === current ? 20 : 6,
           height: 6,
-          borderRadius: 99,
+          borderRadius: 'var(--r-pill)',
           background: i === current ? 'var(--accent-primary)' : i < current ? 'var(--accent-glow-md)' : 'var(--border-default)',
           transition: 'all 0.3s ease',
           border: i < current && i !== current ? '1px solid var(--accent-primary)' : 'none',

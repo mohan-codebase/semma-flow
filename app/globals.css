@@ -181,6 +181,7 @@
   --r-lg:  14px;
   --r-xl:  18px;
   --r-2xl: 22px;
+  --r-pill: 9999px; /* fully-rounded pills/badges/toggles */
 
   /* Dashboard surface tokens */
   --surface-card:       rgba(22, 20, 42, 0.60);

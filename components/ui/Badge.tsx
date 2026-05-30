@@ -37,7 +37,7 @@ export default function Badge({ color, label, size = 'md' }: BadgeProps) {
     justifyContent: 'center',
     background: hexToRgba(color, 0.15),
     color: color,
-    borderRadius: '9999px',
+    borderRadius: 'var(--r-pill)',
     fontSize: isSmall ? '10px' : '11px',
     fontWeight: 600,
     letterSpacing: '0.06em',

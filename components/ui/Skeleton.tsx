@@ -26,7 +26,7 @@ const variantStyles: Record<SkeletonVariant, React.CSSProperties> = {
   circle: {
     height: '40px',
     width: '40px',
-    borderRadius: '9999px',
+    borderRadius: 'var(--r-pill)',
   },
 };
 

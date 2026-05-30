@@ -49,7 +49,7 @@ export default function AchievementsLoading() {
                   <div className="shimmer" style={{ height: 10, width: '50%', borderRadius: 4 }} />
                 </div>
               </div>
-              <div className="shimmer" style={{ height: 6, width: '100%', borderRadius: 99 }} />
+              <div className="shimmer" style={{ height: 6, width: '100%', borderRadius: 'var(--r-pill)' }} />
             </div>
           ))}
         </div>

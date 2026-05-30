@@ -121,7 +121,7 @@ function TierCard({ tier, index }: { tier: PricingTier; index: number }) {
           left: '50%',
           transform: 'translateX(-50%)',
           padding: '3px 12px',
-          borderRadius: 999,
+          borderRadius: 'var(--r-pill)',
           background: tier.highlight ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
           color: tier.highlight ? 'var(--accent-on-primary)' : 'var(--text-muted)',
           border: `1px solid ${tier.border}`,

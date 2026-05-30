@@ -150,7 +150,7 @@ function DashboardPreview() {
         </div>
         <div style={{
           padding: '4px 10px',
-          borderRadius: 999,
+          borderRadius: 'var(--r-pill)',
           background: 'var(--accent-glow-md)',
           border: '1px solid color-mix(in srgb, var(--accent-primary) 30%, transparent)',
           fontSize: 11,
@@ -165,7 +165,7 @@ function DashboardPreview() {
       {/* Progress bar */}
       <div style={{
         height: 4,
-        borderRadius: 99,
+        borderRadius: 'var(--r-pill)',
         background: 'var(--border-subtle)',
         marginBottom: 16,
         overflow: 'hidden',
@@ -176,7 +176,7 @@ function DashboardPreview() {
           transition={{ delay: 1, duration: 0.8, ease: 'easeOut' }}
           style={{
             height: '100%',
-            borderRadius: 99,
+            borderRadius: 'var(--r-pill)',
             background: 'linear-gradient(90deg, var(--accent-primary), var(--cyan))',
           }}
         />
@@ -272,7 +272,7 @@ export default function Hero() {
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 padding: '5px 12px 5px 8px',
-                borderRadius: 999,
+                borderRadius: 'var(--r-pill)',
                 background: 'var(--accent-glow)',
                 border: '1px solid var(--border-accent)',
                 fontSize: 12, fontWeight: 600,

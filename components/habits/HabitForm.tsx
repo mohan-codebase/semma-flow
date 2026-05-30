@@ -465,7 +465,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                       color: 'var(--danger)',
                       border: '1px solid rgba(239,68,68,0.25)',
                       padding: '2px 10px',
-                      borderRadius: 999,
+                      borderRadius: 'var(--r-pill)',
                       fontSize: 11.5,
                       fontWeight: 600,
                       cursor: 'pointer',

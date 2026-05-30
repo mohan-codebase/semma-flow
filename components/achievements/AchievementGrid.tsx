@@ -56,7 +56,7 @@ export default function AchievementGrid({ achievements }: Props) {
                   alignItems: 'center',
                   gap: 6,
                   padding: '6px 14px',
-                  borderRadius: '9999px',
+                  borderRadius: 'var(--r-pill)',
                   border: active ? '1px solid color-mix(in srgb, var(--accent-primary) 35%, transparent)' : '1px solid var(--border-subtle)',
                   background: active ? 'var(--accent-glow)' : 'transparent',
                   color: active ? 'var(--accent-primary)' : 'var(--text-secondary)',

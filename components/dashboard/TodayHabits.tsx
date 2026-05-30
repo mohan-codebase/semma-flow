@@ -459,7 +459,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
             <span
               style={{
                 padding: '2px 10px',
-                borderRadius: '9999px',
+                borderRadius: 'var(--r-pill)',
                 background: 'var(--accent-glow)',
                 border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, transparent)',
                 color: 'var(--accent-primary)',
@@ -474,7 +474,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
             <span
               style={{
                 padding: '2px 10px',
-                borderRadius: '9999px',
+                borderRadius: 'var(--r-pill)',
                 background: 'rgba(239,68,68,0.10)',
                 border: '1px solid rgba(239,68,68,0.25)',
                 color: '#f87171',
@@ -534,7 +534,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
           width: '100%',
           height: 5,
           background: 'var(--bg-tertiary)',
-          borderRadius: 99,
+          borderRadius: 'var(--r-pill)',
           overflow: 'hidden',
         }}>
           <div
@@ -544,7 +544,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
               background: completedCount === habits.length
                 ? 'linear-gradient(90deg, var(--accent-primary), var(--accent-light))'
                 : 'var(--accent-primary)',
-              borderRadius: 99,
+              borderRadius: 'var(--r-pill)',
               transition: 'width 0.5s ease, background 0.3s ease',
               boxShadow: completedCount === habits.length ? '0 0 8px var(--accent-primary)' : 'none',
             }}
@@ -798,7 +798,7 @@ function LiveIndicator({ status }: { status: 'connecting' | 'live' | 'offline' }
         alignItems: 'center',
         gap: 5,
         padding: '2px 8px',
-        borderRadius: 999,
+        borderRadius: 'var(--r-pill)',
         background: 'var(--bg-tertiary)',
         border: '1px solid var(--border-default)',
         fontSize: 10.5,

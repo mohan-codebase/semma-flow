@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus } from 'lucide-react';
-import { DynamicIcon } from '@/lib/icons';
+import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
+import ToggleSwitch from '@/components/ui/ToggleSwitch';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
 import { todayString } from '@/lib/utils/dates';
@@ -321,6 +322,9 @@ function HabitDetailSheet({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting]           = useState(false);
 
+  // Backfill: which day is currently being saved (for disabling during the request)
+  const [savingDay, setSavingDay] = useState<string | null>(null);
+
   const saveEdit = async () => {
     if (!editName.trim()) return;
     setSaving(true);
@@ -392,6 +396,32 @@ function HabitDetailSheet({
     }),
   ];
   while (calCells.length % 7 !== 0) calCells.push(null);
+
+  // Tap any past/today cell to backfill (mark/unmark) that day's entry.
+  const markDay = async (ds: string, currentlyCompleted: boolean) => {
+    if (ds > todayLocal) return;              // never the future
+    const next = !currentlyCompleted;
+    setSavingDay(ds);
+    // optimistic
+    setEntries((prev) => [...prev.filter((e) => e.entry_date !== ds), { entry_date: ds, is_completed: next }]);
+    try {
+      const res = await fetch('/api/entries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ habit_id: habit.id, entry_date: ds, is_completed: next }),
+      });
+      if (!res.ok) throw new Error(`save failed ${res.status}`);
+      // keep the main dashboard list in sync when today is changed here
+      if (ds === todayLocal) {
+        onUpdate({ id: habit.id, todayEntry: { habit_id: habit.id, is_completed: next } as HabitWithEntry['todayEntry'] });
+      }
+    } catch (e) {
+      console.error('[markDay] backfill failed, reverting:', e);
+      setEntries((prev) => [...prev.filter((e) => e.entry_date !== ds), { entry_date: ds, is_completed: currentlyCompleted }]);
+    } finally {
+      setSavingDay(null);
+    }
+  };
 
   // Month-level stats for the visible month
   const monthPrefix   = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
@@ -516,7 +546,7 @@ function HabitDetailSheet({
             <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
               Choose icon
             </p>
-            <div className="hf-icon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 16 }}>
+            <div className="hf-icon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 16, maxHeight: 200, overflowY: 'auto', paddingRight: 2 }}>
               {HABIT_ICONS.map((ic) => {
                 const active = editIcon === ic;
                 return (
@@ -634,20 +664,30 @@ function HabitDetailSheet({
                           ? PURPLE
                           : PURPLE_LIGHT;
                       const txtColor = cell.completed ? '#fff' : cell.isToday ? PURPLE_HEX : cell.isFuture ? 'var(--drag-handle)' : TEXT_MUTED;
+                      const interactive = !cell.isFuture;
+                      const isSaving = savingDay === cell.date;
                       return (
-                        <div key={di} style={{
-                          flex: '1 1 0', minWidth: 0,
-                          height: CELL_H,
-                          borderRadius: 8,
-                          background: bg,
-                          border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
-                          boxShadow: cell.completed ? '0 2px 6px rgba(124,58,237,0.28)' : 'none',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 11,
-                          fontWeight: cell.isToday ? 800 : 500,
-                          color: txtColor,
-                          transition: 'background 0.15s ease',
-                        }}>
+                        <div
+                          key={di}
+                          onClick={interactive && !isSaving ? () => markDay(cell.date, cell.completed) : undefined}
+                          title={interactive ? (cell.completed ? 'Tap to unmark' : 'Tap to mark done') : undefined}
+                          style={{
+                            flex: '1 1 0', minWidth: 0,
+                            height: CELL_H,
+                            borderRadius: 8,
+                            background: bg,
+                            border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
+                            boxShadow: cell.completed ? '0 2px 6px rgba(124,58,237,0.28)' : 'none',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11,
+                            fontWeight: cell.isToday ? 800 : 500,
+                            color: txtColor,
+                            cursor: interactive ? 'pointer' : 'default',
+                            opacity: isSaving ? 0.5 : 1,
+                            transition: 'background 0.15s ease, opacity 0.15s ease',
+                            WebkitTapHighlightColor: 'transparent',
+                          }}
+                        >
                           {cell.day}
                         </div>
                       );
@@ -749,13 +789,9 @@ function HabitDetailSheet({
   );
 }
 
-const HABIT_ICONS = [
-  'circle-check','zap','flame','target','activity','award','trophy',
-  'heart','smile','sun','moon','coffee','utensils','glass-water','apple',
-  'dumbbell','footprints','bicycle','timer','clock','brain',
-  'book-open','pen-tool','music','code','medal','star','shield',
-  'droplets','leaf','palette','wallet','graduation-cap','headphones',
-];
+// Single source of truth — same set the standalone IconPicker offers, so habit
+// icon choices are identical everywhere (add sheet, edit sheet, HabitForm).
+const HABIT_ICONS = HABIT_ICON_NAMES;
 const HABIT_COLORS = ['#7C3AED','#3B82F6','#10B981','#F59E0B','#EF4444','#EC4899'];
 const DAY_LABELS   = ['S','M','T','W','T','F','S'];
 const CHALLENGE_PRESETS = [7, 21, 30, 66, 90];
@@ -1171,7 +1207,7 @@ function ProfileMenu({
 
           {/* Drag handle */}
           <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
-            <div style={{ width: 40, height: 4, borderRadius: 999, background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />
+            <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />
           </div>
 
           {/* Top bar */}
@@ -1289,53 +1325,15 @@ function ProfileMenu({
               <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>Premium theme</p>
             </div>
           </div>
-          <button
-            onClick={toggleTheme}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            aria-pressed={isDark}
-            style={{
-              // Transparent hit-target wrapper. The global mobile rule forces a
-              // ≥36px min-height on buttons; keeping the visual pill in an inner
-              // element lets the tap area grow without stretching the track (which
-              // previously inflated to 44px and shoved the thumb off-centre).
-              border: 'none', background: 'transparent', padding: 0, margin: 0,
-              cursor: 'pointer', flexShrink: 0,
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            {/* liquid glass track */}
-            <span style={{
-              display: 'block', position: 'relative',
-              width: 58, height: 32, borderRadius: 999,
-              background: isDark
-                ? 'linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(167,85,247,0.35) 100%)'
-                : 'linear-gradient(135deg, rgba(196,181,253,0.45) 0%, rgba(221,214,254,0.30) 100%)',
-              boxShadow: isDark
-                ? '0 0 0 1px rgba(167,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(124,58,237,0.45)'
-                : '0 0 0 1px rgba(196,181,253,0.6), inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 8px rgba(124,58,237,0.15)',
-              transition: 'all 0.3s ease',
-            }}>
-              {/* Glass thumb */}
-              <span style={{
-                position: 'absolute', top: 4, left: isDark ? 30 : 4,
-                width: 24, height: 24, borderRadius: '50%',
-                background: isDark
-                  ? 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(237,233,254,0.85) 100%)'
-                  : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.80) 100%)',
-                boxShadow: isDark
-                  ? '0 0 0 1px rgba(255,255,255,0.25), 0 2px 8px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.9)'
-                  : '0 0 0 1px rgba(196,181,253,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)',
-                transition: 'left 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <DynamicIcon
-                  name={isDark ? 'moon' : 'sun'}
-                  size={12}
-                  color={isDark ? PURPLE_HEX : '#F59E0B'}
-                />
-              </span>
-            </span>
-          </button>
+          <ToggleSwitch
+            checked={isDark}
+            onChange={toggleTheme}
+            ariaLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            onIcon="moon"
+            offIcon="sun"
+            onIconColor={PURPLE_HEX}
+            offIconColor="#F59E0B"
+          />
         </motion.div>
 
         {/* Menu items */}

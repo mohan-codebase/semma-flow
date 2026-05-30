@@ -165,7 +165,7 @@ export default function Features() {
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '4px 12px',
-            borderRadius: 999,
+            borderRadius: 'var(--r-pill)',
             background: 'var(--accent-glow)',
             border: '1px solid var(--border-accent)',
             fontSize: 11.5,

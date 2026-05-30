@@ -163,7 +163,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             {isBad && (
               <span style={{
                 fontSize: 9.5, fontWeight: 700,
-                padding: '1px 6px', borderRadius: 99,
+                padding: '1px 6px', borderRadius: 'var(--r-pill)',
                 background: 'rgba(239,68,68,0.12)',
                 border: '1px solid rgba(239,68,68,0.28)',
                 color: '#f87171',
@@ -178,7 +178,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
               <span
                 style={{
                   fontSize: 10.5, fontWeight: 600,
-                  padding: '2px 7px', borderRadius: 99,
+                  padding: '2px 7px', borderRadius: 'var(--r-pill)',
                   background: `${habit.category.color}18`,
                   border: `1px solid ${habit.category.color}30`,
                   color: habit.category.color,
@@ -194,7 +194,7 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             {streak > 0 && (
               <>
                 <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#7C3AED' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? 'var(--accent-primary)' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
                   {isBad
                     ? <Shield size={11} color={streak >= 7 ? '#7C3AED' : 'var(--text-muted)'} />
                     : <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
