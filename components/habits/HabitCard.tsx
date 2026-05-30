@@ -194,9 +194,9 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
             {streak > 0 && (
               <>
                 <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? 'var(--accent-primary)' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#f87171' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
                   {isBad
-                    ? <Shield size={11} color={streak >= 7 ? '#7C3AED' : 'var(--text-muted)'} />
+                    ? <Shield size={11} color={streak >= 7 ? '#EF4444' : 'var(--text-muted)'} />
                     : <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
                   }
                   {streak}d {isBad ? 'clean' : ''}

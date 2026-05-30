@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { todayString } from '@/lib/utils/dates';
+import { buildCoachSummary } from '@/lib/coach/aggregate';
 
 // CSV formula-injection guard: spreadsheets execute cells starting with
 // = + - @ \t \r as formulas. Prefixing with a leading single quote disables
@@ -23,6 +24,32 @@ export async function GET(req: NextRequest) {
     }
 
     const format = req.nextUrl.searchParams.get('format') || 'json';
+
+    // Year-in-review: one clean summary row per habit (aggregated, not raw entries).
+    if (format === 'year-csv') {
+      const days = Number(req.nextUrl.searchParams.get('days')) || 365;
+      const summary = await buildCoachSummary(supabase, user.id, days);
+      if (!summary || summary.habits.length === 0) {
+        return new NextResponse('No data to summarize yet', { status: 404 });
+      }
+      const header = ['habit', 'type', 'completions', 'tracked_days', 'completion_rate_pct', 'current_streak', 'longest_streak']
+        .map(csvCell).join(',');
+      const rows = summary.habits.map((h) => [
+        csvCell(h.name), csvCell(h.isBad ? 'avoid' : 'build'), csvCell(h.completions),
+        csvCell(h.trackedDays), csvCell(h.completionRate), csvCell(h.currentStreak), csvCell(h.longestStreak),
+      ].join(','));
+      const totals = [
+        csvCell('ALL HABITS'), csvCell(`${summary.from}→${summary.to}`), csvCell(summary.totalCompletions),
+        csvCell(''), csvCell(summary.overallCompletionRate), csvCell(''), csvCell(''),
+      ].join(',');
+      const csvData = '﻿' + [header, ...rows, totals].join('\r\n');
+      return new NextResponse(csvData, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="semma-flow-year-in-review-${todayString()}.csv"`,
+        },
+      });
+    }
 
     if (format === 'csv') {
       const { data: entries } = await supabase

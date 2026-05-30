@@ -26,6 +26,11 @@ const TEXT_MUTED    = 'var(--text-muted)';
 // Raw hex needed only for SVG attributes and rgba() calls
 const PURPLE_HEX    = '#7C3AED';
 
+// Bad-habit theming — red accents, kept consistent with HabitCard/HabitList
+const RED           = '#EF4444';
+const RED_SOFT      = '#f87171';
+const RED_LIGHT     = 'rgba(239,68,68,0.12)';
+
 // Liquid glass helpers (inline style objects)
 const GLASS: React.CSSProperties = {
   background: 'var(--glass-bg)',
@@ -182,20 +187,28 @@ function HabitRow({
   index,
   onToggle,
   onOpen,
+  bad = false,
 }: {
   habit: HabitWithEntry;
   index: number;
   onToggle: (id: string, completed: boolean) => void;
   onOpen: (id: string) => void;
+  bad?: boolean;
 }) {
   const done = habit.todayEntry?.is_completed ?? false;
-  const icon = habit.icon ?? 'circle-check';
+  const icon = habit.icon ?? (bad ? 'ban' : 'circle-check');
 
-  const subtitle = habit.description
-    ? habit.description.slice(0, 36) + (habit.description.length > 36 ? '…' : '')
-    : habit.frequency?.type === 'daily'
-      ? 'Daily habit'
-      : 'Habit';
+  // For bad habits, checking the row off means the user *avoided* it today.
+  const accent      = bad ? RED : PURPLE;
+  const accentLight = bad ? RED_LIGHT : PURPLE_LIGHT;
+
+  const subtitle = bad
+    ? (done ? 'Avoided today' : 'Avoid this')
+    : habit.description
+      ? habit.description.slice(0, 36) + (habit.description.length > 36 ? '…' : '')
+      : habit.frequency?.type === 'daily'
+        ? 'Daily habit'
+        : 'Habit';
 
   return (
     <motion.div
@@ -207,7 +220,8 @@ function HabitRow({
         alignItems: 'center',
         gap: 14,
         padding: '14px 16px',
-        ...(done ? GLASS_PURPLE : GLASS_SM),
+        ...(done && !bad ? GLASS_PURPLE : GLASS_SM),
+        ...(bad ? { border: `1px solid ${done ? 'rgba(239,68,68,0.35)' : 'rgba(239,68,68,0.18)'}` } : null),
         borderRadius: 18,
         cursor: 'pointer',
         width: '100%',
@@ -221,7 +235,7 @@ function HabitRow({
         width: 44,
         height: 44,
         borderRadius: 14,
-        background: PURPLE_LIGHT,
+        background: accentLight,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -229,7 +243,7 @@ function HabitRow({
         flexGrow: 0,
         overflow: 'hidden',
       }}>
-        <DynamicIcon name={icon} size={22} color={PURPLE} />
+        <DynamicIcon name={icon} size={22} color={accent} />
       </div>
 
       {/* Text */}
@@ -265,8 +279,8 @@ function HabitRow({
           width: 30,
           height: 30,
           borderRadius: '50%',
-          background: done ? PURPLE : 'transparent',
-          border: `2px solid ${done ? PURPLE : 'var(--drag-handle)'}`,
+          background: done ? accent : 'transparent',
+          border: `2px solid ${done ? accent : 'var(--drag-handle)'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -315,6 +329,7 @@ function HabitDetailSheet({
   const [editMode, setEditMode]     = useState(false);
   const [editName, setEditName]     = useState(habit.name);
   const [editIcon, setEditIcon]     = useState(habit.icon ?? 'circle-check');
+  const [editNotes, setEditNotes]   = useState(habit.description ?? '');
   const [saving, setSaving]         = useState(false);
   const [saveError, setSaveError]   = useState<string | null>(null);
 
@@ -333,11 +348,11 @@ function HabitDetailSheet({
       const res = await fetch(`/api/habits/${habit.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: editName.trim(), icon: editIcon }),
+        body: JSON.stringify({ name: editName.trim(), icon: editIcon, description: editNotes.trim() }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Failed to save');
-      onUpdate({ id: habit.id, name: editName.trim(), icon: editIcon });
+      onUpdate({ id: habit.id, name: editName.trim(), icon: editIcon, description: editNotes.trim() });
       setEditMode(false);
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : 'Failed to save');
@@ -515,7 +530,7 @@ function HabitDetailSheet({
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             {!editMode && (
               <button
-                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditMode(true); }}
+                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
                 style={{
                   width: 34, height: 34, borderRadius: '50%',
                   background: PURPLE_LIGHT, border: 'none',
@@ -543,6 +558,24 @@ function HabitDetailSheet({
         {/* Edit mode — icon picker + save */}
         {editMode && (
           <div style={{ ...GLASS_NESTED_PURPLE, borderRadius: 18, padding: '16px', marginBottom: 16 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              Notes
+            </p>
+            <textarea
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              placeholder="Why this matters, how you'll do it…"
+              maxLength={500}
+              rows={3}
+              style={{
+                width: '100%', boxSizing: 'border-box', resize: 'vertical', minHeight: 60,
+                background: 'var(--input-bg)', border: `1.5px solid var(--input-border)`,
+                borderRadius: 10, padding: '8px 12px', marginBottom: 16,
+                fontSize: 14, color: TEXT_DARK, outline: 'none', fontFamily: 'inherit', lineHeight: 1.5,
+              }}
+              onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
+              onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
+            />
             <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
               Choose icon
             </p>
@@ -577,6 +610,32 @@ function HabitDetailSheet({
             >
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
+          </div>
+        )}
+
+        {/* Notes (read mode) */}
+        {!editMode && (
+          <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 16px', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: habit.description ? 8 : 0 }}>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                Notes
+              </p>
+              <button
+                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: PURPLE, fontSize: 12.5, fontWeight: 700, padding: 0 }}
+              >
+                {habit.description ? 'Edit' : 'Add'}
+              </button>
+            </div>
+            {habit.description ? (
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: TEXT_DARK, whiteSpace: 'pre-wrap' }}>
+                {habit.description}
+              </p>
+            ) : (
+              <p style={{ margin: 0, fontSize: 13.5, color: TEXT_MUTED }}>
+                No notes yet — tap “Add” to jot why this habit matters.
+              </p>
+            )}
           </div>
         )}
 
@@ -813,6 +872,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; onClose: () => void }) {
   const [name, setName]             = useState('');
+  const [notes, setNotes]           = useState('');
   const [icon, setIcon]             = useState('circle-check');
   const [color, setColor]           = useState('#7C3AED');
   const [freqType, setFreqType]     = useState<FreqType>('daily');
@@ -848,6 +908,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         target_unit: targetType === 'duration' ? 'min' : null,
         is_bad_habit: false,
       };
+      if (notes.trim()) body.description = notes.trim();
       if (reminder) body.reminder_time = reminder;
       if (challenge) body.challenge_days = challenge;
 
@@ -932,6 +993,20 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
             onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
             onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
           />
+
+          <div style={{ marginTop: 14 }}>
+            <FieldLabel>Notes (optional)</FieldLabel>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Why this matters, how you'll do it…"
+              maxLength={500}
+              rows={3}
+              style={{ ...inputStyle, resize: 'vertical', minHeight: 64, lineHeight: 1.5, border: '1.5px solid var(--input-border)' }}
+              onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
+              onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
+            />
+          </div>
         </SectionCard>
 
         {/* ── Icon + Color ── */}
@@ -1169,9 +1244,11 @@ function ProfileMenu({
     } catch { setSigningOut(false); }
   };
 
-  const menuItems = [
-    { icon: 'bell',        label: 'Notifications',  sub: 'Reminders & alerts' },
-    { icon: 'help-circle', label: 'Help & Feedback', sub: 'Support & suggestions' },
+  const menuItems: { icon: string; label: string; sub: string; href?: string }[] = [
+    { icon: 'zap',           label: 'Your Coach',     sub: 'Weekly AI insights',     href: '/dashboard/coach' },
+    { icon: 'calendar-check', label: 'Year in Review', sub: 'Highlights & PDF export', href: '/dashboard/year-in-review' },
+    { icon: 'bell',          label: 'Notifications',  sub: 'Reminders & alerts' },
+    { icon: 'help-circle',   label: 'Help & Feedback', sub: 'Support & suggestions' },
   ];
 
   return (
@@ -1353,10 +1430,12 @@ function ProfileMenu({
             border: 'none',
           }}
         >
-          {menuItems.map(({ icon, label, sub }, idx) => (
+          {menuItems.map(({ icon, label, sub, href }, idx) => (
             <div key={label}>
               {idx > 0 && <div style={{ height: 1, background: 'rgba(124,58,237,0.06)', marginLeft: 62 }} />}
-              <button style={{
+              <button
+                onClick={() => { if (href) window.location.href = href; }}
+                style={{
                 width: '100%', display: 'flex', alignItems: 'center', gap: 14,
                 padding: '16px 20px', background: 'none', border: 'none',
                 cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
@@ -1481,6 +1560,16 @@ export default function FitnessSummary({
   const completedCount = displayHabits.filter((h) => h.todayEntry?.is_completed).length;
   const totalCount     = displayHabits.length;
   const todayPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  // Bad habits — checking one off means it was *avoided* on the selected date.
+  const badHabits = localHabits.filter((h) => h.is_bad_habit);
+  const displayBadHabits = isViewingToday
+    ? badHabits
+    : badHabits.map((h) => ({
+        ...h,
+        todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
+      }));
+  const avoidedCount = displayBadHabits.filter((h) => h.todayEntry?.is_completed).length;
 
   const now     = new Date();
   const hour    = now.getHours();
@@ -1778,6 +1867,26 @@ export default function FitnessSummary({
             </div>
           )}
         </div>
+
+        {/* ── Bad Habits (avoidance tracking) ── */}
+        {displayBadHabits.length > 0 && (
+          <div style={{ marginTop: 28 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <DynamicIcon name="ban" size={18} color={RED} />
+                Bad Habits
+              </h2>
+              <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? TEXT_MUTED : RED_SOFT }}>
+                {loadingDate ? 'Loading…' : `${avoidedCount}/${displayBadHabits.length} avoided`}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {displayBadHabits.map((h, i) => (
+                <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} bad />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ── Today's Progress Ring ── */}
         {isViewingToday && <CircularProgress completed={completedCount} total={totalCount} />}

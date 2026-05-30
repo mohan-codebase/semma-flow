@@ -220,7 +220,7 @@ export default function HabitList({
           {badAvoided.length > 0 && (
             <>
               {badPending.length > 0 && (
-                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(124,58,237,0.4)" textColor="#7C3AED" />
+                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(239,68,68,0.3)" textColor="#f87171" />
               )}
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Avoided bad habits">
                 {badAvoided.map((habit) => (
