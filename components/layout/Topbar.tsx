@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, X } from 'lucide-react';
+import { Search, Plus, LayoutDashboard, Dumbbell, BarChart2, Trophy, Settings2, Zap, LogOut, X, Mountain } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -234,6 +235,26 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
 
               {/* Search & Logout at Bottom */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Link
+                  href="/trip"
+                  onClick={() => setSidebarOpen(false)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1px solid var(--border-accent)',
+                    background: 'var(--accent-glow)',
+                    color: 'var(--accent-light)',
+                    cursor: 'pointer',
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  <Mountain size={18} />
+                  Trip Planner
+                </Link>
                 <button
                   onClick={() => { setPalette(true); setSidebarOpen(false); }}
                   style={{
@@ -367,6 +388,26 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
           {/* Desktop actions (ONLY visible on lg screens and larger!) */}
           <div style={{ display: 'none', alignItems: 'center', gap: 8 }} className="lg:flex">
+            <Link
+              href="/trip"
+              title="Open Trip Planner"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 7,
+                padding: '9px 14px',
+                borderRadius: 12,
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-tertiary)',
+                color: 'var(--text-secondary)',
+                fontSize: 13,
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              <Mountain size={16} />
+              Trip Planner
+            </Link>
             <ThemeToggle />
             <NotificationBell />
             <button

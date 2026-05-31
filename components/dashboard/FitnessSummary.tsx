@@ -1338,6 +1338,7 @@ function ProfileMenu({
   };
 
   const menuItems: { icon: string; label: string; sub: string; href?: string }[] = [
+    { icon: 'mountain',      label: 'Trip Planner',   sub: 'Expenses & settlement',  href: '/trip' },
     { icon: 'zap',           label: 'Your Coach',     sub: 'Weekly AI insights',     href: '/dashboard/coach' },
     { icon: 'calendar-check', label: 'Year in Review', sub: 'Highlights & PDF export', href: '/dashboard/year-in-review' },
     { icon: 'bell',          label: 'Notifications',  sub: 'Reminders & alerts' },

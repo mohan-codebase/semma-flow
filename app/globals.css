@@ -810,3 +810,33 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: column !important;
   }
 }
+
+/* Trip Planner — responsive nav (mobile drawer below 860px) */
+@media (max-width: 860px) {
+  .trip-desktop-nav { display: none !important; }
+  .trip-switch-btn { display: none !important; }
+  .trip-mobile-menu-btn { display: inline-flex !important; }
+}
+
+/* Trip Planner — responsive grids */
+.trip-main { padding: 24px 20px 64px; }
+.trip-hero-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; align-items: stretch; }
+.trip-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.trip-two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.trip-three-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.trip-expenses-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
+.trip-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+@media (max-width: 1023px) {
+  .trip-hero-grid,
+  .trip-expenses-grid,
+  .trip-charts-grid,
+  .trip-three-grid { grid-template-columns: 1fr; }
+  .trip-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .trip-main { padding: 16px 14px 56px; }
+  .trip-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .trip-form-row { grid-template-columns: 1fr !important; }
+}

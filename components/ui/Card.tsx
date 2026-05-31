@@ -13,6 +13,7 @@ interface CardProps {
   padding?: PaddingSize;
   tone?: Tone;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 const paddingMap: Record<PaddingSize, string> = {
@@ -38,6 +39,7 @@ export default function Card({
   padding = 'md',
   tone = 'neutral',
   onClick,
+  style = {},
 }: CardProps) {
   const baseStyle: React.CSSProperties = {
     background: 'var(--bg-card)',
@@ -48,6 +50,7 @@ export default function Card({
     overflow: 'hidden',
     cursor: onClick ? 'pointer' : undefined,
     boxShadow: 'none',
+    ...style,
   };
 
   if (!hover && !onClick) {
