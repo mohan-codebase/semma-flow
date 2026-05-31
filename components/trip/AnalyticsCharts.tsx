@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import {
   Area,
   AreaChart,
@@ -8,8 +9,6 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
-  Pie,
-  PieChart,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -58,6 +57,90 @@ function TooltipContent({ active, payload, label }: any) {
   );
 }
 
+function CircularShareProgress({
+  name,
+  amount,
+  percentage,
+  color,
+}: {
+  name: string;
+  amount: number;
+  percentage: number;
+  color: string;
+}) {
+  const radius = 50;
+  const strokeWidth = 8;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference * (1 - percentage / 100);
+  const size = (radius + strokeWidth) * 2;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, minWidth: 120 }}>
+      {/* SVG Ring */}
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          {/* Background Track */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="rgba(255, 255, 255, 0.05)"
+            strokeWidth={strokeWidth}
+          />
+          {/* Progress Arc */}
+          {percentage > 0 && (
+            <motion.circle
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset }}
+              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                filter: `drop-shadow(0px 0px 6px ${color}80)`,
+              }}
+            />
+          )}
+        </svg>
+        {/* Center Labels */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+          }}
+        >
+          <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1, fontFamily: "'Outfit', sans-serif" }}>
+            {percentage}%
+          </span>
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            share
+          </span>
+        </div>
+      </div>
+      {/* Name and Amount */}
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 120, fontFamily: "'Outfit', sans-serif" }}>
+          {name}
+        </p>
+        <p style={{ margin: '2px 0 0', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>
+          {formatINR(amount)}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function AnalyticsCharts({
   expenses,
   userId,
@@ -82,9 +165,12 @@ export default function AnalyticsCharts({
       map.set(e.paid_by, (map.get(e.paid_by) ?? 0) + Number(e.amount));
     });
     return [...map.entries()]
-      .map(([name, value]) => ({ name, value }))
-      .filter((d) => d.value > 0);
+      .map(([name, value]) => ({ name, value }));
   }, [expenses, travelers]);
+
+  const totalSpent = useMemo(() => {
+    return byPerson.reduce((sum, d) => sum + d.value, 0);
+  }, [byPerson]);
 
   // Current week (Mon–Sun) daily spend, for the weekly-report area chart.
   const weekly = useMemo(() => {
@@ -199,24 +285,19 @@ export default function AnalyticsCharts({
       </ChartCard>
 
       <ChartCard title="Spending by person">
-        <ResponsiveContainer width="100%" height={280}>
-          <PieChart>
-            <Pie data={byPerson} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={65} outerRadius={105} paddingAngle={2} isAnimationActive={false}>
-              {byPerson.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip content={<TooltipContent />} />
-          </PieChart>
-        </ResponsiveContainer>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 8 }}>
-          {byPerson.map((d, i) => (
-            <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
-              <span style={{ width: 11, height: 11, borderRadius: '50%', background: COLORS[i % COLORS.length] }} />
-              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{d.name}</span>
-              <span style={{ color: 'var(--text-muted)' }}>{formatINR(d.value)}</span>
-            </div>
-          ))}
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '24px 32px', padding: '24px 12px 12px', minHeight: 280 }}>
+          {byPerson.map((d, i) => {
+            const pct = totalSpent > 0 ? Math.round((d.value / totalSpent) * 100) : 0;
+            return (
+              <CircularShareProgress
+                key={d.name}
+                name={d.name}
+                amount={d.value}
+                percentage={pct}
+                color={COLORS[i % COLORS.length]}
+              />
+            );
+          })}
         </div>
       </ChartCard>
 

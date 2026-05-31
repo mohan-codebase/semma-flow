@@ -289,7 +289,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
             >
               {/* Inner centered column */}
               <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 48px', display: 'flex', flexDirection: 'column' }}>
-                
+
                 {/* Drag handle */}
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
                   <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />

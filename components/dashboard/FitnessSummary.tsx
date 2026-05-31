@@ -19,18 +19,18 @@ interface FitnessSummaryProps {
   email?: string;
 }
 
-const PURPLE        = 'var(--accent-primary)';
-const PURPLE_LIGHT  = 'var(--surface-tint)';
-const PURPLE_MID    = 'var(--surface-tint-mid)';
-const TEXT_DARK     = 'var(--text-primary)';
-const TEXT_MUTED    = 'var(--text-muted)';
+const PURPLE = 'var(--accent-primary)';
+const PURPLE_LIGHT = 'var(--surface-tint)';
+const PURPLE_MID = 'var(--surface-tint-mid)';
+const TEXT_DARK = 'var(--text-primary)';
+const TEXT_MUTED = 'var(--text-muted)';
 // Raw hex needed only for SVG attributes and rgba() calls
-const PURPLE_HEX    = '#7C3AED';
+const PURPLE_HEX = '#7C3AED';
 
 // Bad-habit theming — red accents, kept consistent with HabitCard/HabitList
-const RED           = '#EF4444';
-const RED_SOFT      = '#f87171';
-const RED_LIGHT     = 'rgba(239,68,68,0.12)';
+const RED = '#EF4444';
+const RED_SOFT = '#f87171';
+const RED_LIGHT = 'rgba(239,68,68,0.12)';
 
 // Liquid glass helpers (inline style objects)
 const GLASS: React.CSSProperties = {
@@ -200,7 +200,7 @@ function HabitRow({
   const icon = habit.icon ?? (bad ? 'ban' : 'circle-check');
 
   // For bad habits, checking the row off means the user *avoided* it today.
-  const accent      = bad ? RED : (habit.color || PURPLE);
+  const accent = bad ? RED : (habit.color || PURPLE);
   const accentLight = bad ? RED_LIGHT : `color-mix(in srgb, ${accent} 14%, transparent)`;
 
   const subtitle = bad
@@ -344,26 +344,26 @@ function HabitDetailSheet({
   // These locals deliberately shadow the module-level purple tokens, so every
   // accent below (stat numbers, calendar, nav, month bar, chart) follows the
   // habit's color. Falls back to brand purple when a habit has none.
-  const PURPLE       = habit.color || '#7C3AED';
-  const PURPLE_HEX   = PURPLE;
+  const PURPLE = habit.color || '#7C3AED';
+  const PURPLE_HEX = PURPLE;
   const PURPLE_LIGHT = `color-mix(in srgb, ${PURPLE} 14%, transparent)`;
-  const PURPLE_MID   = `color-mix(in srgb, ${PURPLE} 24%, transparent)`;
+  const PURPLE_MID = `color-mix(in srgb, ${PURPLE} 24%, transparent)`;
 
   const [entries, setEntries] = useState<{ entry_date: string; is_completed: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Edit state
-  const [editMode, setEditMode]     = useState(false);
-  const [editName, setEditName]     = useState(habit.name);
-  const [editIcon, setEditIcon]     = useState(habit.icon ?? 'circle-check');
-  const [editColor, setEditColor]   = useState(habit.color || '#7C3AED');
-  const [editNotes, setEditNotes]   = useState(habit.description ?? '');
-  const [saving, setSaving]         = useState(false);
-  const [saveError, setSaveError]   = useState<string | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editName, setEditName] = useState(habit.name);
+  const [editIcon, setEditIcon] = useState(habit.icon ?? 'circle-check');
+  const [editColor, setEditColor] = useState(habit.color || '#7C3AED');
+  const [editNotes, setEditNotes] = useState(habit.description ?? '');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Delete state
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleting, setDeleting]           = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Backfill: which day is currently being saved (for disabling during the request)
   const [savingDay, setSavingDay] = useState<string | null>(null);
@@ -413,18 +413,18 @@ function HabitDetailSheet({
 
   const [monthOffset, setMonthOffset] = useState(0); // 0 = current month, -1 = last month …
 
-  const todayDate  = new Date();
-  const todayLocal = `${todayDate.getFullYear()}-${String(todayDate.getMonth()+1).padStart(2,'0')}-${String(todayDate.getDate()).padStart(2,'0')}`;
+  const todayDate = new Date();
+  const todayLocal = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, '0')}-${String(todayDate.getDate()).padStart(2, '0')}`;
 
   const displayDate = new Date(todayDate.getFullYear(), todayDate.getMonth() + monthOffset, 1);
-  const calYear  = displayDate.getFullYear();
+  const calYear = displayDate.getFullYear();
   const calMonth = displayDate.getMonth();
 
-  const MONTHS    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const DOW_LABELS = ['S','M','T','W','T','F','S'];
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const DOW_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const firstDow    = new Date(calYear, calMonth, 1).getDay();
+  const firstDow = new Date(calYear, calMonth, 1).getDay();
 
   const entryMap = new Map(entries.map((e) => [e.entry_date, e.is_completed]));
 
@@ -434,7 +434,7 @@ function HabitDetailSheet({
     ...Array(firstDow).fill(null),
     ...Array.from({ length: daysInMonth }, (_, i) => {
       const day = i + 1;
-      const ds  = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const ds = `${calYear}-${String(calMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       return { date: ds, day, completed: entryMap.get(ds) ?? false, isToday: ds === todayLocal, isFuture: ds > todayLocal };
     }),
   ];
@@ -467,12 +467,12 @@ function HabitDetailSheet({
   };
 
   // Month-level stats for the visible month
-  const monthPrefix   = `${calYear}-${String(calMonth+1).padStart(2,'0')}`;
-  const monthEntries  = entries.filter((e) => e.entry_date.startsWith(monthPrefix));
-  const monthDone     = monthEntries.filter((e) => e.is_completed).length;
-  const isCurrentMon  = calYear === todayDate.getFullYear() && calMonth === todayDate.getMonth();
-  const daysElapsed   = isCurrentMon ? todayDate.getDate() : daysInMonth;
-  const monthRate     = daysElapsed > 0 ? Math.round((monthDone / daysElapsed) * 100) : 0;
+  const monthPrefix = `${calYear}-${String(calMonth + 1).padStart(2, '0')}`;
+  const monthEntries = entries.filter((e) => e.entry_date.startsWith(monthPrefix));
+  const monthDone = monthEntries.filter((e) => e.is_completed).length;
+  const isCurrentMon = calYear === todayDate.getFullYear() && calMonth === todayDate.getMonth();
+  const daysElapsed = isCurrentMon ? todayDate.getDate() : daysInMonth;
+  const monthRate = daysElapsed > 0 ? Math.round((monthDone / daysElapsed) * 100) : 0;
   const daysRemaining = Math.max(0, daysInMonth - daysElapsed); // days left in the month
 
   // For stat pills — last 30-day rate
@@ -481,15 +481,15 @@ function HabitDetailSheet({
 
   // Per-habit weekly report — last 7 days (oldest → today). Single habit is
   // binary per day, so each point is 100% (done) or 0% (not).
-  const WEEK_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const WEEK_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const weekChart = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - (6 - i));
-    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return { date: ds, label: WEEK_LABELS[d.getDay()], dayNum: d.getDate(), pct: entryMap.get(ds) ? 100 : 0, isToday: ds === todayLocal };
   });
   const weekChartAvg = Math.round((weekChart.filter((w) => w.pct === 100).length / 7) * 100);
 
-  const canGoBack    = monthOffset > -3;
+  const canGoBack = monthOffset > -3;
   const canGoForward = monthOffset < 0;
 
   return (
@@ -527,383 +527,383 @@ function HabitDetailSheet({
             boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
           }}
         >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 0, marginBottom: 22 }}>
-          <div style={{
-            width: 54, height: 54, borderRadius: 16,
-            background: `color-mix(in srgb, ${habit.color || PURPLE} 14%, transparent)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, overflow: 'hidden',
-            boxShadow: 'none',
-          }}>
-            <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={habit.color || PURPLE} />
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {editMode ? (
-              <input
-                autoFocus
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
-                style={{
-                  width: '100%', boxSizing: 'border-box',
-                  background: 'var(--input-bg)', border: `1.5px solid ${PURPLE}`,
-                  borderRadius: 10, padding: '8px 12px',
-                  fontSize: 17, fontWeight: 700, color: TEXT_DARK,
-                  outline: 'none', fontFamily: 'inherit',
-                }}
-              />
-            ) : (
-              <>
-                <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
-                  {habit.name}
-                </h2>
-                <p style={{ margin: '3px 0 0', fontSize: 13, color: TEXT_MUTED }}>
-                  {habit.description ?? (habit.frequency?.type === 'daily' ? 'Daily habit' : 'Habit')}
-                </p>
-              </>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-            {!editMode && (
-              <button
-                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
-                style={{
-                  width: 34, height: 34, borderRadius: '50%',
-                  background: PURPLE_LIGHT, border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <DynamicIcon name="pencil" size={16} color={PURPLE} />
-              </button>
-            )}
-            <button
-              onClick={editMode ? () => setEditMode(false) : onClose}
-              style={{
-                width: 34, height: 34, borderRadius: '50%',
-                background: PURPLE_MID, border: 'none',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: PURPLE, fontWeight: 700, fontSize: 18,
-              }}
-            >
-              ×
-            </button>
-          </div>
-        </div>
-
-        {/* Edit mode — icon picker + save */}
-        {editMode && (
-          <div style={{ ...GLASS_NESTED_PURPLE, borderRadius: 18, padding: '16px', marginBottom: 16 }}>
-            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-              Notes
-            </p>
-            <textarea
-              value={editNotes}
-              onChange={(e) => setEditNotes(e.target.value)}
-              placeholder="Why this matters, how you'll do it…"
-              maxLength={500}
-              rows={3}
-              style={{
-                width: '100%', boxSizing: 'border-box', resize: 'vertical', minHeight: 60,
-                background: 'var(--input-bg)', border: `1.5px solid var(--input-border)`,
-                borderRadius: 10, padding: '8px 12px', marginBottom: 16,
-                fontSize: 14, color: TEXT_DARK, outline: 'none', fontFamily: 'inherit', lineHeight: 1.5,
-              }}
-              onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
-            />
-            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-              Choose icon
-            </p>
-            <div className="hf-icon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 16, maxHeight: 200, overflowY: 'auto', paddingRight: 2 }}>
-              {HABIT_ICONS.map((ic) => {
-                const active = editIcon === ic;
-                return (
-                  <button key={ic} onClick={() => setEditIcon(ic)} title={ic} style={{
-                    width: '100%', aspectRatio: '1', borderRadius: 12, border: `2px solid ${active ? PURPLE : 'transparent'}`,
-                    background: PURPLE_LIGHT,
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 0, marginBottom: 22 }}>
+            <div style={{
+              width: 54, height: 54, borderRadius: 16,
+              background: `color-mix(in srgb, ${habit.color || PURPLE} 14%, transparent)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, overflow: 'hidden',
+              boxShadow: 'none',
+            }}>
+              <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={habit.color || PURPLE} />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {editMode ? (
+                <input
+                  autoFocus
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    background: 'var(--input-bg)', border: `1.5px solid ${PURPLE}`,
+                    borderRadius: 10, padding: '8px 12px',
+                    fontSize: 17, fontWeight: 700, color: TEXT_DARK,
+                    outline: 'none', fontFamily: 'inherit',
+                  }}
+                />
+              ) : (
+                <>
+                  <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+                    {habit.name}
+                  </h2>
+                  <p style={{ margin: '3px 0 0', fontSize: 13, color: TEXT_MUTED }}>
+                    {habit.description ?? (habit.frequency?.type === 'daily' ? 'Daily habit' : 'Habit')}
+                  </p>
+                </>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+              {!editMode && (
+                <button
+                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                  style={{
+                    width: 34, height: 34, borderRadius: '50%',
+                    background: PURPLE_LIGHT, border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer',
-                    boxShadow: active ? `0 2px 10px rgba(124,58,237,0.2)` : 'none',
-                    transition: 'all 0.15s', transform: active ? 'scale(1.1)' : 'scale(1)',
-                  }}>
-                    <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
-                  </button>
-                );
-              })}
+                  }}
+                >
+                  <DynamicIcon name="pencil" size={16} color={PURPLE} />
+                </button>
+              )}
+              <button
+                onClick={editMode ? () => setEditMode(false) : onClose}
+                style={{
+                  width: 34, height: 34, borderRadius: '50%',
+                  background: PURPLE_MID, border: 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', color: PURPLE, fontWeight: 700, fontSize: 18,
+                }}
+              >
+                ×
+              </button>
             </div>
-            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-              Color
-            </p>
-            <div style={{ marginBottom: 16 }}>
-              <ColorPicker value={editColor} onChange={setEditColor} />
-            </div>
-            {saveError && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#EF4444' }}>{saveError}</p>}
-            <button
-              onClick={saveEdit}
-              disabled={saving}
-              style={{
-                width: '100%', padding: '13px 0', borderRadius: 14, border: 'none',
-                background: saving ? 'var(--accent-light)' : PURPLE,
-                color: 'var(--accent-on-primary)', fontSize: 15, fontWeight: 700,
-                cursor: saving ? 'default' : 'pointer',
-                boxShadow: 'none',
-              }}
-            >
-              {saving ? 'Saving…' : 'Save Changes'}
-            </button>
           </div>
-        )}
 
-        {/* Notes (read mode) */}
-        {!editMode && (
-          <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 16px', marginBottom: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: habit.description ? 8 : 0 }}>
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+          {/* Edit mode — icon picker + save */}
+          {editMode && (
+            <div style={{ ...GLASS_NESTED_PURPLE, borderRadius: 18, padding: '16px', marginBottom: 16 }}>
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
                 Notes
               </p>
-              <button
-                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: PURPLE, fontSize: 12.5, fontWeight: 700, padding: 0 }}
-              >
-                {habit.description ? 'Edit' : 'Add'}
-              </button>
-            </div>
-            {habit.description ? (
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: TEXT_DARK, whiteSpace: 'pre-wrap' }}>
-                {habit.description}
+              <textarea
+                value={editNotes}
+                onChange={(e) => setEditNotes(e.target.value)}
+                placeholder="Why this matters, how you'll do it…"
+                maxLength={500}
+                rows={3}
+                style={{
+                  width: '100%', boxSizing: 'border-box', resize: 'vertical', minHeight: 60,
+                  background: 'var(--input-bg)', border: `1.5px solid var(--input-border)`,
+                  borderRadius: 10, padding: '8px 12px', marginBottom: 16,
+                  fontSize: 14, color: TEXT_DARK, outline: 'none', fontFamily: 'inherit', lineHeight: 1.5,
+                }}
+                onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
+                onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
+              />
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                Choose icon
               </p>
-            ) : (
-              <p style={{ margin: 0, fontSize: 13.5, color: TEXT_MUTED }}>
-                No notes yet — tap “Add” to jot why this habit matters.
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Stat pills */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
-          <StatPill label="Current Streak" value={`${habit.current_streak}d`} accent color={PURPLE} />
-          <StatPill label="Longest Streak" value={`${habit.longest_streak}d`} />
-          <StatPill label="30-day Rate"    value={`${rate}%`} accent color={PURPLE} />
-          <StatPill label="Total Done"     value={`${habit.total_completions}`} />
-        </div>
-
-        {/* Weekly report — this habit, last 7 days */}
-        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 12px 10px', marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 4px', marginBottom: 6 }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-              Weekly report
-            </p>
-            <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE }}>{weekChartAvg}% avg</span>
-          </div>
-          {loading
-            ? <p style={{ margin: 0, fontSize: 13, color: TEXT_MUTED, textAlign: 'center', padding: '24px 0' }}>Loading…</p>
-            : <WeeklyReportChart data={weekChart} avg={weekChartAvg} color={PURPLE} />}
-        </div>
-
-        {/* Calendar */}
-        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px 14px', marginBottom: 14 }}>
-          {/* Month header + navigation */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <button
-              onClick={() => setMonthOffset((o) => o - 1)}
-              disabled={!canGoBack}
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: canGoBack ? PURPLE_LIGHT : 'transparent',
-                border: 'none', cursor: canGoBack ? 'pointer' : 'default',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: canGoBack ? PURPLE : 'var(--drag-handle)', fontSize: 18, fontWeight: 700,
-              }}
-            >‹</button>
-
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.01em' }}>
-                {MONTHS[calMonth]} {calYear}
-              </p>
-              <p style={{ margin: '2px 0 0', fontSize: 11, color: TEXT_MUTED }}>
-                {monthDone} done · {monthRate}% this month
-              </p>
-            </div>
-
-            <button
-              onClick={() => setMonthOffset((o) => o + 1)}
-              disabled={!canGoForward}
-              style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: canGoForward ? PURPLE_LIGHT : 'transparent',
-                border: 'none', cursor: canGoForward ? 'pointer' : 'default',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: canGoForward ? PURPLE : 'var(--drag-handle)', fontSize: 18, fontWeight: 700,
-              }}
-            >›</button>
-          </div>
-
-          {loading ? (
-            <p style={{ margin: 0, fontSize: 13, color: TEXT_MUTED, textAlign: 'center', padding: '16px 0' }}>Loading…</p>
-          ) : (() => {
-            const weeks = Array.from(
-              { length: Math.ceil(calCells.length / 7) },
-              (_, wi) => calCells.slice(wi * 7, (wi + 1) * 7)
-            );
-            const CELL_H = 'clamp(30px, 10vw, 40px)';
-            const rowStyle: React.CSSProperties = { display: 'flex', gap: '4px', width: '100%' };
-
-            return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
-                {/* Day-of-week headers */}
-                <div style={rowStyle}>
-                  {DOW_LABELS.map((d, i) => (
-                    <div key={i} style={{
-                      flex: '1 1 0', textAlign: 'center',
-                      fontSize: 10, fontWeight: 700, color: TEXT_MUTED,
-                      paddingBottom: 4,
+              <div className="hf-icon-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 16, maxHeight: 200, overflowY: 'auto', paddingRight: 2 }}>
+                {HABIT_ICONS.map((ic) => {
+                  const active = editIcon === ic;
+                  return (
+                    <button key={ic} onClick={() => setEditIcon(ic)} title={ic} style={{
+                      width: '100%', aspectRatio: '1', borderRadius: 12, border: `2px solid ${active ? PURPLE : 'transparent'}`,
+                      background: PURPLE_LIGHT,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer',
+                      boxShadow: active ? `0 2px 10px rgba(124,58,237,0.2)` : 'none',
+                      transition: 'all 0.15s', transform: active ? 'scale(1.1)' : 'scale(1)',
                     }}>
-                      {d}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Week rows */}
-                {weeks.map((week, wi) => (
-                  <div key={wi} style={rowStyle}>
-                    {week.map((cell, di) => {
-                      if (!cell) {
-                        return <div key={di} style={{ flex: '1 1 0', height: CELL_H }} />;
-                      }
-                      const bg = cell.isFuture
-                        ? 'transparent'
-                        : cell.completed
-                          ? PURPLE
-                          : PURPLE_LIGHT;
-                      const txtColor = cell.completed ? '#fff' : cell.isToday ? PURPLE_HEX : cell.isFuture ? 'var(--drag-handle)' : TEXT_MUTED;
-                      const interactive = !cell.isFuture;
-                      const isSaving = savingDay === cell.date;
-                      return (
-                        <div
-                          key={di}
-                          onClick={interactive && !isSaving ? () => markDay(cell.date, cell.completed) : undefined}
-                          title={interactive ? (cell.completed ? 'Tap to unmark' : 'Tap to mark done') : undefined}
-                          style={{
-                            flex: '1 1 0', minWidth: 0,
-                            height: CELL_H,
-                            borderRadius: 8,
-                            background: bg,
-                            border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
-                            boxShadow: cell.completed ? '0 2px 6px rgba(124,58,237,0.28)' : 'none',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11,
-                            fontWeight: cell.isToday ? 800 : 500,
-                            color: txtColor,
-                            cursor: interactive ? 'pointer' : 'default',
-                            opacity: isSaving ? 0.5 : 1,
-                            transition: 'background 0.15s ease, opacity 0.15s ease',
-                            WebkitTapHighlightColor: 'transparent',
-                          }}
-                        >
-                          {cell.day}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-
-                {/* Legend */}
-                <div style={{ display: 'flex', gap: 14, marginTop: 10, justifyContent: 'center' }}>
-                  {[
-                    { bg: PURPLE,       label: 'Done',   txt: '#fff'    },
-                    { bg: PURPLE_LIGHT, label: 'Missed', txt: TEXT_MUTED },
-                    { bg: 'transparent',label: 'Today',  txt: PURPLE, border: `2px solid ${PURPLE}` },
-                  ].map(({ bg, label, txt, border }) => (
-                    <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <div style={{
-                        width: 16, height: 16, borderRadius: 4,
-                        background: bg, border: border ?? 'none',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 9, fontWeight: 700, color: txt,
-                      }} />
-                      <span style={{ fontSize: 11, color: TEXT_MUTED }}>{label}</span>
-                    </div>
-                  ))}
-                </div>
+                      <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
+                    </button>
+                  );
+                })}
               </div>
-            );
-          })()}
-        </div>
-
-        {/* Completion rate bar */}
-        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT_DARK }}>
-              {MONTHS[calMonth]} Completion
-            </p>
-            <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{monthRate}%</span>
-          </div>
-          <div style={{ height: 10, borderRadius: 5, background: PURPLE_LIGHT, overflow: 'hidden' }}>
-            <motion.div
-              key={`${calYear}-${calMonth}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${monthRate}%` }}
-              transition={{ duration: 0.7, ease: 'easeOut' }}
-              style={{ height: '100%', background: `linear-gradient(90deg, ${PURPLE}, color-mix(in srgb, ${PURPLE} 65%, #fff))`, borderRadius: 5 }}
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '8px 0 0', gap: 12 }}>
-            <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED }}>
-              <span style={{ fontWeight: 700, color: TEXT_DARK }}>{monthDone}</span> of {daysElapsed} days completed
-            </p>
-            <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED, whiteSpace: 'nowrap' }}>
-              <span style={{ fontWeight: 700, color: TEXT_DARK }}>{daysRemaining}</span> {daysRemaining === 1 ? 'day' : 'days'} left
-            </p>
-          </div>
-        </div>
-
-        {/* Delete */}
-        {!confirmDelete ? (
-          <button
-            onClick={() => setConfirmDelete(true)}
-            style={{
-              marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
-              background: 'rgba(239,68,68,0.08)',
-              color: '#EF4444', fontSize: 14, fontWeight: 700,
-              cursor: 'pointer', fontFamily: 'inherit',
-            }}
-          >
-            Delete Habit
-          </button>
-        ) : (
-          <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.08)', borderRadius: 16, padding: '16px' }}>
-            <p style={{ margin: '0 0 12px', fontSize: 13, color: '#EF4444', fontWeight: 600, textAlign: 'center' }}>
-              Delete &quot;{habit.name}&quot;? This removes all history and cannot be undone.
-            </p>
-            <div style={{ display: 'flex', gap: 10 }}>
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                Color
+              </p>
+              <div style={{ marginBottom: 16 }}>
+                <ColorPicker value={editColor} onChange={setEditColor} />
+              </div>
+              {saveError && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#EF4444' }}>{saveError}</p>}
               <button
-                onClick={() => setConfirmDelete(false)}
+                onClick={saveEdit}
+                disabled={saving}
                 style={{
-                  flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
-                  background: PURPLE_LIGHT, color: PURPLE, fontSize: 14, fontWeight: 700,
-                  cursor: 'pointer', fontFamily: 'inherit',
+                  width: '100%', padding: '13px 0', borderRadius: 14, border: 'none',
+                  background: saving ? 'var(--accent-light)' : PURPLE,
+                  color: 'var(--accent-on-primary)', fontSize: 15, fontWeight: 700,
+                  cursor: saving ? 'default' : 'pointer',
+                  boxShadow: 'none',
                 }}
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                style={{
-                  flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
-                  background: '#EF4444', color: '#fff', fontSize: 14, fontWeight: 700,
-                  cursor: deleting ? 'default' : 'pointer', fontFamily: 'inherit',
-                  opacity: deleting ? 0.7 : 1,
-                }}
-              >
-                {deleting ? 'Deleting…' : 'Yes, Delete'}
+                {saving ? 'Saving…' : 'Save Changes'}
               </button>
             </div>
+          )}
+
+          {/* Notes (read mode) */}
+          {!editMode && (
+            <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 16px', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: habit.description ? 8 : 0 }}>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                  Notes
+                </p>
+                <button
+                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: PURPLE, fontSize: 12.5, fontWeight: 700, padding: 0 }}
+                >
+                  {habit.description ? 'Edit' : 'Add'}
+                </button>
+              </div>
+              {habit.description ? (
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: TEXT_DARK, whiteSpace: 'pre-wrap' }}>
+                  {habit.description}
+                </p>
+              ) : (
+                <p style={{ margin: 0, fontSize: 13.5, color: TEXT_MUTED }}>
+                  No notes yet — tap “Add” to jot why this habit matters.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Stat pills */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+            <StatPill label="Current Streak" value={`${habit.current_streak}d`} accent color={PURPLE} />
+            <StatPill label="Longest Streak" value={`${habit.longest_streak}d`} />
+            <StatPill label="30-day Rate" value={`${rate}%`} accent color={PURPLE} />
+            <StatPill label="Total Done" value={`${habit.total_completions}`} />
           </div>
-        )}
+
+          {/* Weekly report — this habit, last 7 days */}
+          <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 12px 10px', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 4px', marginBottom: 6 }}>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                Weekly report
+              </p>
+              <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE }}>{weekChartAvg}% avg</span>
+            </div>
+            {loading
+              ? <p style={{ margin: 0, fontSize: 13, color: TEXT_MUTED, textAlign: 'center', padding: '24px 0' }}>Loading…</p>
+              : <WeeklyReportChart data={weekChart} avg={weekChartAvg} color={PURPLE} />}
+          </div>
+
+          {/* Calendar */}
+          <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px 14px', marginBottom: 14 }}>
+            {/* Month header + navigation */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+              <button
+                onClick={() => setMonthOffset((o) => o - 1)}
+                disabled={!canGoBack}
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: canGoBack ? PURPLE_LIGHT : 'transparent',
+                  border: 'none', cursor: canGoBack ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: canGoBack ? PURPLE : 'var(--drag-handle)', fontSize: 18, fontWeight: 700,
+                }}
+              >‹</button>
+
+              <div style={{ textAlign: 'center' }}>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.01em' }}>
+                  {MONTHS[calMonth]} {calYear}
+                </p>
+                <p style={{ margin: '2px 0 0', fontSize: 11, color: TEXT_MUTED }}>
+                  {monthDone} done · {monthRate}% this month
+                </p>
+              </div>
+
+              <button
+                onClick={() => setMonthOffset((o) => o + 1)}
+                disabled={!canGoForward}
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: canGoForward ? PURPLE_LIGHT : 'transparent',
+                  border: 'none', cursor: canGoForward ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: canGoForward ? PURPLE : 'var(--drag-handle)', fontSize: 18, fontWeight: 700,
+                }}
+              >›</button>
+            </div>
+
+            {loading ? (
+              <p style={{ margin: 0, fontSize: 13, color: TEXT_MUTED, textAlign: 'center', padding: '16px 0' }}>Loading…</p>
+            ) : (() => {
+              const weeks = Array.from(
+                { length: Math.ceil(calCells.length / 7) },
+                (_, wi) => calCells.slice(wi * 7, (wi + 1) * 7)
+              );
+              const CELL_H = 'clamp(30px, 10vw, 40px)';
+              const rowStyle: React.CSSProperties = { display: 'flex', gap: '4px', width: '100%' };
+
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+                  {/* Day-of-week headers */}
+                  <div style={rowStyle}>
+                    {DOW_LABELS.map((d, i) => (
+                      <div key={i} style={{
+                        flex: '1 1 0', textAlign: 'center',
+                        fontSize: 10, fontWeight: 700, color: TEXT_MUTED,
+                        paddingBottom: 4,
+                      }}>
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Week rows */}
+                  {weeks.map((week, wi) => (
+                    <div key={wi} style={rowStyle}>
+                      {week.map((cell, di) => {
+                        if (!cell) {
+                          return <div key={di} style={{ flex: '1 1 0', height: CELL_H }} />;
+                        }
+                        const bg = cell.isFuture
+                          ? 'transparent'
+                          : cell.completed
+                            ? PURPLE
+                            : PURPLE_LIGHT;
+                        const txtColor = cell.completed ? '#fff' : cell.isToday ? PURPLE_HEX : cell.isFuture ? 'var(--drag-handle)' : TEXT_MUTED;
+                        const interactive = !cell.isFuture;
+                        const isSaving = savingDay === cell.date;
+                        return (
+                          <div
+                            key={di}
+                            onClick={interactive && !isSaving ? () => markDay(cell.date, cell.completed) : undefined}
+                            title={interactive ? (cell.completed ? 'Tap to unmark' : 'Tap to mark done') : undefined}
+                            style={{
+                              flex: '1 1 0', minWidth: 0,
+                              height: CELL_H,
+                              borderRadius: 8,
+                              background: bg,
+                              border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
+                              boxShadow: cell.completed ? '0 2px 6px rgba(124,58,237,0.28)' : 'none',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 11,
+                              fontWeight: cell.isToday ? 800 : 500,
+                              color: txtColor,
+                              cursor: interactive ? 'pointer' : 'default',
+                              opacity: isSaving ? 0.5 : 1,
+                              transition: 'background 0.15s ease, opacity 0.15s ease',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            {cell.day}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+
+                  {/* Legend */}
+                  <div style={{ display: 'flex', gap: 14, marginTop: 10, justifyContent: 'center' }}>
+                    {[
+                      { bg: PURPLE, label: 'Done', txt: '#fff' },
+                      { bg: PURPLE_LIGHT, label: 'Missed', txt: TEXT_MUTED },
+                      { bg: 'transparent', label: 'Today', txt: PURPLE, border: `2px solid ${PURPLE}` },
+                    ].map(({ bg, label, txt, border }) => (
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <div style={{
+                          width: 16, height: 16, borderRadius: 4,
+                          background: bg, border: border ?? 'none',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 9, fontWeight: 700, color: txt,
+                        }} />
+                        <span style={{ fontSize: 11, color: TEXT_MUTED }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Completion rate bar */}
+          <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT_DARK }}>
+                {MONTHS[calMonth]} Completion
+              </p>
+              <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{monthRate}%</span>
+            </div>
+            <div style={{ height: 10, borderRadius: 5, background: PURPLE_LIGHT, overflow: 'hidden' }}>
+              <motion.div
+                key={`${calYear}-${calMonth}`}
+                initial={{ width: 0 }}
+                animate={{ width: `${monthRate}%` }}
+                transition={{ duration: 0.7, ease: 'easeOut' }}
+                style={{ height: '100%', background: `linear-gradient(90deg, ${PURPLE}, color-mix(in srgb, ${PURPLE} 65%, #fff))`, borderRadius: 5 }}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '8px 0 0', gap: 12 }}>
+              <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED }}>
+                <span style={{ fontWeight: 700, color: TEXT_DARK }}>{monthDone}</span> of {daysElapsed} days completed
+              </p>
+              <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED, whiteSpace: 'nowrap' }}>
+                <span style={{ fontWeight: 700, color: TEXT_DARK }}>{daysRemaining}</span> {daysRemaining === 1 ? 'day' : 'days'} left
+              </p>
+            </div>
+          </div>
+
+          {/* Delete */}
+          {!confirmDelete ? (
+            <button
+              onClick={() => setConfirmDelete(true)}
+              style={{
+                marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
+                background: 'rgba(239,68,68,0.08)',
+                color: '#EF4444', fontSize: 14, fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              Delete Habit
+            </button>
+          ) : (
+            <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.08)', borderRadius: 16, padding: '16px' }}>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#EF4444', fontWeight: 600, textAlign: 'center' }}>
+                Delete &quot;{habit.name}&quot;? This removes all history and cannot be undone.
+              </p>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  onClick={() => setConfirmDelete(false)}
+                  style={{
+                    flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
+                    background: PURPLE_LIGHT, color: PURPLE, fontSize: 14, fontWeight: 700,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  style={{
+                    flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
+                    background: '#EF4444', color: '#fff', fontSize: 14, fontWeight: 700,
+                    cursor: deleting ? 'default' : 'pointer', fontFamily: 'inherit',
+                    opacity: deleting ? 0.7 : 1,
+                  }}
+                >
+                  {deleting ? 'Deleting…' : 'Yes, Delete'}
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </>
@@ -925,7 +925,7 @@ const HABIT_COLORS = [
   '#E11D48', // rose
   '#C026D3', // fuchsia
 ];
-const DAY_LABELS   = ['S','M','T','W','T','F','S'];
+const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 // Glossy radial sheen for a color orb.
 const orbGloss = (c: string) =>
@@ -1012,18 +1012,18 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 }
 
 function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; onClose: () => void }) {
-  const [name, setName]             = useState('');
-  const [notes, setNotes]           = useState('');
-  const [icon, setIcon]             = useState('circle-check');
+  const [name, setName] = useState('');
+  const [notes, setNotes] = useState('');
+  const [icon, setIcon] = useState('circle-check');
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [color, setColor]           = useState('#7C3AED');
-  const [freqType, setFreqType]     = useState<FreqType>('daily');
-  const [days, setDays]             = useState<number[]>([]);
-  const [perWeek, setPerWeek]       = useState(3);
+  const [color, setColor] = useState('#7C3AED');
+  const [freqType, setFreqType] = useState<FreqType>('daily');
+  const [days, setDays] = useState<number[]>([]);
+  const [perWeek, setPerWeek] = useState(3);
   const [targetType, setTargetType] = useState<TargetType>('boolean');
-  const [duration, setDuration]     = useState(30);
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState<string | null>(null);
+  const [duration, setDuration] = useState(30);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const toggleDay = (d: number) =>
     setDays((prev) => prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort((a, b) => a - b));
@@ -1065,8 +1065,8 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
   };
 
   const freqTabs: { key: FreqType; label: string }[] = [
-    { key: 'daily',     label: 'Every Day' },
-    { key: 'weekly',    label: 'Specific Days' },
+    { key: 'daily', label: 'Every Day' },
+    { key: 'weekly', label: 'Specific Days' },
     { key: 'x_per_week', label: 'Per Week' },
   ];
 
@@ -1108,198 +1108,198 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
             boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
           }}
         >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 0, marginBottom: 18 }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>New Habit</h2>
-            <p style={{ margin: '2px 0 0', fontSize: 13, color: TEXT_MUTED }}>Build a streak that sticks</p>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 0, marginBottom: 18 }}>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>New Habit</h2>
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: TEXT_MUTED }}>Build a streak that sticks</p>
+            </div>
+            <button onClick={onClose} style={{
+              width: 34, height: 34, borderRadius: '50%', background: PURPLE_MID,
+              border: 'none', cursor: 'pointer', color: PURPLE, fontWeight: 700, fontSize: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>×</button>
           </div>
-          <button onClick={onClose} style={{
-            width: 34, height: 34, borderRadius: '50%', background: PURPLE_MID,
-            border: 'none', cursor: 'pointer', color: PURPLE, fontWeight: 700, fontSize: 20,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>×</button>
-        </div>
 
-        {/* ── Name ── */}
-        <SectionCard>
-          <FieldLabel>Habit name</FieldLabel>
-          <input
-            autoFocus
-            value={name}
-            onChange={(e) => { setName(e.target.value); setError(null); }}
-            placeholder="e.g. Morning Run"
-            style={{ ...inputStyle, border: `1.5px solid ${error && !name.trim() ? '#EF4444' : 'var(--input-border)'}` }}
-            onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
-            onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
-          />
-
-          <div style={{ marginTop: 14 }}>
-            <FieldLabel>Notes (optional)</FieldLabel>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Why this matters, how you'll do it…"
-              maxLength={500}
-              rows={3}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 64, lineHeight: 1.5, border: '1.5px solid var(--input-border)' }}
+          {/* ── Name ── */}
+          <SectionCard>
+            <FieldLabel>Habit name</FieldLabel>
+            <input
+              autoFocus
+              value={name}
+              onChange={(e) => { setName(e.target.value); setError(null); }}
+              placeholder="e.g. Morning Run"
+              style={{ ...inputStyle, border: `1.5px solid ${error && !name.trim() ? '#EF4444' : 'var(--input-border)'}` }}
               onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
             />
-          </div>
-        </SectionCard>
 
-        {/* ── Icon + Color ── */}
-        <SectionCard>
-          <FieldLabel>Icon</FieldLabel>
-          <div className="hf-icon-grid" style={{
-            display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 12,
-          }}>
-            {(showAllIcons ? HABIT_ICONS : HABIT_ICONS.slice(0, 6)).map((ic) => {
-              const active = icon === ic;
-              return (
-                <button key={ic} onClick={() => setIcon(ic)} title={ic} style={{
-                  width: '100%', aspectRatio: '1', borderRadius: 12,
-                  border: `1.5px solid ${active ? PURPLE : 'transparent'}`,
-                  background: active ? 'var(--surface-tint-mid)' : PURPLE_LIGHT,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
-                }}>
-                  <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
-                </button>
-              );
-            })}
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowAllIcons((v) => !v)}
-            style={{
-              border: 'none', background: 'transparent', color: PURPLE,
-              fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: '2px 0',
-              marginBottom: 18,
-            }}
-          >
-            {showAllIcons ? 'Show less' : `View more (${HABIT_ICONS.length - 6})`}
-          </button>
-          <FieldLabel>Color</FieldLabel>
-          <ColorPicker value={color} onChange={setColor} />
-        </SectionCard>
+            <div style={{ marginTop: 14 }}>
+              <FieldLabel>Notes (optional)</FieldLabel>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Why this matters, how you'll do it…"
+                maxLength={500}
+                rows={3}
+                style={{ ...inputStyle, resize: 'vertical', minHeight: 64, lineHeight: 1.5, border: '1.5px solid var(--input-border)' }}
+                onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
+                onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
+              />
+            </div>
+          </SectionCard>
 
-        {/* ── Frequency ── */}
-        <SectionCard>
-          <FieldLabel>How often</FieldLabel>
-          <div style={{ display: 'flex', background: 'var(--surface-tint)', borderRadius: 12, padding: 3, gap: 3, marginBottom: 14 }}>
-            {freqTabs.map(({ key, label }) => (
-              <button key={key} onClick={() => setFreqType(key)} style={{
-                flex: 1, padding: '8px 4px', borderRadius: 9, border: 'none',
-                background: freqType === key ? PURPLE : 'transparent',
-                color: freqType === key ? '#fff' : TEXT_MUTED,
-                fontSize: 12, fontWeight: freqType === key ? 700 : 500,
-                cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap',
-              }}>{label}</button>
-            ))}
-          </div>
-
-          {freqType === 'weekly' && (
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              {DAY_LABELS.map((label, idx) => {
-                const active = days.includes(idx);
+          {/* ── Icon + Color ── */}
+          <SectionCard>
+            <FieldLabel>Icon</FieldLabel>
+            <div className="hf-icon-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 12,
+            }}>
+              {(showAllIcons ? HABIT_ICONS : HABIT_ICONS.slice(0, 6)).map((ic) => {
+                const active = icon === ic;
                 return (
-                  <button key={idx} onClick={() => toggleDay(idx)} style={{
-                    width: 38, height: 38, borderRadius: '50%', border: 'none',
-                    background: active ? color : '#F5F3FF',
-                    color: active ? '#fff' : TEXT_MUTED,
-                    fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    boxShadow: active ? `0 2px 8px rgba(124,58,237,0.3)` : 'none',
-                  }}>{label}</button>
+                  <button key={ic} onClick={() => setIcon(ic)} title={ic} style={{
+                    width: '100%', aspectRatio: '1', borderRadius: 12,
+                    border: `1.5px solid ${active ? PURPLE : 'transparent'}`,
+                    background: active ? 'var(--surface-tint-mid)' : PURPLE_LIGHT,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
+                  }}>
+                    <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
+                  </button>
                 );
               })}
             </div>
-          )}
+            <button
+              type="button"
+              onClick={() => setShowAllIcons((v) => !v)}
+              style={{
+                border: 'none', background: 'transparent', color: PURPLE,
+                fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: '2px 0',
+                marginBottom: 18,
+              }}
+            >
+              {showAllIcons ? 'Show less' : `View more (${HABIT_ICONS.length - 6})`}
+            </button>
+            <FieldLabel>Color</FieldLabel>
+            <ColorPicker value={color} onChange={setColor} />
+          </SectionCard>
 
-          {freqType === 'x_per_week' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <p style={{ margin: 0, fontSize: 14, color: TEXT_DARK, fontWeight: 600 }}>
-                {perWeek}× per week
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <button onClick={() => setPerWeek((n) => Math.max(1, n - 1))} style={{
-                  width: 36, height: 36, borderRadius: '50%', border: 'none',
-                  background: 'var(--surface-tint)', color: PURPLE, fontSize: 22, fontWeight: 700,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>−</button>
-                <span style={{ width: 28, textAlign: 'center', fontSize: 20, fontWeight: 800, color: TEXT_DARK }}>{perWeek}</span>
-                <button onClick={() => setPerWeek((n) => Math.min(7, n + 1))} style={{
-                  width: 36, height: 36, borderRadius: '50%', border: 'none',
-                  background: PURPLE, color: '#fff', fontSize: 22, fontWeight: 700,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>+</button>
+          {/* ── Frequency ── */}
+          <SectionCard>
+            <FieldLabel>How often</FieldLabel>
+            <div style={{ display: 'flex', background: 'var(--surface-tint)', borderRadius: 12, padding: 3, gap: 3, marginBottom: 14 }}>
+              {freqTabs.map(({ key, label }) => (
+                <button key={key} onClick={() => setFreqType(key)} style={{
+                  flex: 1, padding: '8px 4px', borderRadius: 9, border: 'none',
+                  background: freqType === key ? PURPLE : 'transparent',
+                  color: freqType === key ? '#fff' : TEXT_MUTED,
+                  fontSize: 12, fontWeight: freqType === key ? 700 : 500,
+                  cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap',
+                }}>{label}</button>
+              ))}
+            </div>
+
+            {freqType === 'weekly' && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                {DAY_LABELS.map((label, idx) => {
+                  const active = days.includes(idx);
+                  return (
+                    <button key={idx} onClick={() => toggleDay(idx)} style={{
+                      width: 38, height: 38, borderRadius: '50%', border: 'none',
+                      background: active ? color : '#F5F3FF',
+                      color: active ? '#fff' : TEXT_MUTED,
+                      fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      boxShadow: active ? `0 2px 8px rgba(124,58,237,0.3)` : 'none',
+                    }}>{label}</button>
+                  );
+                })}
               </div>
+            )}
+
+            {freqType === 'x_per_week' && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ margin: 0, fontSize: 14, color: TEXT_DARK, fontWeight: 600 }}>
+                  {perWeek}× per week
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button onClick={() => setPerWeek((n) => Math.max(1, n - 1))} style={{
+                    width: 36, height: 36, borderRadius: '50%', border: 'none',
+                    background: 'var(--surface-tint)', color: PURPLE, fontSize: 22, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>−</button>
+                  <span style={{ width: 28, textAlign: 'center', fontSize: 20, fontWeight: 800, color: TEXT_DARK }}>{perWeek}</span>
+                  <button onClick={() => setPerWeek((n) => Math.min(7, n + 1))} style={{
+                    width: 36, height: 36, borderRadius: '50%', border: 'none',
+                    background: PURPLE, color: '#fff', fontSize: 22, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>+</button>
+                </div>
+              </div>
+            )}
+          </SectionCard>
+
+          {/* ── Target / Timer ── */}
+          <SectionCard>
+            <FieldLabel>Target type</FieldLabel>
+            <div style={{ display: 'flex', gap: 10, marginBottom: targetType === 'duration' ? 16 : 0 }}>
+              {(['boolean', 'duration'] as TargetType[]).map((t) => (
+                <button key={t} onClick={() => setTargetType(t)} style={{
+                  flex: 1, padding: '10px 0', borderRadius: 12, border: 'none',
+                  background: targetType === t ? color : '#F5F3FF',
+                  color: targetType === t ? '#fff' : TEXT_MUTED,
+                  fontSize: 13, fontWeight: targetType === t ? 700 : 500,
+                  cursor: 'pointer', transition: 'all 0.15s',
+                  boxShadow: targetType === t ? `0 2px 10px rgba(124,58,237,0.25)` : 'none',
+                }}>
+                  {t === 'boolean' ? 'Check-off' : 'Duration'}
+                </button>
+              ))}
+            </div>
+
+            {targetType === 'duration' && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 }}>
+                <p style={{ margin: 0, fontSize: 14, color: TEXT_DARK, fontWeight: 600 }}>{duration} minutes</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button onClick={() => setDuration((n) => Math.max(5, n - 5))} style={{
+                    width: 36, height: 36, borderRadius: '50%', border: 'none',
+                    background: 'var(--surface-tint)', color: PURPLE, fontSize: 22, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>−</button>
+                  <span style={{ width: 40, textAlign: 'center', fontSize: 20, fontWeight: 800, color: TEXT_DARK }}>{duration}</span>
+                  <button onClick={() => setDuration((n) => Math.min(240, n + 5))} style={{
+                    width: 36, height: 36, borderRadius: '50%', border: 'none',
+                    background: PURPLE, color: '#fff', fontSize: 22, fontWeight: 700,
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>+</button>
+                </div>
+              </div>
+            )}
+          </SectionCard>
+
+          {/* Error */}
+          {error && (
+            <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 14 }}>
+              <p style={{ margin: 0, fontSize: 13, color: '#EF4444', fontWeight: 600 }}>{error}</p>
             </div>
           )}
-        </SectionCard>
 
-        {/* ── Target / Timer ── */}
-        <SectionCard>
-          <FieldLabel>Target type</FieldLabel>
-          <div style={{ display: 'flex', gap: 10, marginBottom: targetType === 'duration' ? 16 : 0 }}>
-            {(['boolean','duration'] as TargetType[]).map((t) => (
-              <button key={t} onClick={() => setTargetType(t)} style={{
-                flex: 1, padding: '10px 0', borderRadius: 12, border: 'none',
-                background: targetType === t ? color : '#F5F3FF',
-                color: targetType === t ? '#fff' : TEXT_MUTED,
-                fontSize: 13, fontWeight: targetType === t ? 700 : 500,
-                cursor: 'pointer', transition: 'all 0.15s',
-                boxShadow: targetType === t ? `0 2px 10px rgba(124,58,237,0.25)` : 'none',
-              }}>
-                {t === 'boolean' ? 'Check-off' : 'Duration'}
-              </button>
-            ))}
-          </div>
-
-          {targetType === 'duration' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4 }}>
-              <p style={{ margin: 0, fontSize: 14, color: TEXT_DARK, fontWeight: 600 }}>{duration} minutes</p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <button onClick={() => setDuration((n) => Math.max(5, n - 5))} style={{
-                  width: 36, height: 36, borderRadius: '50%', border: 'none',
-                  background: 'var(--surface-tint)', color: PURPLE, fontSize: 22, fontWeight: 700,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>−</button>
-                <span style={{ width: 40, textAlign: 'center', fontSize: 20, fontWeight: 800, color: TEXT_DARK }}>{duration}</span>
-                <button onClick={() => setDuration((n) => Math.min(240, n + 5))} style={{
-                  width: 36, height: 36, borderRadius: '50%', border: 'none',
-                  background: PURPLE, color: '#fff', fontSize: 22, fontWeight: 700,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>+</button>
-              </div>
-            </div>
-          )}
-        </SectionCard>
-
-        {/* Error */}
-        {error && (
-          <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 14 }}>
-            <p style={{ margin: 0, fontSize: 13, color: '#EF4444', fontWeight: 600 }}>{error}</p>
-          </div>
-        )}
-
-        {/* Save button */}
-        <button
-          onClick={submit}
-          disabled={loading}
-          style={{
-            width: '100%', padding: '16px 0', borderRadius: 18, border: 'none',
-            background: loading ? 'var(--accent-light)' : 'var(--accent-primary)',
-            color: 'var(--accent-on-primary)', fontSize: 16, fontWeight: 700,
-            cursor: loading ? 'default' : 'pointer',
-            boxShadow: 'none',
-            transition: 'all 0.15s',
-          }}
-        >
-          {loading ? 'Saving…' : 'Create Habit'}
-        </button>
+          {/* Save button */}
+          <button
+            onClick={submit}
+            disabled={loading}
+            style={{
+              width: '100%', padding: '16px 0', borderRadius: 18, border: 'none',
+              background: loading ? 'var(--accent-light)' : 'var(--accent-primary)',
+              color: 'var(--accent-on-primary)', fontSize: 16, fontWeight: 700,
+              cursor: loading ? 'default' : 'pointer',
+              boxShadow: 'none',
+              transition: 'all 0.15s',
+            }}
+          >
+            {loading ? 'Saving…' : 'Create Habit'}
+          </button>
         </motion.div>
       </div>
     </>
@@ -1338,11 +1338,11 @@ function ProfileMenu({
   };
 
   const menuItems: { icon: string; label: string; sub: string; href?: string }[] = [
-    { icon: 'mountain',      label: 'Trip Planner',   sub: 'Expenses & settlement',  href: '/trip' },
-    { icon: 'zap',           label: 'Your Coach',     sub: 'Weekly AI insights',     href: '/dashboard/coach' },
+    { icon: 'mountain', label: 'Trip Planner', sub: 'Expenses & settlement', href: '/trip' },
+    { icon: 'zap', label: 'Your Coach', sub: 'Weekly AI insights', href: '/dashboard/coach' },
     { icon: 'calendar-check', label: 'Year in Review', sub: 'Highlights & PDF export', href: '/dashboard/year-in-review' },
-    { icon: 'bell',          label: 'Notifications',  sub: 'Reminders & alerts' },
-    { icon: 'help-circle',   label: 'Help & Feedback', sub: 'Support & suggestions' },
+    { icon: 'bell', label: 'Notifications', sub: 'Reminders & alerts' },
+    { icon: 'help-circle', label: 'Help & Feedback', sub: 'Support & suggestions' },
   ];
 
   return (
@@ -1402,190 +1402,187 @@ function ProfileMenu({
             </button>
           </motion.div>
 
-        {/* Profile card */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, type: 'spring', damping: 28, stiffness: 280 }}
-          style={{
-            marginTop: 16,
-            background: isDark
-              ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-              : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            borderRadius: 28,
-            padding: '28px 24px 24px',
-            boxShadow: isDark
-              ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-              : '0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
-            border: 'none',
-          }}
-        >
-          {/* Avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <div style={{
-              width: 68, height: 68, borderRadius: '50%',
-              background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
-              boxShadow: 'none',
-            }}>
-              {initials}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {displayName}
-              </p>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: TEXT_MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {email}
-              </p>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(124,58,237,0.10)', margin: '20px 0' }} />
-
-          {/* Stats row */}
-          <div style={{ display: 'flex', gap: 12 }}>
-            {[
-              { label: 'Habits', value: String(totalHabits) },
-              { label: 'Today', value: new Date().toLocaleDateString('en-US', { weekday: 'short' }) },
-              { label: 'Plan', value: 'Free' },
-            ].map(({ label, value }) => (
-              <div key={label} style={{
-                flex: 1,
-                background: isDark
-                  ? 'linear-gradient(155deg, rgba(124,58,237,0.22) 0%, rgba(124,58,237,0.10) 100%)'
-                  : 'linear-gradient(155deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.06) 100%)',
-                borderRadius: 14,
-                padding: '12px 10px', textAlign: 'center',
-                boxShadow: isDark
-                  ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(124,58,237,0.28)'
-                  : 'inset 0 1px 0 rgba(255,255,255,0.90), 0 0 0 1px rgba(124,58,237,0.14)',
-              }}>
-                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: TEXT_DARK }}>{value}</p>
-                <p style={{ margin: '2px 0 0', fontSize: 11, color: TEXT_MUTED, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Theme toggle */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.16, type: 'spring', damping: 28, stiffness: 280 }}
-          style={{
-            marginTop: 16,
-            background: isDark
-              ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-              : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            borderRadius: 24, padding: '16px 20px',
-            boxShadow: isDark
-              ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-              : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
-            border: 'none',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <DynamicIcon name={isDark ? 'moon' : 'sun'} size={18} color={PURPLE_HEX} />
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>{isDark ? 'Dark Mode' : 'Light Mode'}</p>
-              <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>Premium theme</p>
-            </div>
-          </div>
-          <ToggleSwitch
-            checked={isDark}
-            onChange={toggleTheme}
-            ariaLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            onIcon="moon"
-            offIcon="sun"
-            onIconColor={PURPLE_HEX}
-            offIconColor="#F59E0B"
-          />
-        </motion.div>
-
-        {/* Menu items */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22, type: 'spring', damping: 28, stiffness: 280 }}
-          style={{
-            marginTop: 16,
-            background: isDark
-              ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-              : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
-            borderRadius: 24, overflow: 'hidden',
-            boxShadow: isDark
-              ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-              : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
-            border: 'none',
-          }}
-        >
-          {menuItems.map(({ icon, label, sub, href }, idx) => (
-            <div key={label}>
-              {idx > 0 && <div style={{ height: 1, background: 'rgba(124,58,237,0.06)', marginLeft: 62 }} />}
-              <button
-                onClick={() => { if (href) window.location.href = href; }}
-                style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                padding: '16px 20px', background: 'none', border: 'none',
-                cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
-              }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: 12,
-                  background: PURPLE_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                }}>
-                  <DynamicIcon name={icon} size={18} color={PURPLE} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>{label}</p>
-                  <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>{sub}</p>
-                </div>
-                <DynamicIcon name="chevron-right" size={16} color={TEXT_MUTED} />
-              </button>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Sign out */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.28, type: 'spring', damping: 28, stiffness: 280 }}
-          style={{ marginTop: 16 }}
-        >
-          <button
-            onClick={handleSignOut}
-            disabled={signingOut}
+          {/* Profile card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, type: 'spring', damping: 28, stiffness: 280 }}
             style={{
-              width: '100%', padding: '16px 0', borderRadius: 20, border: 'none',
+              marginTop: 16,
               background: isDark
-                ? 'linear-gradient(155deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.10) 100%)'
-                : 'linear-gradient(155deg, rgba(255,255,255,0.80) 0%, rgba(255,230,230,0.60) 100%)',
-              color: isDark ? '#F87171' : '#DC2626',
-              fontSize: 15, fontWeight: 700,
-              cursor: signingOut ? 'default' : 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              fontFamily: 'inherit',
+                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+              borderRadius: 28,
+              padding: '28px 24px 24px',
               boxShadow: isDark
-                ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(239,68,68,0.22)'
-                : 'inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(239,68,68,0.18)',
+                ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
+                : '0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+              border: 'none',
             }}
           >
-            <DynamicIcon name="log-out" size={18} color="#EF4444" />
-            {signingOut ? 'Signing out…' : 'Sign Out'}
-          </button>
-        </motion.div>
+            {/* Avatar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+              <div style={{
+                width: 68, height: 68, borderRadius: '50%',
+                background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
+                boxShadow: 'none',
+              }}>
+                {initials}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {displayName}
+                </p>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: TEXT_MUTED, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {email}
+                </p>
+              </div>
+            </div>
 
-        {/* Version */}
-        <p style={{ paddingTop: 32, textAlign: 'center', fontSize: 11, color: TEXT_MUTED, margin: 0 }}>
-          Semma Flow · v1.0
-        </p>
-      </div>
-    </motion.div>
+            {/* Divider */}
+            <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(124,58,237,0.10)', margin: '20px 0' }} />
+
+            {/* Stats row */}
+            <div style={{ display: 'flex', gap: 12 }}>
+              {[
+                { label: 'Habits', value: String(totalHabits) },
+                { label: 'Today', value: new Date().toLocaleDateString('en-US', { weekday: 'short' }) },
+                { label: 'Plan', value: 'Free' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{
+                  flex: 1,
+                  background: isDark
+                    ? 'linear-gradient(155deg, rgba(124,58,237,0.22) 0%, rgba(124,58,237,0.10) 100%)'
+                    : 'linear-gradient(155deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.06) 100%)',
+                  borderRadius: 14,
+                  padding: '12px 10px', textAlign: 'center',
+                  boxShadow: isDark
+                    ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(124,58,237,0.28)'
+                    : 'inset 0 1px 0 rgba(255,255,255,0.90), 0 0 0 1px rgba(124,58,237,0.14)',
+                }}>
+                  <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: TEXT_DARK }}>{value}</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: TEXT_MUTED, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Theme toggle */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.16, type: 'spring', damping: 28, stiffness: 280 }}
+            style={{
+              marginTop: 16,
+              background: isDark
+                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+              borderRadius: 24, padding: '16px 20px',
+              boxShadow: isDark
+                ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
+                : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+              border: 'none',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--surface-tint)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <DynamicIcon name={isDark ? 'moon' : 'sun'} size={18} color={PURPLE_HEX} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>{isDark ? 'Dark Mode' : 'Light Mode'}</p>
+                <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>Premium theme</p>
+              </div>
+            </div>
+            <ToggleSwitch
+              checked={isDark}
+              onChange={toggleTheme}
+              ariaLabel={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              onIcon="moon"
+              offIcon="sun"
+              onIconColor={PURPLE_HEX}
+              offIconColor="#F59E0B"
+            />
+          </motion.div>
+
+          {/* Menu items */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.22, type: 'spring', damping: 28, stiffness: 280 }}
+            style={{
+              marginTop: 16,
+              background: isDark
+                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+              borderRadius: 24, overflow: 'hidden',
+              boxShadow: isDark
+                ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
+                : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+              border: 'none',
+            }}
+          >
+            {menuItems.map(({ icon, label, sub, href }, idx) => (
+              <div key={label}>
+                {idx > 0 && <div style={{ height: 1, background: 'rgba(124,58,237,0.06)', marginLeft: 62 }} />}
+                <button
+                  onClick={() => { if (href) window.location.href = href; }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                    padding: '16px 20px', background: 'none', border: 'none',
+                    cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+                  }}>
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 12,
+                    background: PURPLE_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <DynamicIcon name={icon} size={18} color={PURPLE} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>{label}</p>
+                    <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>{sub}</p>
+                  </div>
+                  <DynamicIcon name="chevron-right" size={16} color={TEXT_MUTED} />
+                </button>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Sign out */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28, type: 'spring', damping: 28, stiffness: 280 }}
+            style={{ marginTop: 16 }}
+          >
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              style={{
+                width: '100%', padding: '16px 0', borderRadius: 20, border: 'none',
+                background: isDark
+                  ? 'linear-gradient(155deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.10) 100%)'
+                  : 'linear-gradient(155deg, rgba(255,255,255,0.80) 0%, rgba(255,230,230,0.60) 100%)',
+                color: isDark ? '#F87171' : '#DC2626',
+                fontSize: 15, fontWeight: 700,
+                cursor: signingOut ? 'default' : 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                fontFamily: 'inherit',
+                boxShadow: isDark
+                  ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(239,68,68,0.22)'
+                  : 'inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(239,68,68,0.18)',
+              }}
+            >
+              <DynamicIcon name="log-out" size={18} color="#EF4444" />
+              {signingOut ? 'Signing out…' : 'Sign Out'}
+            </button>
+          </motion.div>
+
+
+        </div>
+      </motion.div>
     </>
   );
 }
@@ -1598,13 +1595,13 @@ export default function FitnessSummary({
   initials = '?',
   email = '',
 }: FitnessSummaryProps) {
-  const [localHabits, setLocalHabits]   = useState<HabitWithEntry[]>(habits);
-  const [selectedId, setSelectedId]     = useState<string | null>(null);
-  const [addOpen, setAddOpen]           = useState(false);
-  const [menuOpen, setMenuOpen]         = useState(false);
+  const [localHabits, setLocalHabits] = useState<HabitWithEntry[]>(habits);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(todayString());
-  const [dateEntries, setDateEntries]   = useState<Record<string, boolean>>({});
-  const [loadingDate, setLoadingDate]   = useState(false);
+  const [dateEntries, setDateEntries] = useState<Record<string, boolean>>({});
+  const [loadingDate, setLoadingDate] = useState(false);
 
   const isViewingToday = selectedDate === todayString();
 
@@ -1623,7 +1620,7 @@ export default function FitnessSummary({
         });
         setDateEntries(map);
       }
-    } catch {}
+    } catch { }
     setLoadingDate(false);
   };
 
@@ -1647,12 +1644,12 @@ export default function FitnessSummary({
   const displayHabits = isViewingToday
     ? goodHabits
     : goodHabits.map((h) => ({
-        ...h,
-        todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
-      }));
+      ...h,
+      todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
+    }));
 
   const completedCount = displayHabits.filter((h) => h.todayEntry?.is_completed).length;
-  const totalCount     = displayHabits.length;
+  const totalCount = displayHabits.length;
   const todayPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   // Bad habits — checking one off means it was *avoided* on the selected date.
@@ -1660,13 +1657,13 @@ export default function FitnessSummary({
   const displayBadHabits = isViewingToday
     ? badHabits
     : badHabits.map((h) => ({
-        ...h,
-        todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
-      }));
+      ...h,
+      todayEntry: { habit_id: h.id, is_completed: dateEntries[h.id] ?? false } as HabitWithEntry['todayEntry'],
+    }));
   const avoidedCount = displayBadHabits.filter((h) => h.todayEntry?.is_completed).length;
 
-  const now     = new Date();
-  const hour    = now.getHours();
+  const now = new Date();
+  const hour = now.getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'short' });
 

@@ -42,6 +42,8 @@ export function Field({
   );
 }
 
+import CustomSelect from '@/components/ui/Select';
+
 export function Select({
   value,
   onChange,
@@ -51,20 +53,7 @@ export function Select({
   onChange: (v: string) => void;
   options: readonly string[] | { value: string; label: string }[];
 }) {
-  const opts = options.map((o) => (typeof o === 'string' ? { value: o, label: o } : o));
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{ ...controlBase, appearance: 'none', cursor: 'pointer' }}
-    >
-      {opts.map((o) => (
-        <option key={o.value} value={o.value} style={{ background: 'var(--bg-elevated)' }}>
-          {o.label}
-        </option>
-      ))}
-    </select>
-  );
+  return <CustomSelect value={value} onChange={onChange} options={options} />;
 }
 
 export function TextField({

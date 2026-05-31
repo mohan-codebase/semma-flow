@@ -9,6 +9,8 @@ import {
   Plus,
   Receipt,
   Search,
+  SlidersHorizontal,
+  X,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -18,7 +20,8 @@ import CategoryBadge from '@/components/trip/CategoryBadge';
 import ExpenseFormModal from '@/components/trip/ExpenseFormModal';
 import ExpenseDetailModal from '@/components/trip/ExpenseDetailModal';
 import ConfirmModal from '@/components/trip/ConfirmModal';
-import { Select } from '@/components/trip/fields';
+import Modal from '@/components/ui/Modal';
+import { Select, Field } from '@/components/trip/fields';
 import { tripMutate } from '@/lib/trip/client';
 import { exportExpensesToExcel, exportExpensesToPDF } from '@/lib/trip/export';
 import { computeSettlement } from '@/lib/trip/settlement';
@@ -53,9 +56,18 @@ export default function ExpensesClient({
   const [sort, setSort] = useState<SortKey>('date-desc');
 
   const [formOpen, setFormOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [editing, setEditing] = useState<TripExpense | null>(null);
   const [deleting, setDeleting] = useState<TripExpense | null>(null);
   const [viewing, setViewing] = useState<TripExpense | null>(null);
+
+  const activeFilterCount = (category !== 'all' ? 1 : 0) + (person !== 'all' ? 1 : 0);
+
+  function resetFilters() {
+    setCategory('all');
+    setPerson('all');
+    setSort('date-desc');
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -174,6 +186,30 @@ export default function ExpensesClient({
           <Button variant="secondary" size="sm" icon={<FileText size={15} />} onClick={() => exportExpensesToPDF(filtered, settlement)} className="flex-1 sm:flex-initial">
             <span className="hidden sm:inline">PDF</span>
           </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<SlidersHorizontal size={15} />}
+            onClick={() => setFilterOpen(true)}
+            className="flex-1 sm:flex-initial"
+          >
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  padding: '1px 6px',
+                  fontSize: 11,
+                  borderRadius: 999,
+                  background: 'var(--accent-primary)',
+                  color: '#fff',
+                  fontWeight: 800,
+                }}
+              >
+                {activeFilterCount}
+              </span>
+            )}
+          </Button>
           <Button size="sm" icon={<Plus size={15} />} onClick={openAdd} className="flex-1 sm:flex-initial">
             <span className="hidden sm:inline">Add expense</span>
             <span className="sm:hidden">Add</span>
@@ -181,28 +217,88 @@ export default function ExpensesClient({
         </div>
       </div>
 
-      {/* Filters */}
-      <div style={{ gap: 8 }} className="grid grid-cols-2 sm:flex sm:flex-wrap sm:items-center">
-        <div className="w-full sm:w-[150px]">
-          <Select value={category} onChange={setCategory} options={[{ value: 'all', label: 'All categories' }, ...EXPENSE_CATEGORIES.map((c) => ({ value: c, label: c }))]} />
+      {/* Active Filter Chips & Totals */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 8,
+          fontSize: 13,
+          color: 'var(--text-muted)',
+          paddingBottom: 4,
+        }}
+      >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+          {activeFilterCount > 0 ? (
+            <>
+              <span style={{ fontSize: 12 }}>Active filters:</span>
+              {category !== 'all' && (
+                <div className="chip" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px' }}>
+                  <span>{category}</span>
+                  <button
+                    type="button"
+                    onClick={() => setCategory('all')}
+                    aria-label="Remove category filter"
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: 0,
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )}
+              {person !== 'all' && (
+                <div className="chip" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '3px 8px' }}>
+                  <span>Paid by: {person}</span>
+                  <button
+                    type="button"
+                    onClick={() => setPerson('all')}
+                    aria-label="Remove traveler filter"
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: 0,
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={resetFilters}
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--accent-light)',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  padding: '2px 4px',
+                }}
+              >
+                Clear all
+              </button>
+            </>
+          ) : (
+            <span style={{ fontSize: 12.5 }}>Showing all expenses</span>
+          )}
         </div>
-        <div className="w-full sm:w-[130px]">
-          <Select value={person} onChange={setPerson} options={[{ value: 'all', label: 'All persons' }, ...trip.travelers.map((t) => ({ value: t, label: t }))]} />
-        </div>
-        <div className="col-span-2 w-full sm:w-[170px]">
-          <Select
-            value={sort}
-            onChange={(v) => setSort(v as SortKey)}
-            options={[
-              { value: 'date-desc', label: 'Newest first' },
-              { value: 'date-asc', label: 'Oldest first' },
-              { value: 'amount-desc', label: 'Amount: high → low' },
-              { value: 'amount-asc', label: 'Amount: low → high' },
-            ]}
-          />
-        </div>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }} className="col-span-2 text-right sm:ml-auto">
-          {filtered.length} · {formatINR(filteredTotal)}
+        <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 500, fontSize: 12.5 }}>
+          {filtered.length} {filtered.length === 1 ? 'expense' : 'expenses'} ·{' '}
+          <span style={{ color: 'var(--text-primary)', fontWeight: 700 }}>{formatINR(filteredTotal)}</span>
         </span>
       </div>
 
@@ -380,6 +476,48 @@ export default function ExpensesClient({
         description={deleting ? `"${deleting.item}" — ${formatINR(Number(deleting.amount))}` : undefined}
         onConfirm={confirmDelete}
       />
+      <Modal isOpen={filterOpen} onClose={() => setFilterOpen(false)} title="Filters" size="sm">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Field label="Category">
+            <Select
+              value={category}
+              onChange={setCategory}
+              options={[{ value: 'all', label: 'All categories' }, ...EXPENSE_CATEGORIES.map((c) => ({ value: c, label: c }))]}
+            />
+          </Field>
+          <Field label="Paid by">
+            <Select
+              value={person}
+              onChange={setPerson}
+              options={[{ value: 'all', label: 'All persons' }, ...trip.travelers.map((t) => ({ value: t, label: t }))]}
+            />
+          </Field>
+          <Field label="Sort order">
+            <Select
+              value={sort}
+              onChange={(v) => setSort(v as SortKey)}
+              options={[
+                { value: 'date-desc', label: 'Newest first' },
+                { value: 'date-asc', label: 'Oldest first' },
+                { value: 'amount-desc', label: 'Amount: high → low' },
+                { value: 'amount-asc', label: 'Amount: low → high' },
+              ]}
+            />
+          </Field>
+          <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+            <div style={{ flex: 1 }}>
+              <Button variant="secondary" onClick={resetFilters} fullWidth>
+                Reset
+              </Button>
+            </div>
+            <div style={{ flex: 1 }}>
+              <Button onClick={() => setFilterOpen(false)} fullWidth>
+                Apply
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

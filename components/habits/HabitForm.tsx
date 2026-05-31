@@ -8,6 +8,7 @@ import Modal from '@/components/ui/Modal';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import IconPicker from '@/components/ui/IconPicker';
+import Select from '@/components/ui/Select';
 import { habitSchema, type HabitFormValues } from '@/lib/validations/habit';
 import type { Habit, Category } from '@/types/habit';
 
@@ -426,32 +427,21 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
             <Controller
               name="category_id"
               control={control}
-              render={({ field }) => (
-                <select
-                  value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value || null)}
-                  style={{
-                    width: '100%',
-                    background: 'var(--bg-tertiary)',
-                    color: field.value ? 'var(--text-primary)' : 'var(--text-muted)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 10,
-                    padding: '10px 14px',
-                    fontSize: 14,
-                    outline: 'none',
-                    cursor: 'pointer',
-                    appearance: 'none',
-                  }}
-                >
-                  <option value="">No category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                  <option value="__new__">+ Create new category</option>
-                </select>
-              )}
+              render={({ field }) => {
+                const categoryOptions = [
+                  { value: '', label: 'No category' },
+                  ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                  { value: '__new__', label: '+ Create new category' },
+                ];
+                return (
+                  <Select
+                    value={field.value ?? ''}
+                    onChange={(v) => field.onChange(v || null)}
+                    options={categoryOptions}
+                    style={{ padding: '10px 14px' }}
+                  />
+                );
+              }}
             />
             {categoryError && (
               <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--danger)' }}>
