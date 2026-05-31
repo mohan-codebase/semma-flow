@@ -39,6 +39,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // rather than re-deriving it. No applyTheme() call needed — the DOM is
     // already correct, so this only catches the toggle's state up to it.
     setThemeState(readAppliedTheme());
+
+    // Follow the OS appearance live. An actual OS change always wins and also
+    // clears any manual pin — so the toggle overrides the theme until the next
+    // time you change your system appearance, and you can never get stuck.
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const onSystemChange = (e: MediaQueryListEvent) => {
+      const next: Theme = e.matches ? 'dark' : 'light';
+      try { window.localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+      applyTheme(next);
+      setThemeState(next);
+    };
+    mq.addEventListener('change', onSystemChange);
+    return () => mq.removeEventListener('change', onSystemChange);
   }, []);
 
   const setTheme = useCallback((t: Theme) => {

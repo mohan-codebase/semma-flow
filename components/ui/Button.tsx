@@ -26,13 +26,13 @@ const Spinner = () => (
 );
 
 /* Liquid-glass button variants:
-   - primary: vibrant mint-to-indigo gradient with inner highlight
+   - primary: solid purple accent
    - secondary: frosted glass
    - ghost: fully transparent with soft hover fill
    - danger: tinted red glass */
 const base: Record<ButtonVariant, { bg: string; color: string; border: string; shadow?: string }> = {
   primary: {
-    bg:     'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
+    bg:     'var(--accent-primary)',
     color:  'var(--accent-on-primary)',
     border: '1px solid rgba(255,255,255,0.14)',
     shadow: 'none',

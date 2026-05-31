@@ -57,7 +57,7 @@ export default async function middleware(request: NextRequest) {
     return supabaseResponse;
   }
 
-  const authPaths = ['/login', '/signup'];
+  const authPaths = ['/login', '/signup', '/charttest'];
   const isAuthPath = authPaths.some(p => pathname.startsWith(p));
 
   // If no user and trying to access a protected route, send to login

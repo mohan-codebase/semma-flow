@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus } from 'lucide-react';
 import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
 import ToggleSwitch from '@/components/ui/ToggleSwitch';
+import WeeklyReportChart from '@/components/dashboard/WeeklyReportChart';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
 import { todayString } from '@/lib/utils/dates';
@@ -199,8 +200,8 @@ function HabitRow({
   const icon = habit.icon ?? (bad ? 'ban' : 'circle-check');
 
   // For bad habits, checking the row off means the user *avoided* it today.
-  const accent      = bad ? RED : PURPLE;
-  const accentLight = bad ? RED_LIGHT : PURPLE_LIGHT;
+  const accent      = bad ? RED : (habit.color || PURPLE);
+  const accentLight = bad ? RED_LIGHT : `color-mix(in srgb, ${accent} 14%, transparent)`;
 
   const subtitle = bad
     ? (done ? 'Avoided today' : 'Avoid this')
@@ -227,6 +228,8 @@ function HabitRow({
         width: '100%',
         minWidth: 0,
         boxSizing: 'border-box',
+        position: 'relative',
+        overflow: 'hidden',
       }}
       onClick={() => onOpen(habit.id)}
     >
@@ -290,21 +293,36 @@ function HabitRow({
       >
         {done && <CheckIcon />}
       </div>
+
+      {/* Animated progress bar — fills with the habit's color on completion.
+         Lives in the shared row, so every habit (incl. brand-new ones) gets it. */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, height: 4,
+        background: 'rgba(127,127,127,0.10)',
+      }}>
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: done ? '100%' : '0%' }}
+          transition={{ duration: 0.55, delay: 0.1 + index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+          style={{ height: '100%', background: accent, borderRadius: '0 2px 2px 0' }}
+        />
+      </div>
     </motion.div>
   );
 }
 
-function StatPill({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function StatPill({ label, value, accent, color }: { label: string; value: string; accent?: boolean; color?: string }) {
+  const c = color || PURPLE;
   return (
     <div style={{
-      ...(accent ? GLASS_NESTED_PURPLE : GLASS_NESTED),
+      ...(accent ? { ...GLASS_NESTED_PURPLE, background: `color-mix(in srgb, ${c} 14%, transparent)` } : GLASS_NESTED),
       borderRadius: 14,
       padding: '14px 16px',
     }}>
       <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: TEXT_MUTED, letterSpacing: '0.07em', textTransform: 'uppercase' }}>
         {label}
       </p>
-      <p style={{ margin: '4px 0 0', fontSize: 24, fontWeight: 800, color: accent ? PURPLE : TEXT_DARK, letterSpacing: '-0.03em' }}>
+      <p style={{ margin: '4px 0 0', fontSize: 24, fontWeight: 800, color: accent ? c : TEXT_DARK, letterSpacing: '-0.03em' }}>
         {value}
       </p>
     </div>
@@ -322,6 +340,15 @@ function HabitDetailSheet({
   onUpdate: (updated: Partial<HabitWithEntry> & { id: string }) => void;
   onDelete: (id: string) => void;
 }) {
+  // ── Theme the whole sheet with this habit's chosen color ──
+  // These locals deliberately shadow the module-level purple tokens, so every
+  // accent below (stat numbers, calendar, nav, month bar, chart) follows the
+  // habit's color. Falls back to brand purple when a habit has none.
+  const PURPLE       = habit.color || '#7C3AED';
+  const PURPLE_HEX   = PURPLE;
+  const PURPLE_LIGHT = `color-mix(in srgb, ${PURPLE} 14%, transparent)`;
+  const PURPLE_MID   = `color-mix(in srgb, ${PURPLE} 24%, transparent)`;
+
   const [entries, setEntries] = useState<{ entry_date: string; is_completed: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -329,6 +356,7 @@ function HabitDetailSheet({
   const [editMode, setEditMode]     = useState(false);
   const [editName, setEditName]     = useState(habit.name);
   const [editIcon, setEditIcon]     = useState(habit.icon ?? 'circle-check');
+  const [editColor, setEditColor]   = useState(habit.color || '#7C3AED');
   const [editNotes, setEditNotes]   = useState(habit.description ?? '');
   const [saving, setSaving]         = useState(false);
   const [saveError, setSaveError]   = useState<string | null>(null);
@@ -348,11 +376,11 @@ function HabitDetailSheet({
       const res = await fetch(`/api/habits/${habit.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: editName.trim(), icon: editIcon, description: editNotes.trim() }),
+        body: JSON.stringify({ name: editName.trim(), icon: editIcon, color: editColor, description: editNotes.trim() }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Failed to save');
-      onUpdate({ id: habit.id, name: editName.trim(), icon: editIcon, description: editNotes.trim() });
+      onUpdate({ id: habit.id, name: editName.trim(), icon: editIcon, color: editColor, description: editNotes.trim() });
       setEditMode(false);
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : 'Failed to save');
@@ -445,10 +473,21 @@ function HabitDetailSheet({
   const isCurrentMon  = calYear === todayDate.getFullYear() && calMonth === todayDate.getMonth();
   const daysElapsed   = isCurrentMon ? todayDate.getDate() : daysInMonth;
   const monthRate     = daysElapsed > 0 ? Math.round((monthDone / daysElapsed) * 100) : 0;
+  const daysRemaining = Math.max(0, daysInMonth - daysElapsed); // days left in the month
 
   // For stat pills — last 30-day rate
   const completedCount = entries.filter((e) => e.is_completed).length;
   const rate = Math.min(100, Math.round((completedCount / 30) * 100));
+
+  // Per-habit weekly report — last 7 days (oldest → today). Single habit is
+  // binary per day, so each point is 100% (done) or 0% (not).
+  const WEEK_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const weekChart = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - (6 - i));
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return { date: ds, label: WEEK_LABELS[d.getDay()], dayNum: d.getDate(), pct: entryMap.get(ds) ? 100 : 0, isToday: ds === todayLocal };
+  });
+  const weekChartAvg = Math.round((weekChart.filter((w) => w.pct === 100).length / 7) * 100);
 
   const canGoBack    = monthOffset > -3;
   const canGoForward = monthOffset < 0;
@@ -464,42 +503,40 @@ function HabitDetailSheet({
         style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
       />
 
-      {/* Sheet */}
-      <motion.div
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-        style={{
-          position: 'fixed',
-          bottom: 0, left: 0, right: 0,
-          maxWidth: 480,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          zIndex: 201,
-          background: 'var(--glass-bg-sheet)',
-          borderRadius: '24px 24px 0 0',
-          maxHeight: '88dvh',
-          overflowY: 'auto',
-          padding: '0 20px 52px',
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          boxShadow: '0 -8px 48px rgba(30,27,75,0.28), inset 0 1px 0 rgba(255,255,255,0.12)',
-        }}
-      >
-        {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--drag-handle)' }} />
-        </div>
-
+      {/* Floating card */}
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 201,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16, pointerEvents: 'none',
+      }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 360 }}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            pointerEvents: 'auto',
+            width: '100%', maxWidth: 480,
+            background: 'var(--glass-bg-sheet)',
+            borderRadius: 24,
+            maxHeight: '90dvh',
+            overflowY: 'auto',
+            padding: '24px 20px 32px',
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
+          }}
+        >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 12, marginBottom: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 0, marginBottom: 22 }}>
           <div style={{
             width: 54, height: 54, borderRadius: 16,
-            background: PURPLE_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: `color-mix(in srgb, ${habit.color || PURPLE} 14%, transparent)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, overflow: 'hidden',
-            boxShadow: '0 2px 12px rgba(124,58,237,0.10)',
+            boxShadow: 'none',
           }}>
-            <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={PURPLE} />
+            <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={habit.color || PURPLE} />
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             {editMode ? (
@@ -530,7 +567,7 @@ function HabitDetailSheet({
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             {!editMode && (
               <button
-                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
                 style={{
                   width: 34, height: 34, borderRadius: '50%',
                   background: PURPLE_LIGHT, border: 'none',
@@ -596,16 +633,22 @@ function HabitDetailSheet({
                 );
               })}
             </div>
+            <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              Color
+            </p>
+            <div style={{ marginBottom: 16 }}>
+              <ColorPicker value={editColor} onChange={setEditColor} />
+            </div>
             {saveError && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#EF4444' }}>{saveError}</p>}
             <button
               onClick={saveEdit}
               disabled={saving}
               style={{
                 width: '100%', padding: '13px 0', borderRadius: 14, border: 'none',
-                background: saving ? '#A78BFA' : PURPLE,
-                color: '#fff', fontSize: 15, fontWeight: 700,
+                background: saving ? 'var(--accent-light)' : PURPLE,
+                color: 'var(--accent-on-primary)', fontSize: 15, fontWeight: 700,
                 cursor: saving ? 'default' : 'pointer',
-                boxShadow: '0 3px 12px rgba(124,58,237,0.35)',
+                boxShadow: 'none',
               }}
             >
               {saving ? 'Saving…' : 'Save Changes'}
@@ -621,7 +664,7 @@ function HabitDetailSheet({
                 Notes
               </p>
               <button
-                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: PURPLE, fontSize: 12.5, fontWeight: 700, padding: 0 }}
               >
                 {habit.description ? 'Edit' : 'Add'}
@@ -641,10 +684,23 @@ function HabitDetailSheet({
 
         {/* Stat pills */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
-          <StatPill label="Current Streak" value={`${habit.current_streak}d`} accent />
+          <StatPill label="Current Streak" value={`${habit.current_streak}d`} accent color={PURPLE} />
           <StatPill label="Longest Streak" value={`${habit.longest_streak}d`} />
-          <StatPill label="30-day Rate"    value={`${rate}%`} accent />
+          <StatPill label="30-day Rate"    value={`${rate}%`} accent color={PURPLE} />
           <StatPill label="Total Done"     value={`${habit.total_completions}`} />
+        </div>
+
+        {/* Weekly report — this habit, last 7 days */}
+        <div style={{ ...GLASS_NESTED, borderRadius: 18, padding: '14px 12px 10px', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 4px', marginBottom: 6 }}>
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              Weekly report
+            </p>
+            <span style={{ fontSize: 12, fontWeight: 700, color: PURPLE }}>{weekChartAvg}% avg</span>
+          </div>
+          {loading
+            ? <p style={{ margin: 0, fontSize: 13, color: TEXT_MUTED, textAlign: 'center', padding: '24px 0' }}>Loading…</p>
+            : <WeeklyReportChart data={weekChart} avg={weekChartAvg} color={PURPLE} />}
         </div>
 
         {/* Calendar */}
@@ -791,12 +847,17 @@ function HabitDetailSheet({
               initial={{ width: 0 }}
               animate={{ width: `${monthRate}%` }}
               transition={{ duration: 0.7, ease: 'easeOut' }}
-              style={{ height: '100%', background: `linear-gradient(90deg,${PURPLE},#A855F7)`, borderRadius: 5 }}
+              style={{ height: '100%', background: `linear-gradient(90deg, ${PURPLE}, color-mix(in srgb, ${PURPLE} 65%, #fff))`, borderRadius: 5 }}
             />
           </div>
-          <p style={{ margin: '8px 0 0', fontSize: 12, color: TEXT_MUTED }}>
-            {monthDone} of {daysElapsed} days completed
-          </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', margin: '8px 0 0', gap: 12 }}>
+            <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED }}>
+              <span style={{ fontWeight: 700, color: TEXT_DARK }}>{monthDone}</span> of {daysElapsed} days completed
+            </p>
+            <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED, whiteSpace: 'nowrap' }}>
+              <span style={{ fontWeight: 700, color: TEXT_DARK }}>{daysRemaining}</span> {daysRemaining === 1 ? 'day' : 'days'} left
+            </p>
+          </div>
         </div>
 
         {/* Delete */}
@@ -843,7 +904,8 @@ function HabitDetailSheet({
             </div>
           </div>
         )}
-      </motion.div>
+        </motion.div>
+      </div>
     </>
   );
 }
@@ -851,9 +913,88 @@ function HabitDetailSheet({
 // Single source of truth — same set the standalone IconPicker offers, so habit
 // icon choices are identical everywhere (add sheet, edit sheet, HabitForm).
 const HABIT_ICONS = HABIT_ICON_NAMES;
-const HABIT_COLORS = ['#7C3AED','#3B82F6','#10B981','#F59E0B','#EF4444','#EC4899'];
+// Premium jewel-tone palette — tuned to read well on both the light
+// (purple-tinted) and dark surfaces. First entry is the brand violet (default).
+const HABIT_COLORS = [
+  '#7C3AED', // amethyst (brand)
+  '#4F46E5', // indigo
+  '#2563EB', // sapphire
+  '#0D9488', // teal
+  '#059669', // emerald
+  '#CA8A04', // gold
+  '#E11D48', // rose
+  '#C026D3', // fuchsia
+];
 const DAY_LABELS   = ['S','M','T','W','T','F','S'];
-const CHALLENGE_PRESETS = [7, 21, 30, 66, 90];
+
+// Glossy radial sheen for a color orb.
+const orbGloss = (c: string) =>
+  `radial-gradient(circle at 32% 28%, color-mix(in srgb, ${c} 72%, #fff) 0%, ${c} 52%, color-mix(in srgb, ${c} 84%, #000) 100%)`;
+
+/* Premium color picker — glossy "orbs" with a radial sheen and a check on the
+   selected swatch, plus a custom-color orb (native color wheel) so any color is
+   reachable. Shared by the add + edit sheets so they stay identical. */
+function ColorPicker({ value, onChange }: { value: string; onChange: (c: string) => void }) {
+  const isCustom = !HABIT_COLORS.includes(value);
+  const orbBase: React.CSSProperties = {
+    width: 38, height: 38, borderRadius: '50%', padding: 0, border: 'none',
+    cursor: 'pointer', flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+  };
+  return (
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      {HABIT_COLORS.map((c) => {
+        const active = value === c;
+        return (
+          <button
+            key={c}
+            type="button"
+            onClick={() => onChange(c)}
+            title={c}
+            aria-label={`Color ${c}`}
+            aria-pressed={active}
+            style={{
+              ...orbBase,
+              background: orbGloss(c),
+              boxShadow: active
+                ? `inset 0 1px 1px rgba(255,255,255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${c}`
+                : 'inset 0 1px 1px rgba(255,255,255,0.45)',
+              transform: active ? 'scale(1.08)' : 'scale(1)',
+            }}
+          >
+            {active && <CheckIcon />}
+          </button>
+        );
+      })}
+
+      {/* Custom color — opens the native color wheel */}
+      <label
+        title="Custom color"
+        aria-label="Pick a custom color"
+        style={{
+          ...orbBase,
+          position: 'relative', overflow: 'hidden',
+          background: isCustom
+            ? orbGloss(value)
+            : 'conic-gradient(from 90deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+          boxShadow: isCustom
+            ? `inset 0 1px 1px rgba(255,255,255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${value}`
+            : 'inset 0 1px 1px rgba(255,255,255,0.45)',
+          transform: isCustom ? 'scale(1.08)' : 'scale(1)',
+        }}
+      >
+        <input
+          type="color"
+          value={isCustom ? value : '#7C3AED'}
+          onChange={(e) => onChange(e.target.value)}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 'none', padding: 0 }}
+        />
+        {isCustom ? <CheckIcon /> : <Plus size={18} color="#fff" strokeWidth={2.6} style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.35))' }} />}
+      </label>
+    </div>
+  );
+}
 
 type FreqType = 'daily' | 'weekly' | 'x_per_week';
 type TargetType = 'boolean' | 'duration';
@@ -874,14 +1015,13 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
   const [name, setName]             = useState('');
   const [notes, setNotes]           = useState('');
   const [icon, setIcon]             = useState('circle-check');
+  const [showAllIcons, setShowAllIcons] = useState(false);
   const [color, setColor]           = useState('#7C3AED');
   const [freqType, setFreqType]     = useState<FreqType>('daily');
   const [days, setDays]             = useState<number[]>([]);
   const [perWeek, setPerWeek]       = useState(3);
   const [targetType, setTargetType] = useState<TargetType>('boolean');
   const [duration, setDuration]     = useState(30);
-  const [reminder, setReminder]     = useState('');
-  const [challenge, setChallenge]   = useState<number | null>(null);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState<string | null>(null);
 
@@ -909,8 +1049,6 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         is_bad_habit: false,
       };
       if (notes.trim()) body.description = notes.trim();
-      if (reminder) body.reminder_time = reminder;
-      if (challenge) body.challenge_days = challenge;
 
       const res = await fetch('/api/habits', {
         method: 'POST',
@@ -948,28 +1086,30 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         onClick={onClose}
         style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
       />
-      <motion.div
-        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-        style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0,
-          maxWidth: 480, marginLeft: 'auto', marginRight: 'auto',
-          zIndex: 201,
-          background: 'var(--glass-bg-sheet)',
-          borderRadius: '24px 24px 0 0',
-          maxHeight: '92dvh', overflowY: 'auto',
-          padding: '0 16px 44px',
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          boxShadow: '0 -8px 48px rgba(30,27,75,0.28), inset 0 1px 0 rgba(255,255,255,0.12)',
-        }}
-      >
-        {/* Drag handle */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 4px' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'var(--drag-handle)' }} />
-        </div>
-
+      <div style={{
+        position: 'fixed', inset: 0, zIndex: 201,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 16, pointerEvents: 'none',
+      }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 360 }}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            pointerEvents: 'auto',
+            width: '100%', maxWidth: 480,
+            background: 'var(--glass-bg-sheet)',
+            borderRadius: 24,
+            maxHeight: '90dvh', overflowY: 'auto',
+            padding: '24px 16px 32px',
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
+          }}
+        >
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 0, marginBottom: 18 }}>
           <div>
             <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>New Habit</h2>
             <p style={{ margin: '2px 0 0', fontSize: 13, color: TEXT_MUTED }}>Build a streak that sticks</p>
@@ -1013,36 +1153,36 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         <SectionCard>
           <FieldLabel>Icon</FieldLabel>
           <div className="hf-icon-grid" style={{
-            display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 18,
-            maxHeight: 180, overflowY: 'auto', paddingRight: 2,
+            display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: 8, marginBottom: 12,
           }}>
-            {HABIT_ICONS.map((ic) => {
+            {(showAllIcons ? HABIT_ICONS : HABIT_ICONS.slice(0, 6)).map((ic) => {
               const active = icon === ic;
               return (
                 <button key={ic} onClick={() => setIcon(ic)} title={ic} style={{
-                  width: '100%', aspectRatio: '1', borderRadius: 12, border: `2px solid ${active ? PURPLE : 'transparent'}`,
-                  background: PURPLE_LIGHT,
+                  width: '100%', aspectRatio: '1', borderRadius: 12,
+                  border: `1.5px solid ${active ? PURPLE : 'transparent'}`,
+                  background: active ? 'var(--surface-tint-mid)' : PURPLE_LIGHT,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  cursor: 'pointer',
-                  boxShadow: active ? `0 2px 10px rgba(124,58,237,0.2)` : 'none',
-                  transition: 'all 0.15s', transform: active ? 'scale(1.1)' : 'scale(1)',
+                  cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
                 }}>
                   <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
                 </button>
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={() => setShowAllIcons((v) => !v)}
+            style={{
+              border: 'none', background: 'transparent', color: PURPLE,
+              fontSize: 13, fontWeight: 700, cursor: 'pointer', padding: '2px 0',
+              marginBottom: 18,
+            }}
+          >
+            {showAllIcons ? 'Show less' : `View more (${HABIT_ICONS.length - 6})`}
+          </button>
           <FieldLabel>Color</FieldLabel>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {HABIT_COLORS.map((c) => (
-              <button key={c} onClick={() => setColor(c)} style={{
-                width: 34, height: 34, borderRadius: '50%', border: 'none',
-                background: c, cursor: 'pointer', flexShrink: 0,
-                boxShadow: color === c ? `0 0 0 3px #fff, 0 0 0 5px ${c}` : 'none',
-                transition: 'all 0.15s', transform: color === c ? 'scale(1.15)' : 'scale(1)',
-              }} />
-            ))}
-          </div>
+          <ColorPicker value={color} onChange={setColor} />
         </SectionCard>
 
         {/* ── Frequency ── */}
@@ -1138,56 +1278,6 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
           )}
         </SectionCard>
 
-        {/* ── Challenge / Days to follow ── */}
-        <SectionCard>
-          <FieldLabel>Challenge duration (optional)</FieldLabel>
-          <p style={{ margin: '0 0 12px', fontSize: 13, color: TEXT_MUTED, lineHeight: 1.5 }}>
-            Set a goal for how many days to follow this habit.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {CHALLENGE_PRESETS.map((d) => {
-              const active = challenge === d;
-              return (
-                <button key={d} onClick={() => setChallenge(active ? null : d)} style={{
-                  padding: '8px 16px', borderRadius: 20, border: 'none',
-                  background: active ? color : '#F5F3FF',
-                  color: active ? '#fff' : TEXT_DARK,
-                  fontSize: 13, fontWeight: active ? 700 : 500,
-                  cursor: 'pointer', transition: 'all 0.15s',
-                  boxShadow: active ? `0 2px 8px rgba(124,58,237,0.25)` : 'none',
-                }}>{d} days</button>
-              );
-            })}
-          </div>
-        </SectionCard>
-
-        {/* ── Reminder ── */}
-        <SectionCard>
-          <FieldLabel>Daily reminder (optional)</FieldLabel>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <DynamicIcon name="bell" size={20} color={TEXT_MUTED} />
-            <input
-              type="time"
-              value={reminder}
-              onChange={(e) => setReminder(e.target.value)}
-              style={{
-                ...inputStyle,
-                width: 'auto', flex: 1,
-                fontSize: 15, fontWeight: 600, color: reminder ? TEXT_DARK : TEXT_MUTED,
-              }}
-              onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
-            />
-            {reminder && (
-              <button onClick={() => setReminder('')} style={{
-                width: 32, height: 32, borderRadius: '50%', border: 'none',
-                background: 'var(--surface-tint)', color: TEXT_MUTED, fontSize: 16,
-                cursor: 'pointer', flexShrink: 0,
-              }}>×</button>
-            )}
-          </div>
-        </SectionCard>
-
         {/* Error */}
         {error && (
           <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 14 }}>
@@ -1201,16 +1291,17 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
           disabled={loading}
           style={{
             width: '100%', padding: '16px 0', borderRadius: 18, border: 'none',
-            background: loading ? '#A78BFA' : `linear-gradient(135deg, ${color} 0%, #9F67FF 100%)`,
-            color: '#fff', fontSize: 16, fontWeight: 700,
+            background: loading ? 'var(--accent-light)' : 'var(--accent-primary)',
+            color: 'var(--accent-on-primary)', fontSize: 16, fontWeight: 700,
             cursor: loading ? 'default' : 'pointer',
-            boxShadow: '0 4px 20px rgba(124,58,237,0.4)',
+            boxShadow: 'none',
             transition: 'all 0.15s',
           }}
         >
-          {loading ? 'Saving…' : challenge ? `Start ${challenge}-Day Challenge` : 'Create Habit'}
+          {loading ? 'Saving…' : 'Create Habit'}
         </button>
-      </motion.div>
+        </motion.div>
+      </div>
     </>
   );
 }
@@ -1224,7 +1315,9 @@ function ProfileMenu({
   const [signingOut, setSigningOut] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window === 'undefined') return true;
-    return (localStorage.getItem('semma_flow_theme') ?? 'dark') !== 'light';
+    // Reflect whatever theme is actually applied (system-resolved by the
+    // pre-paint script when there's no pinned override), not a hardcoded default.
+    return document.documentElement.dataset.theme !== 'light';
   });
 
   const toggleTheme = () => {
@@ -1333,7 +1426,7 @@ function ProfileMenu({
               background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
-              boxShadow: '0 6px 20px rgba(124,58,237,0.4)',
+              boxShadow: 'none',
             }}>
               {initials}
             </div>
@@ -1751,6 +1844,27 @@ export default function FitnessSummary({
                 </div>
               );
             })}
+          </div>
+        </motion.div>
+
+        {/* ── Weekly Report ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.12 }}
+          style={{ marginTop: 32 }}
+        >
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+              Weekly report
+            </h2>
+            <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{avgPct}% avg</span>
+          </div>
+          <div style={{ ...GLASS, borderRadius: 20, padding: '18px 12px 12px' }}>
+            <WeeklyReportChart
+              data={weekBars.map(({ date, dayLabel, dayNum, pct, isToday }) => ({ date, label: dayLabel, dayNum, pct, isToday }))}
+              avg={avgPct}
+            />
           </div>
         </motion.div>
 

@@ -214,7 +214,7 @@ function LoginContent() {
                 fontWeight: 700,
                 letterSpacing: '-0.01em',
                 color: 'var(--accent-on-primary)',
-                background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--cyan) 100%)',
+                background: 'var(--accent-primary)',
                 border: '1px solid rgba(255,255,255,0.14)',
                 boxShadow: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
