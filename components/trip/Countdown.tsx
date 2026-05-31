@@ -37,55 +37,49 @@ export default function Countdown({
   }, [startDate]);
 
   const units = [
-    { label: 'Days', value: t.days },
-    { label: 'Hours', value: t.hours },
-    { label: 'Min', value: t.minutes },
-    { label: 'Sec', value: t.seconds },
+    { label: 'd', value: t.days },
+    { label: 'h', value: t.hours },
+    { label: 'm', value: t.minutes },
+    { label: 's', value: t.seconds },
   ];
 
   return (
     <div
       style={{
         borderRadius: 'var(--r-xl)',
-        overflow: 'hidden',
-        padding: 22,
-        color: '#fff',
-        background: 'linear-gradient(140deg, var(--accent-primary), #9333EA 60%, #6D28D9)',
+        border: '1px solid var(--border-subtle)',
+        background: 'var(--bg-secondary)',
+        padding: 16,
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        gap: 14,
       }}
     >
-      <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, opacity: 0.95 }}>
-        <Plane size={15} /> {tripName}
-      </p>
-      <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, opacity: 0.85 }}>
-        <CalendarDays size={13} />
-        {formatDate(startDate)} – {formatDate(endDate)}
-      </p>
+      <div>
+        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 7, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+          <Plane size={14} color="var(--accent-light)" /> {tripName}
+        </p>
+        <p style={{ margin: '3px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+          <CalendarDays size={12} />
+          {formatDate(startDate)} – {formatDate(endDate)}
+        </p>
+      </div>
 
       {t.started ? (
-        <p style={{ marginTop: 20, fontSize: 22, fontWeight: 800, fontFamily: "'Outfit', sans-serif" }}>
-          The adventure has begun! 🏔️
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--accent-light)' }}>
+          The adventure has begun 🏔️
         </p>
       ) : (
-        <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
           {units.map((u) => (
-            <div
-              key={u.label}
-              style={{
-                background: 'rgba(255,255,255,0.16)',
-                borderRadius: 12,
-                padding: '12px 4px',
-                textAlign: 'center',
-                backdropFilter: 'blur(4px)',
-              }}
-            >
-              <p style={{ margin: 0, fontSize: 26, fontWeight: 800, fontVariantNumeric: 'tabular-nums', fontFamily: "'Outfit', sans-serif" }}>
+            <span key={u.label} style={{ display: 'inline-flex', alignItems: 'baseline', gap: 2 }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums', fontFamily: "'Outfit', sans-serif" }}>
                 {String(u.value).padStart(2, '0')}
-              </p>
-              <p style={{ margin: 0, fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.85 }}>
-                {u.label}
-              </p>
-            </div>
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{u.label}</span>
+            </span>
           ))}
         </div>
       )}

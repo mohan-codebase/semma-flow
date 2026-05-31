@@ -68,6 +68,11 @@ const nextConfig: NextConfig = {
   // Enable Next.js 16 server component output cache (use cache directive + cacheLife/cacheTag)
   cacheComponents: true,
 
+  // Hide the on-screen dev indicator (the floating "Cache disabled" pill) — it's
+  // fixed-positioned and overlaps page content on small viewports. Build/runtime
+  // errors are still surfaced by Next.js regardless of this setting.
+  devIndicators: false,
+
   // Tree-shake unused exports from large packages
   // Note: optimizePackageImports was removed in Next.js 16 - use package.json imports field or next.config.js instead
   // For now, we rely on Next.js built-in tree-shaking
@@ -92,14 +97,17 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
   },
 
-  // Headers — security + cache control
+  // Headers — security + cache control.
+  // The aggressive (immutable) static-asset cache headers are production-only:
+  // applying them in dev makes the browser serve stale /_next/static chunks
+  // after edits, which Next.js warns about and breaks HMR/refresh behavior.
   async headers() {
     return [
       {
         source: '/:path*',
         headers: securityHeaders,
       },
-      ...cacheControlHeaders,
+      ...(isDev ? [] : cacheControlHeaders),
     ];
   },
 

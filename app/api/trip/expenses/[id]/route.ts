@@ -5,14 +5,28 @@ import { safeErrorMessage } from '@/lib/utils/api';
 
 type Params = { params: Promise<{ id: string }> };
 
-// PATCH /api/trip/expenses/[id] — update (the edit form submits all fields).
+// PATCH /api/trip/expenses/[id] — update. The edit form submits all fields;
+// a `{ settled }`-only body just toggles the settled flag.
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     const auth = await getAuth();
     if (!auth) return err('Unauthorized', 401);
 
-    const parsed = expenseSchema.safeParse(await req.json());
+    const body = await req.json();
+
+    // Lightweight settled-only toggle (no full-expense payload).
+    if (typeof body?.settled === 'boolean' && body.item === undefined) {
+      const { error } = await auth.supabase
+        .from('trip_expenses')
+        .update({ settled: body.settled })
+        .eq('id', id)
+        .eq('user_id', auth.user.id);
+      if (error) return err(safeErrorMessage(error, 'Failed to update expense'), 500);
+      return ok(true);
+    }
+
+    const parsed = expenseSchema.safeParse(body);
     if (!parsed.success) return err(parsed.error.issues[0]?.message ?? 'Invalid input');
 
     const v = parsed.data;
@@ -23,6 +37,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         item: v.item,
         amount: v.amount,
         paid_by: v.paid_by,
+        split_between: v.split_between && v.split_between.length > 0 ? v.split_between : null,
         source_url: v.source_url || null,
         notes: v.notes || null,
         expense_date: v.expense_date,

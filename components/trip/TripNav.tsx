@@ -181,7 +181,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
       <header
         style={{
           height: 64,
-          padding: '0 20px',
+          padding: '0 12px',
           background: 'var(--bg-glass)',
           borderBottom: '1px solid color-mix(in srgb, var(--border-default) 70%, transparent)',
           position: 'sticky',

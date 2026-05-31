@@ -6,9 +6,11 @@ import {
   AreaChart,
   Bar,
   BarChart,
+  CartesianGrid,
   Cell,
   Pie,
   PieChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -23,6 +25,15 @@ import { EXPENSE_CATEGORIES, type TripExpense } from '@/lib/trip/types';
 
 const COLORS = ['#A78BFA', '#67E8F9', '#F472B6', '#FCA5A5', '#FBBF24', '#34D399'];
 const TABLES = ['trip_expenses'];
+// Brand purple — literal hex (CSS vars don't resolve in SVG stroke/fill attrs).
+const WEEKLY_ACCENT = '#7C3AED';
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+// Short money labels for the Y axis / avg pill, e.g. ₹1.2k, ₹12k.
+function formatINRCompact(n: number): string {
+  if (n >= 1000) return `₹${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
+  return `₹${Math.round(n)}`;
+}
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -75,6 +86,28 @@ export default function AnalyticsCharts({
       .filter((d) => d.value > 0);
   }, [expenses, travelers]);
 
+  // Current week (Mon–Sun) daily spend, for the weekly-report area chart.
+  const weekly = useMemo(() => {
+    const now = new Date();
+    const offset = (now.getDay() + 6) % 7; // 0 = Monday
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
+    const days = WEEKDAYS.map((label, i) => {
+      const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      return { label, key, value: 0 };
+    });
+    for (const e of expenses) {
+      const hit = days.find((d) => d.key === e.expense_date.slice(0, 10));
+      if (hit) hit.value += Number(e.amount);
+    }
+    return days;
+  }, [expenses]);
+
+  const weeklyAvg = useMemo(
+    () => weekly.reduce((sum, d) => sum + d.value, 0) / weekly.length,
+    [weekly],
+  );
+
   const monthly = useMemo(() => {
     const map = new Map<string, number>();
     for (const e of expenses) {
@@ -104,6 +137,52 @@ export default function AnalyticsCharts({
 
   return (
     <div className="trip-charts-grid">
+      <div style={{ gridColumn: '1 / -1' }}>
+        <Card>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+              Weekly report
+            </h3>
+            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-light)', fontFamily: "'Outfit', sans-serif" }}>
+              {formatINRCompact(weeklyAvg)} avg
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={weekly} margin={{ top: 10, right: 10, left: -8, bottom: 0 }}>
+              <defs>
+                <linearGradient id="tripWeekly" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={WEEKLY_ACCENT} stopOpacity={0.35} />
+                  <stop offset="95%" stopColor={WEEKLY_ACCENT} stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="4 4" stroke={WEEKLY_ACCENT} strokeOpacity={0.14} vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 12, fill: 'var(--text-muted)', fontWeight: 500 }} axisLine={false} tickLine={false} dy={6} />
+              <YAxis tickFormatter={formatINRCompact} tick={{ fontSize: 11, fill: 'var(--text-muted)', fontWeight: 500 }} axisLine={false} tickLine={false} width={52} />
+              <Tooltip content={<TooltipContent />} cursor={{ stroke: WEEKLY_ACCENT, strokeOpacity: 0.35, strokeWidth: 2 }} />
+              {weeklyAvg > 0 && (
+                <ReferenceLine
+                  y={weeklyAvg}
+                  stroke={WEEKLY_ACCENT}
+                  strokeOpacity={0.45}
+                  strokeDasharray="5 4"
+                  label={{ value: `avg ${formatINRCompact(weeklyAvg)}`, position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}
+                />
+              )}
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke={WEEKLY_ACCENT}
+                strokeWidth={3}
+                strokeLinecap="round"
+                fill="url(#tripWeekly)"
+                dot={{ r: 3, fill: WEEKLY_ACCENT, strokeWidth: 0 }}
+                activeDot={{ r: 6, fill: WEEKLY_ACCENT, stroke: 'var(--bg-primary)', strokeWidth: 3 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
+
       <ChartCard title="Spending by category">
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={byCategory} margin={{ left: -16, right: 8 }}>

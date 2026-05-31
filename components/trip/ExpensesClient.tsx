@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  CheckCircle2,
+  Circle,
   ExternalLink,
   FileSpreadsheet,
   FileText,
@@ -25,20 +27,22 @@ import { exportExpensesToExcel, exportExpensesToPDF } from '@/lib/trip/export';
 import { computeSettlement } from '@/lib/trip/settlement';
 import { formatDate, formatINR } from '@/lib/trip/format';
 import { useTripRealtime } from '@/lib/trip/useTripRealtime';
-import { EXPENSE_CATEGORIES, type TripExpense, type Trip } from '@/lib/trip/types';
+import { EXPENSE_CATEGORIES, type TripExpense, type Trip, type TripSettlement } from '@/lib/trip/types';
 
 type SortKey = 'date-desc' | 'date-asc' | 'amount-desc' | 'amount-asc';
 
-const TABLES = ['trip_expenses'];
+const TABLES = ['trip_expenses', 'trip_settlements'];
 
 const cellPad = '12px 14px';
 
 export default function ExpensesClient({
   expenses,
+  settlements = [],
   userId,
   trip,
 }: {
   expenses: TripExpense[];
+  settlements?: TripSettlement[];
   userId: string;
   trip: Trip;
 }) {
@@ -79,7 +83,7 @@ export default function ExpensesClient({
   }, [expenses, query, category, person, sort]);
 
   const filteredTotal = filtered.reduce((s, e) => s + Number(e.amount), 0);
-  const settlement = useMemo(() => computeSettlement(expenses, trip.travelers), [expenses, trip.travelers]);
+  const settlement = useMemo(() => computeSettlement(expenses, trip.travelers, settlements), [expenses, trip.travelers, settlements]);
 
   function openAdd() {
     setEditing(null);
@@ -98,6 +102,94 @@ export default function ExpensesClient({
     } else {
       toast(res.error, 'error');
     }
+  }
+
+  // What each non-payer owes for this expense (their share).
+  function nonPayerShares(e: TripExpense): Array<{ name: string; amount: number }> {
+    const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : trip.travelers;
+    const per = Number(e.amount) / (sharers.length || 1);
+    return sharers.filter((s) => s !== e.paid_by).map((name) => ({ name, amount: per }));
+  }
+
+  async function toggleSettled(e: TripExpense) {
+    const res = await tripMutate('PATCH', `expenses/${e.id}`, { settled: !e.settled });
+    if (res.ok) {
+      toast(e.settled ? 'Marked as pending' : 'Marked as settled', 'success');
+      router.refresh();
+    } else {
+      toast(res.error, 'error');
+    }
+  }
+
+  // Quiet inline status: { text, settled } or null when there's nothing pending.
+  function settleStatus(e: TripExpense): { text: string; settled: boolean } | null {
+    if (e.settled) return { text: 'Settled', settled: true };
+    const shares = nonPayerShares(e);
+    if (shares.length === 0) return null; // personal — nothing owed
+    return { text: `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`, settled: false };
+  }
+
+  // Settle toggle: empty circle (pending) to mark paid; a green check + "Undo"
+  // pill (settled) to revert.
+  const settleBtn = (e: TripExpense) => {
+    if (nonPayerShares(e).length === 0 && !e.settled) return null; // personal
+
+    if (e.settled) {
+      return (
+        <button
+          onClick={() => toggleSettled(e)}
+          aria-label="Undo — mark as pending"
+          title="Settled — tap to undo"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            height: 30,
+            padding: '0 9px',
+            borderRadius: 8,
+            background: 'transparent',
+            border: '1px solid var(--border-subtle)',
+            color: '#34D399',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          <CheckCircle2 size={14} />
+          <span style={{ color: 'var(--text-muted)' }}>Undo</span>
+        </button>
+      );
+    }
+
+    return (
+      <button
+        onClick={() => toggleSettled(e)}
+        aria-label="Mark as paid"
+        title="Mark as paid"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 30,
+          height: 30,
+          borderRadius: 8,
+          background: 'transparent',
+          border: 'none',
+          color: 'var(--text-muted)',
+          cursor: 'pointer',
+        }}
+      >
+        <Circle size={16} />
+      </button>
+    );
+  };
+
+  // Short label describing a non-default split (returns null when split among all).
+  function splitLabel(e: TripExpense): string | null {
+    const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : trip.travelers;
+    if (sharers.length >= trip.travelers.length) return null; // everyone — the default
+    if (sharers.length === 1) return sharers[0] === e.paid_by ? 'Personal' : `For ${sharers[0]}`;
+    return `Split: ${sharers.join(', ')}`;
   }
 
   const iconBtn = (onClick: () => void, label: string, danger = false) => (
@@ -210,7 +302,7 @@ export default function ExpensesClient({
                     <th style={{ padding: cellPad, fontWeight: 600 }}>Paid by</th>
                     <th style={{ padding: cellPad, fontWeight: 600 }}>Date</th>
                     <th style={{ padding: cellPad, fontWeight: 600, textAlign: 'right' }}>Amount</th>
-                    <th style={{ padding: cellPad, width: 70 }} />
+                    <th style={{ padding: cellPad, width: 104 }} />
                   </tr>
                 </thead>
                 <tbody>
@@ -236,13 +328,24 @@ export default function ExpensesClient({
                       <td style={{ padding: cellPad }}>
                         <CategoryBadge category={e.category} />
                       </td>
-                      <td style={{ padding: cellPad, color: 'var(--text-secondary)' }}>{e.paid_by}</td>
+                      <td style={{ padding: cellPad, color: 'var(--text-secondary)' }}>
+                        {e.paid_by}
+                        {splitLabel(e) && (
+                          <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-muted)' }}>{splitLabel(e)}</span>
+                        )}
+                        {settleStatus(e) && (
+                          <span style={{ display: 'block', fontSize: 11.5, color: settleStatus(e)!.settled ? '#34D399' : 'var(--text-muted)' }}>
+                            {settleStatus(e)!.text}
+                          </span>
+                        )}
+                      </td>
                       <td style={{ padding: cellPad, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(e.expense_date)}</td>
                       <td style={{ padding: cellPad, textAlign: 'right', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                         {formatINR(Number(e.amount))}
                       </td>
                       <td style={{ padding: '8px 10px' }}>
                         <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                          {settleBtn(e)}
                           {iconBtn(() => openEdit(e), 'Edit expense')}
                           {iconBtn(() => setDeleting(e), 'Delete expense', true)}
                         </div>
@@ -300,8 +403,23 @@ export default function ExpensesClient({
                       <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--text-secondary)' }}>{e.paid_by}</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(e.expense_date)}</span>
+                      {splitLabel(e) && (
+                        <>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
+                          <span style={{ fontSize: 12, color: 'var(--accent-light)', fontWeight: 500 }}>{splitLabel(e)}</span>
+                        </>
+                      )}
+                      {settleStatus(e) && (
+                        <>
+                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
+                          <span style={{ fontSize: 12, fontWeight: 500, color: settleStatus(e)!.settled ? '#34D399' : 'var(--text-muted)' }}>
+                            {settleStatus(e)!.text}
+                          </span>
+                        </>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                      {settleBtn(e)}
                       {iconBtn(() => openEdit(e), 'Edit expense')}
                       {iconBtn(() => setDeleting(e), 'Delete expense', true)}
                     </div>

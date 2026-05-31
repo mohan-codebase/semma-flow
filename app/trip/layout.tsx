@@ -12,7 +12,7 @@ export default async function TripLayout({ children }: { children: React.ReactNo
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', overflowX: 'hidden' }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', flexDirection: 'column' }}>
+      <div className="trip-shell">
         <TripNav trips={trips} activeTrip={ctx.trip} />
         <main className="trip-main">
           {children}

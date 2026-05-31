@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { Field, Select, TextField, TextArea } from '@/components/trip/fields';
 import { expenseSchema } from '@/lib/trip/schemas';
+import { formatINR } from '@/lib/trip/format';
 import { tripMutate } from '@/lib/trip/client';
 import { EXPENSE_CATEGORIES, type TripExpense, type Trip } from '@/lib/trip/types';
 
@@ -48,8 +49,11 @@ export default function ExpenseFormModal({
   const router = useRouter();
   const { toast } = useToast();
   const editing = Boolean(expense);
-  const defaultTraveler = trip?.travelers?.[0] || '';
+  const allTravelers = trip?.travelers ?? [];
+  const defaultTraveler = allTravelers[0] || '';
   const [form, setForm] = useState<FormState>(empty(defaultTraveler));
+  // Who shares this expense. Defaults to everyone (the previous behaviour).
+  const [splitBetween, setSplitBetween] = useState<string[]>(allTravelers);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
@@ -66,18 +70,29 @@ export default function ExpenseFormModal({
         notes: expense.notes ?? '',
         expense_date: expense.expense_date.slice(0, 10),
       });
+      // Restrict to current travelers in case the roster changed since.
+      const saved = (expense.split_between ?? allTravelers).filter((t) => allTravelers.includes(t));
+      setSplitBetween(saved.length > 0 ? saved : allTravelers);
     } else {
       setForm(empty(defaultTraveler));
+      setSplitBetween(allTravelers);
     }
-  }, [open, expense, defaultTraveler]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, expense]);
 
   const set = (k: keyof FormState) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const toggleSharer = (name: string) =>
+    setSplitBetween((prev) =>
+      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name],
+    );
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = expenseSchema.safeParse({
       trip_id: trip.id,
       ...form,
+      split_between: splitBetween,
       amount: form.amount === '' ? 0 : form.amount,
     });
     if (!parsed.success) {
@@ -129,6 +144,41 @@ export default function ExpenseFormModal({
             <TextField type="date" value={form.expense_date} onChange={set('expense_date')} />
           </Field>
         </div>
+
+        <Field label="Split between" required error={errors.split_between}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {allTravelers.map((t) => {
+              const active = splitBetween.includes(t);
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => toggleSharer(t)}
+                  aria-pressed={active}
+                  style={{
+                    padding: '7px 14px',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    borderRadius: 999,
+                    cursor: 'pointer',
+                    color: active ? 'var(--accent-light)' : 'var(--text-muted)',
+                    background: active ? 'var(--accent-glow)' : 'var(--bg-tertiary)',
+                    border: `1px solid ${active ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
+                  }}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+          {splitBetween.length > 0 && Number(form.amount) > 0 && (
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {splitBetween.length === 1
+                ? `Personal — ${splitBetween[0]} owes the full amount.`
+                : `Split ${splitBetween.length} ways · ${formatINR(Number(form.amount) / splitBetween.length)} each.`}
+            </span>
+          )}
+        </Field>
 
         <Field label="Source URL (optional)" error={errors.source_url}>
           <TextField value={form.source_url} onChange={set('source_url')} placeholder="https://…" />

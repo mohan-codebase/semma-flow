@@ -17,14 +17,14 @@ export default function PageHeader({
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12,
-        marginBottom: 20,
+        marginBottom: 14,
       }}
     >
       <div>
         <h1
           style={{
             margin: 0,
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: 800,
             letterSpacing: '-0.02em',
             color: 'var(--text-primary)',
@@ -34,7 +34,7 @@ export default function PageHeader({
           {title}
         </h1>
         {description && (
-          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: 'var(--text-muted)' }}>{description}</p>
+          <p style={{ margin: '3px 0 0', fontSize: 12.5, color: 'var(--text-muted)' }}>{description}</p>
         )}
       </div>
       {action && <div style={{ display: 'flex', gap: 8 }}>{action}</div>}

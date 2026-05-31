@@ -24,13 +24,13 @@ export default function StatCard({
   accent?: Accent;
 }) {
   return (
-    <Card padding="md">
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+    <Card padding="sm" style={{ height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, height: '100%' }}>
         <div style={{ minWidth: 0 }}>
           <p
             style={{
               margin: 0,
-              fontSize: 11,
+              fontSize: 10.5,
               fontWeight: 600,
               letterSpacing: '0.04em',
               textTransform: 'uppercase',
@@ -41,8 +41,8 @@ export default function StatCard({
           </p>
           <p
             style={{
-              margin: '6px 0 0',
-              fontSize: 23,
+              margin: '4px 0 0',
+              fontSize: 18,
               fontWeight: 800,
               fontVariantNumeric: 'tabular-nums',
               color: accentColor[accent],
@@ -51,14 +51,14 @@ export default function StatCard({
           >
             {value}
           </p>
-          {sub && <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>{sub}</p>}
+          {sub && <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--text-muted)' }}>{sub}</p>}
         </div>
         {icon && (
           <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
+              width: 30,
+              height: 30,
+              borderRadius: 8,
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',

@@ -293,7 +293,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Next.js 16: set scroll-behavior on html but use data attribute to avoid
    conflict with RSC transition scroll management */
-html { height: 100%; }
+html { height: 100%; scrollbar-gutter: stable both-edges; }
 html[data-scroll-behavior="smooth"],
 html:not([data-nextjs-scroll-focus-boundary]) { scroll-behavior: smooth; }
 
@@ -613,9 +613,9 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   /* Main content never inherits sidebar offset on mobile */
-  main, .flex-1.min-w-0 {
+  /* main, .flex-1.min-w-0 {
     padding-left: 0 !important;
-  }
+  } */
 
   /* Every child of a page/grid must be able to shrink */
   .hf-dashboard-page > *,
@@ -819,9 +819,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Trip Planner — responsive grids */
-.trip-main { padding: 24px 20px 64px; }
-.trip-hero-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; align-items: stretch; }
-.trip-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+/* Shell widens on desktop so the multi-column grids below can activate; on
+   phones it is simply full-width. (Was hard-capped at 480px, which made every
+   viewport render as the same narrow mobile column.) */
+.trip-shell { width: 100%; max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; }
+.trip-main { padding: 16px 12px 48px; }
+.trip-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.trip-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .trip-two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .trip-three-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .trip-expenses-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; align-items: start; }
@@ -836,7 +840,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 560px) {
-  .trip-main { padding: 16px 14px 56px; }
+  .trip-main { padding: 12px 12px 40px; }
   .trip-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .trip-form-row { grid-template-columns: 1fr !important; }
 }

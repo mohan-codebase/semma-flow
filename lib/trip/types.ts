@@ -50,6 +50,10 @@ export interface TripExpense {
   item: string;
   amount: number;
   paid_by: Traveler;
+  // Travelers who share this expense's cost. null/empty = split among everyone.
+  split_between: string[] | null;
+  // Whether this expense's debt has been reimbursed (drops out of the pending balance).
+  settled: boolean;
   source_url: string | null;
   notes: string | null;
   expense_date: string;
@@ -100,11 +104,26 @@ export interface TripDocument {
   created_at: string;
 }
 
+// A recorded payment from one traveler to another to clear a pending balance.
+export interface TripSettlement {
+  id: string;
+  user_id: string;
+  trip_id: string;
+  from_person: string;
+  to_person: string;
+  amount: number;
+  created_at: string;
+}
+
 // Computed settlement between travelers.
 export interface Settlement {
   totalExpenses: number;
+  // Average share across travelers (totalExpenses / traveler count). With
+  // per-expense splits, individual shares live in `owed`.
   sharePerPerson: number;
-  payments: Record<string, number>;
+  payments: Record<string, number>; // amount each person actually paid
+  owed: Record<string, number>;     // each person's share of consumed expenses
+  balances: Record<string, number>; // paid − owed (positive = creditor)
   transfers: Array<{
     from: string;
     to: string;

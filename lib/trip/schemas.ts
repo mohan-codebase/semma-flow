@@ -38,6 +38,7 @@ export const expenseSchema = z.object({
   item: safeText(120, 1),
   amount: z.coerce.number().min(0, 'Amount must be >= 0'),
   paid_by: traveler,
+  split_between: z.array(traveler).min(1, 'Pick at least one person to split with').optional(),
   source_url: z.string().trim().url('Must be a valid URL').optional().or(z.literal('')),
   notes: safeText(500).optional().or(z.literal('')),
   expense_date: z.string().min(1, 'Date is required'),
@@ -71,6 +72,13 @@ export const tripSchema = z.object({
   travelers: z.array(z.string().min(1, 'Name cannot be empty')).min(1, 'At least one traveler is required').optional(),
 });
 export type TripFormValues = z.infer<typeof tripSchema>;
+
+export const settlementSchema = z.object({
+  trip_id: z.string().uuid('Trip ID is required'),
+  from_person: traveler,
+  to_person: traveler,
+  amount: z.coerce.number().min(0),
+});
 
 export const packingSchema = z.object({
   trip_id: z.string().uuid('Trip ID is required'),

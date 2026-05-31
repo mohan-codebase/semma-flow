@@ -8,6 +8,7 @@ import type {
   TripExpense,
   TripItineraryDay,
   TripPackingItem,
+  TripSettlement,
 } from '@/lib/trip/types';
 
 // Starter packing list seeded the first time a user opens the planner.
@@ -149,6 +150,20 @@ export async function getPackingItems(tripId: string): Promise<TripPackingItem[]
       .eq('trip_id', tripId)
       .order('created_at', { ascending: true });
     return (data as TripPackingItem[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getSettlements(tripId: string): Promise<TripSettlement[]> {
+  try {
+    const supabase = await createServerClient();
+    const { data } = await supabase
+      .from('trip_settlements')
+      .select('*')
+      .eq('trip_id', tripId)
+      .order('created_at', { ascending: false });
+    return (data as TripSettlement[]) ?? [];
   } catch {
     return [];
   }
