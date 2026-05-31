@@ -3,16 +3,12 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  CheckCircle2,
-  Circle,
   ExternalLink,
   FileSpreadsheet,
   FileText,
-  Pencil,
   Plus,
   Receipt,
   Search,
-  Trash2,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -20,6 +16,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { useToast } from '@/components/ui/Toast';
 import CategoryBadge from '@/components/trip/CategoryBadge';
 import ExpenseFormModal from '@/components/trip/ExpenseFormModal';
+import ExpenseDetailModal from '@/components/trip/ExpenseDetailModal';
 import ConfirmModal from '@/components/trip/ConfirmModal';
 import { Select } from '@/components/trip/fields';
 import { tripMutate } from '@/lib/trip/client';
@@ -58,6 +55,7 @@ export default function ExpensesClient({
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<TripExpense | null>(null);
   const [deleting, setDeleting] = useState<TripExpense | null>(null);
+  const [viewing, setViewing] = useState<TripExpense | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -93,6 +91,14 @@ export default function ExpensesClient({
     setEditing(e);
     setFormOpen(true);
   }
+  function detailEdit(e: TripExpense) {
+    setViewing(null);
+    openEdit(e);
+  }
+  function detailDelete(e: TripExpense) {
+    setViewing(null);
+    setDeleting(e);
+  }
   async function confirmDelete() {
     if (!deleting) return;
     const res = await tripMutate('DELETE', `expenses/${deleting.id}`);
@@ -115,6 +121,8 @@ export default function ExpensesClient({
     const res = await tripMutate('PATCH', `expenses/${e.id}`, { settled: !e.settled });
     if (res.ok) {
       toast(e.settled ? 'Marked as pending' : 'Marked as settled', 'success');
+      // Keep the detail modal (if open on this expense) in sync optimistically.
+      setViewing((v) => (v && v.id === e.id ? { ...v, settled: !e.settled } : v));
       router.refresh();
     } else {
       toast(res.error, 'error');
@@ -129,61 +137,6 @@ export default function ExpensesClient({
     return { text: `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`, settled: false };
   }
 
-  // Settle toggle: empty circle (pending) to mark paid; a green check + "Undo"
-  // pill (settled) to revert.
-  const settleBtn = (e: TripExpense) => {
-    if (nonPayerShares(e).length === 0 && !e.settled) return null; // personal
-
-    if (e.settled) {
-      return (
-        <button
-          onClick={() => toggleSettled(e)}
-          aria-label="Undo — mark as pending"
-          title="Settled — tap to undo"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            height: 30,
-            padding: '0 9px',
-            borderRadius: 8,
-            background: 'transparent',
-            border: '1px solid var(--border-subtle)',
-            color: '#34D399',
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: 'pointer',
-          }}
-        >
-          <CheckCircle2 size={14} />
-          <span style={{ color: 'var(--text-muted)' }}>Undo</span>
-        </button>
-      );
-    }
-
-    return (
-      <button
-        onClick={() => toggleSettled(e)}
-        aria-label="Mark as paid"
-        title="Mark as paid"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 30,
-          height: 30,
-          borderRadius: 8,
-          background: 'transparent',
-          border: 'none',
-          color: 'var(--text-muted)',
-          cursor: 'pointer',
-        }}
-      >
-        <Circle size={16} />
-      </button>
-    );
-  };
-
   // Short label describing a non-default split (returns null when split among all).
   function splitLabel(e: TripExpense): string | null {
     const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : trip.travelers;
@@ -191,27 +144,6 @@ export default function ExpensesClient({
     if (sharers.length === 1) return sharers[0] === e.paid_by ? 'Personal' : `For ${sharers[0]}`;
     return `Split: ${sharers.join(', ')}`;
   }
-
-  const iconBtn = (onClick: () => void, label: string, danger = false) => (
-    <button
-      onClick={onClick}
-      aria-label={label}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 30,
-        height: 30,
-        borderRadius: 8,
-        background: 'transparent',
-        border: 'none',
-        color: danger ? 'var(--danger)' : 'var(--text-muted)',
-        cursor: 'pointer',
-      }}
-    >
-      {label.startsWith('Edit') ? <Pencil size={15} /> : <Trash2 size={15} />}
-    </button>
-  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -302,19 +234,22 @@ export default function ExpensesClient({
                     <th style={{ padding: cellPad, fontWeight: 600 }}>Paid by</th>
                     <th style={{ padding: cellPad, fontWeight: 600 }}>Date</th>
                     <th style={{ padding: cellPad, fontWeight: 600, textAlign: 'right' }}>Amount</th>
-                    <th style={{ padding: cellPad, width: 104 }} />
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map((e) => (
-                    <tr key={e.id} style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                    <tr
+                      key={e.id}
+                      onClick={() => setViewing(e)}
+                      style={{ borderTop: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+                    >
                       <td style={{ padding: cellPad, maxWidth: 260 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span style={{ fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {e.item}
                           </span>
                           {e.source_url && (
-                            <a href={e.source_url} target="_blank" rel="noreferrer" aria-label="Open source" style={{ color: 'var(--text-muted)', display: 'flex' }}>
+                            <a href={e.source_url} target="_blank" rel="noreferrer" aria-label="Open source" onClick={(ev) => ev.stopPropagation()} style={{ color: 'var(--text-muted)', display: 'flex' }}>
                               <ExternalLink size={13} />
                             </a>
                           )}
@@ -343,13 +278,6 @@ export default function ExpensesClient({
                       <td style={{ padding: cellPad, textAlign: 'right', fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                         {formatINR(Number(e.amount))}
                       </td>
-                      <td style={{ padding: '8px 10px' }}>
-                        <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                          {settleBtn(e)}
-                          {iconBtn(() => openEdit(e), 'Edit expense')}
-                          {iconBtn(() => setDeleting(e), 'Delete expense', true)}
-                        </div>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -363,6 +291,15 @@ export default function ExpensesClient({
               {filtered.map((e) => (
                 <div
                   key={e.id}
+                  onClick={() => setViewing(e)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(ev) => {
+                    if (ev.key === 'Enter' || ev.key === ' ') {
+                      ev.preventDefault();
+                      setViewing(e);
+                    }
+                  }}
                   style={{
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border-subtle)',
@@ -371,6 +308,7 @@ export default function ExpensesClient({
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 10,
+                    cursor: 'pointer',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
@@ -380,7 +318,7 @@ export default function ExpensesClient({
                           {e.item}
                         </span>
                         {e.source_url && (
-                          <a href={e.source_url} target="_blank" rel="noreferrer" aria-label="Open source" style={{ color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center' }}>
+                          <a href={e.source_url} target="_blank" rel="noreferrer" aria-label="Open source" onClick={(ev) => ev.stopPropagation()} style={{ color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center' }}>
                             <ExternalLink size={13} />
                           </a>
                         )}
@@ -418,11 +356,6 @@ export default function ExpensesClient({
                         </>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-                      {settleBtn(e)}
-                      {iconBtn(() => openEdit(e), 'Edit expense')}
-                      {iconBtn(() => setDeleting(e), 'Delete expense', true)}
-                    </div>
                   </div>
                 </div>
               ))}
@@ -431,6 +364,14 @@ export default function ExpensesClient({
         </>
       )}
 
+      <ExpenseDetailModal
+        expense={viewing}
+        trip={trip}
+        onClose={() => setViewing(null)}
+        onEdit={detailEdit}
+        onDelete={detailDelete}
+        onToggleSettled={toggleSettled}
+      />
       <ExpenseFormModal open={formOpen} onClose={() => setFormOpen(false)} expense={editing} trip={trip} />
       <ConfirmModal
         open={Boolean(deleting)}
