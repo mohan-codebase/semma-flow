@@ -1395,6 +1395,118 @@ function ProfileMenu({
   );
 }
 
+/** Shared day label under each chart point/bar. */
+function DayTick({ label, isToday }: { label: string; isToday: boolean }) {
+  return (
+    <span style={{
+      fontSize: 11,
+      fontWeight: isToday ? 800 : 500,
+      color: isToday ? '#fff' : 'rgba(255,255,255,0.55)',
+      letterSpacing: '0.02em',
+    }}>
+      {label}
+    </span>
+  );
+}
+
+/** Cardinal spline → smooth cubic bezier SVG path. */
+function weekSmoothPath(pts: { x: number; y: number }[], tension = 0.32): string {
+  if (pts.length === 0) return '';
+  if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`;
+  const d: string[] = [`M ${pts[0].x.toFixed(2)},${pts[0].y.toFixed(2)}`];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const cp1x = p1.x + (p2.x - p0.x) * tension;
+    const cp1y = p1.y + (p2.y - p0.y) * tension;
+    const cp2x = p2.x - (p3.x - p1.x) * tension;
+    const cp2y = p2.y - (p3.y - p1.y) * tension;
+    d.push(`C ${cp1x.toFixed(2)},${cp1y.toFixed(2)} ${cp2x.toFixed(2)},${cp2y.toFixed(2)} ${p2.x.toFixed(2)},${p2.y.toFixed(2)}`);
+  }
+  return d.join(' ');
+}
+
+/** Smooth area/line view of the same weekly completion data. */
+function WeekLineChart({
+  weekBars,
+  dayShort,
+}: {
+  weekBars: { pct: number; isToday: boolean }[];
+  dayShort: string[];
+}) {
+  const W = 320;
+  const H = 56;
+  const padX = 10;
+  const padTop = 8;
+  const padBottom = 6;
+  const innerW = W - padX * 2;
+  const innerH = H - padTop - padBottom;
+  const n = weekBars.length;
+  const step = n > 1 ? innerW / (n - 1) : 0;
+
+  const points = weekBars.map((b, i) => ({
+    x: padX + i * step,
+    y: padTop + innerH - (Math.min(100, Math.max(0, b.pct)) / 100) * innerH,
+    isToday: b.isToday,
+  }));
+
+  const line = weekSmoothPath(points);
+  const area =
+    points.length > 0
+      ? `${line} L ${points[points.length - 1].x.toFixed(2)},${(padTop + innerH).toFixed(2)} L ${points[0].x.toFixed(2)},${(padTop + innerH).toFixed(2)} Z`
+      : '';
+
+  return (
+    <div>
+      <svg
+        width="100%"
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        style={{ display: 'block', overflow: 'visible' }}
+      >
+        <defs>
+          <linearGradient id="week-line-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fff" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {area && <path d={area} fill="url(#week-line-fill)" />}
+        {line && (
+          <motion.path
+            d={line}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          />
+        )}
+        {points.map((p, i) => (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={p.isToday ? 3.5 : 2.5}
+            fill={p.isToday ? '#fff' : 'rgba(255,255,255,0.85)'}
+            stroke={p.isToday ? PURPLE_HEX : 'none'}
+            strokeWidth={p.isToday ? 1.5 : 0}
+          />
+        ))}
+      </svg>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+        {weekBars.map((b, i) => (
+          <DayTick key={i} label={dayShort[i]} isToday={b.isToday} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function FitnessSummary({
   stats,
   habits,
@@ -1407,6 +1519,7 @@ export default function FitnessSummary({
   const [selectedId, setSelectedId]   = useState<string | null>(null);
   const [addOpen, setAddOpen]         = useState(false);
   const [menuOpen, setMenuOpen]       = useState(false);
+  const [chartMode, setChartMode]     = useState<'bar' | 'line'>('bar');
 
   const handleAddSuccess = (saved: Habit) => {
     setLocalHabits((prev) => [...prev, { ...saved, todayEntry: null, completionRate: 0 } as HabitWithEntry]);
@@ -1587,53 +1700,86 @@ export default function FitnessSummary({
                 Goal: 90% completion
               </p>
             </div>
-            <div style={{
-              background: 'rgba(255,255,255,0.18)',
-              borderRadius: 20,
-              padding: '5px 10px',
-              flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
-                {todayPct >= 80 ? '+' : ''}{todayPct}% today
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {/* Bar / Line view toggle */}
+              <div style={{
+                display: 'flex',
+                background: 'rgba(255,255,255,0.12)',
+                borderRadius: 20,
+                padding: 2,
+              }}>
+                {(['bar', 'line'] as const).map((mode) => {
+                  const active = chartMode === mode;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={active}
+                      aria-label={`${mode} chart`}
+                      onClick={() => setChartMode(mode)}
+                      style={{
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: 18,
+                        padding: '4px 9px',
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        letterSpacing: '0.02em',
+                        textTransform: 'capitalize',
+                        background: active ? 'rgba(255,255,255,0.92)' : 'transparent',
+                        color: active ? PURPLE_HEX : 'rgba(255,255,255,0.7)',
+                        transition: 'background 0.18s ease, color 0.18s ease',
+                      }}
+                    >
+                      {mode}
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{
+                background: 'rgba(255,255,255,0.18)',
+                borderRadius: 20,
+                padding: '5px 10px',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>
+                  {todayPct >= 80 ? '+' : ''}{todayPct}% today
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Day labels */}
+          {/* Chart: bar columns or smooth line/area */}
           <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
             marginTop: 28,
             paddingTop: 12,
             borderTop: '1px solid rgba(255,255,255,0.15)',
           }}>
-            {weekBars.map(({ dow, pct, isToday }, i) => {
-              const barH = Math.max(4, Math.round((pct / 100) * 32));
-              return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  {/* bar track */}
-                  <div style={{ width: 6, height: 32, borderRadius: 3, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'flex-end' }}>
-                    <div style={{
-                      width: '100%',
-                      height: barH,
-                      borderRadius: 3,
-                      background: pct > 0
-                        ? `rgba(255,255,255,${0.45 + (pct / 100) * 0.55})`
-                        : 'transparent',
-                      transition: 'height 0.4s ease',
-                    }} />
-                  </div>
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: isToday ? 800 : 500,
-                    color: isToday ? '#fff' : 'rgba(255,255,255,0.55)',
-                    letterSpacing: '0.02em',
-                  }}>
-                    {DAY_SHORT[i]}
-                  </span>
-                </div>
-              );
-            })}
+            {chartMode === 'bar' ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                {weekBars.map(({ pct, isToday }, i) => {
+                  const barH = Math.max(4, Math.round((pct / 100) * 32));
+                  return (
+                    <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                      {/* bar track */}
+                      <div style={{ width: 6, height: 32, borderRadius: 3, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'flex-end' }}>
+                        <div style={{
+                          width: '100%',
+                          height: barH,
+                          borderRadius: 3,
+                          background: pct > 0
+                            ? `rgba(255,255,255,${0.45 + (pct / 100) * 0.55})`
+                            : 'transparent',
+                          transition: 'height 0.4s ease',
+                        }} />
+                      </div>
+                      <DayTick label={DAY_SHORT[i]} isToday={isToday} />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <WeekLineChart weekBars={weekBars} dayShort={DAY_SHORT} />
+            )}
           </div>
         </motion.div>
 
