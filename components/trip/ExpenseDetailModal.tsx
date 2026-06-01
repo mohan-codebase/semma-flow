@@ -9,13 +9,7 @@ import { formatDate, formatINR } from '@/lib/trip/format';
 import { expensePayers, expenseShares } from '@/lib/trip/settlement';
 import type { TripExpense, Trip } from '@/lib/trip/types';
 
-// Short label describing a non-default split (returns null when split among all).
-function splitLabel(e: TripExpense, travelers: string[]): string | null {
-  const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : travelers;
-  if (sharers.length >= travelers.length) return null; // everyone — the default
-  if (sharers.length === 1) return sharers[0] === e.paid_by ? 'Personal' : `For ${sharers[0]}`;
-  return `Split: ${sharers.join(', ')}`;
-}
+
 
 // "Mohan" for a single payer, "Mohan ₹600 · Charles ₹486" when several paid.
 function paidByLabel(e: TripExpense): string {
@@ -59,7 +53,6 @@ export default function ExpenseDetailModal({
 
   const e = expense;
   const shares = expenseShares(e, trip.travelers);
-  const split = splitLabel(e, trip.travelers);
   const canSettle = shares.length > 0 || e.settled;
 
   async function handleToggle() {
@@ -101,20 +94,12 @@ export default function ExpenseDetailModal({
             <span style={rowLabel}>Date</span>
             <span style={rowValue}>{formatDate(e.expense_date)}</span>
           </div>
-          {split && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-              <span style={rowLabel}>Split</span>
-              <span style={{ ...rowValue, color: 'var(--accent-light)' }}>{split}</span>
-            </div>
-          )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <span style={rowLabel}>Status</span>
-            <span style={{ ...rowValue, fontWeight: !e.settled && shares.length > 0 ? 700 : 500, color: e.settled ? '#34D399' : shares.length === 0 ? 'var(--text-muted)' : 'var(--danger)' }}>
+            <span style={{ ...rowValue, fontWeight: !e.settled && shares.length > 0 ? 700 : 500, color: e.settled ? '#34D399' : 'var(--danger)' }}>
               {e.settled
                 ? 'Settled'
-                : shares.length === 0
-                  ? 'Personal'
-                  : `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`}
+                : `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`}
             </span>
           </div>
           {e.notes && (

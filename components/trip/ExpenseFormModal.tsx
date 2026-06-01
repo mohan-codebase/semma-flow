@@ -55,10 +55,11 @@ export default function ExpenseFormModal({
   const [payers, setPayers] = useState<string[]>(defaultTraveler ? [defaultTraveler] : []);
   // Per-payer amounts (string inputs), used only when >1 payer is selected.
   const [payerAmounts, setPayerAmounts] = useState<Record<string, string>>({});
-  // Who shares this expense. Defaults to everyone (the previous behaviour).
-  const [splitBetween, setSplitBetween] = useState<string[]>(allTravelers);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+
+  // Every expense is split equally among all current travelers of the trip.
+  const splitBetween = allTravelers;
 
   useEffect(() => {
     if (!open) return;
@@ -76,14 +77,10 @@ export default function ExpenseFormModal({
       const savedPayers = Object.keys(paid).filter((t) => allTravelers.includes(t));
       setPayers(savedPayers.length > 0 ? savedPayers : defaultTraveler ? [defaultTraveler] : []);
       setPayerAmounts(Object.fromEntries(Object.entries(paid).map(([n, a]) => [n, String(a)])));
-      // Restrict to current travelers in case the roster changed since.
-      const saved = (expense.split_between ?? allTravelers).filter((t) => allTravelers.includes(t));
-      setSplitBetween(saved.length > 0 ? saved : allTravelers);
     } else {
       setForm(empty());
       setPayers(defaultTraveler ? [defaultTraveler] : []);
       setPayerAmounts({});
-      setSplitBetween(allTravelers);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, expense]);
@@ -106,11 +103,6 @@ export default function ExpenseFormModal({
     0,
   );
   const remaining = total - paidSum;
-
-  const toggleSharer = (name: string) =>
-    setSplitBetween((prev) =>
-      prev.includes(name) ? prev.filter((t) => t !== name) : [...prev, name],
-    );
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -236,41 +228,6 @@ export default function ExpenseFormModal({
                     : `Over by ${formatINR(-remaining)}.`}
               </span>
             </div>
-          )}
-        </Field>
-
-        <Field label="Split between" required error={errors.split_between}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {allTravelers.map((t) => {
-              const active = splitBetween.includes(t);
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => toggleSharer(t)}
-                  aria-pressed={active}
-                  style={{
-                    padding: '7px 14px',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    borderRadius: 999,
-                    cursor: 'pointer',
-                    color: active ? 'var(--accent-light)' : 'var(--text-muted)',
-                    background: active ? 'var(--accent-glow)' : 'var(--bg-tertiary)',
-                    border: `1px solid ${active ? 'var(--border-accent)' : 'var(--border-subtle)'}`,
-                  }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-          {splitBetween.length > 0 && Number(form.amount) > 0 && (
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              {splitBetween.length === 1
-                ? `Personal — ${splitBetween[0]} owes the full amount.`
-                : `Split ${splitBetween.length} ways · ${formatINR(Number(form.amount) / splitBetween.length)} each.`}
-            </span>
           )}
         </Field>
 

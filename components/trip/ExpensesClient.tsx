@@ -150,10 +150,7 @@ export default function ExpensesClient({
 
   // Short label describing a non-default split (returns null when split among all).
   function splitLabel(e: TripExpense): string | null {
-    const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : trip.travelers;
-    if (sharers.length >= trip.travelers.length) return null; // everyone — the default
-    if (sharers.length === 1) return sharers[0] === e.paid_by ? 'Personal' : `For ${sharers[0]}`;
-    return `Split: ${sharers.join(', ')}`;
+    return null;
   }
 
   return (
@@ -360,9 +357,6 @@ export default function ExpensesClient({
                       </td>
                       <td style={{ padding: cellPad, color: 'var(--text-secondary)' }}>
                         {payerLabel(e)}
-                        {splitLabel(e) && (
-                          <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-muted)' }}>{splitLabel(e)}</span>
-                        )}
                         {settleStatus(e) && (
                           <span style={{ display: 'block', fontSize: 11.5, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#34D399' : 'var(--danger)' }}>
                             {settleStatus(e)!.text}
@@ -436,12 +430,7 @@ export default function ExpensesClient({
                       <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--text-secondary)' }}>{payerLabel(e)}</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(e.expense_date)}</span>
-                      {splitLabel(e) && (
-                        <>
-                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
-                          <span style={{ fontSize: 12, color: 'var(--accent-light)', fontWeight: 500 }}>{splitLabel(e)}</span>
-                        </>
-                      )}
+
                       {settleStatus(e) && (
                         <>
                           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>

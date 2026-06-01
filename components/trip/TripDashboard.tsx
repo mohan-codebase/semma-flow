@@ -27,7 +27,8 @@ import { EXPENSE_CATEGORIES, type Trip, type TripExpense, type TripSettlement, t
 
 const TABLES = ['trip_expenses', 'trip_trips', 'trip_settlements'];
 
-const COLORS = ['#A78BFA', '#67E8F9', '#F472B6', '#FCA5A5', '#FBBF24', '#34D399'];
+const SPENDING_COLORS = ['#FB923C', '#F472B6', '#FBBF24', '#FCA5A5', '#EC4899'];
+const PENDING_COLORS = ['#A78BFA', '#67E8F9', '#34D399', '#2DD4BF', '#60A5FA'];
 
 // Per-category accent, matching the hue of the category tags (CategoryBadge).
 const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
@@ -47,11 +48,13 @@ function CircularShareProgress({
   amount,
   percentage,
   color,
+  label = 'share',
 }: {
   name: string;
   amount: number;
   percentage: number;
   color: string;
+  label?: string;
 }) {
   const radius = 50;
   const strokeWidth = 8;
@@ -70,7 +73,7 @@ function CircularShareProgress({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(255, 255, 255, 0.05)"
+            stroke="rgba(255, 255, 255, 0.1)"
             strokeWidth={strokeWidth}
           />
           {/* Progress Arc */}
@@ -109,7 +112,7 @@ function CircularShareProgress({
             {percentage}%
           </span>
           <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-            share
+            {label}
           </span>
         </div>
       </div>
@@ -177,10 +180,11 @@ export default function TripDashboard({
 
       <Card>
         <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-          Expense share by person
+          Spending by person
         </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '24px 32px', padding: '12px 12px' }}>
           {trip.travelers.map((t, i) => {
+            // How much cash each person actually paid/fronted overall
             const amount = settlement.payments[t] || 0;
             const pct = settlement.totalExpenses > 0 ? Math.round((amount / settlement.totalExpenses) * 100) : 0;
             return (
@@ -189,7 +193,32 @@ export default function TripDashboard({
                 name={t}
                 amount={amount}
                 percentage={pct}
-                color={COLORS[i % COLORS.length]}
+                color={SPENDING_COLORS[i % SPENDING_COLORS.length]}
+                label="paid"
+              />
+            );
+          })}
+        </div>
+      </Card>
+
+      <Card>
+        <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+          Pending to pay
+        </h3>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '24px 32px', padding: '12px 12px' }}>
+          {trip.travelers.map((t, i) => {
+            // How much each person still needs to pay (outstanding debt)
+            const balance = settlement.balances[t] || 0;
+            const amount = balance < 0 ? -balance : 0;
+            const pct = (settlement.owed[t] || 0) > 0 ? Math.round((amount / settlement.owed[t]) * 100) : 0;
+            return (
+              <CircularShareProgress
+                key={t}
+                name={t}
+                amount={amount}
+                percentage={pct}
+                color={PENDING_COLORS[i % PENDING_COLORS.length]}
+                label="pending"
               />
             );
           })}

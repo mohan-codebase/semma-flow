@@ -104,7 +104,7 @@ export default function SettlementCard({
                   color: owes ? 'var(--danger)' : owed ? '#34D399' : 'var(--text-muted)',
                 }}
               >
-                {owes ? `pending ${formatINR(-balance)}` : owed ? `paid ${formatINR(balance)}` : 'settled up'}
+                {owes ? `pending -${formatINR(-balance)}` : owed ? `credit +${formatINR(balance)}` : 'settled up'}
               </span>
             </div>
           );
