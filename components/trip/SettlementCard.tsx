@@ -25,6 +25,9 @@ export default function SettlementCard({
 
   const settled = settlement.transfers.length === 0;
 
+  // More than one person actually put in money toward the trip's expenses.
+  const multiplePayers = Object.values(settlement.payments).filter((p) => p > 0.01).length > 1;
+
   // Per-person net pending: positive = owed money, negative = owes money.
   const balances = Object.entries(settlement.balances)
     .map(([name, balance]) => ({ name, balance }))
@@ -204,7 +207,13 @@ export default function SettlementCard({
         }}
       >
         {Object.entries(settlement.payments).map(([traveler, paid]) =>
-          miniItem(`Paid by ${traveler}`, formatINR(paid), `share ${formatINR(settlement.owed[traveler] ?? 0)}`)
+          // Show the per-person "share" only when a single person paid; when the
+          // cost was split across multiple payers, just show what each paid.
+          miniItem(
+            `Paid by ${traveler}`,
+            formatINR(paid),
+            multiplePayers ? undefined : `share ${formatINR(settlement.owed[traveler] ?? 0)}`,
+          )
         )}
         {miniItem('Total expenses', formatINR(settlement.totalExpenses))}
       </div>
