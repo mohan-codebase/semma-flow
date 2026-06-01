@@ -23,11 +23,24 @@ import SettlementCard from '@/components/trip/SettlementCard';
 import { computeSettlement } from '@/lib/trip/settlement';
 import { formatINR } from '@/lib/trip/format';
 import { useTripRealtime } from '@/lib/trip/useTripRealtime';
-import type { Trip, TripExpense, TripSettlement } from '@/lib/trip/types';
+import { EXPENSE_CATEGORIES, type Trip, type TripExpense, type TripSettlement, type ExpenseCategory } from '@/lib/trip/types';
 
 const TABLES = ['trip_expenses', 'trip_trips', 'trip_settlements'];
 
 const COLORS = ['#A78BFA', '#67E8F9', '#F472B6', '#FCA5A5', '#FBBF24', '#34D399'];
+
+// Per-category accent, matching the hue of the category tags (CategoryBadge).
+const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
+  Travel: '#38BDF8',
+  Hotel: '#A78BFA',
+  Food: '#FBBF24',
+  Fuel: '#FB923C',
+  Clothing: '#34D399',
+  Accessories: '#2DD4BF',
+  Medicine: '#FB7185',
+  Booking: '#818CF8',
+  Miscellaneous: '#94A3B8',
+};
 
 function CircularShareProgress({
   name,
@@ -143,6 +156,17 @@ export default function TripDashboard({
     [expenses, trip.travelers, settlements],
   );
 
+  // Total spend per category, biggest first — feeds the breakdown bars.
+  const byCategory = useMemo(() => {
+    const map = new Map<ExpenseCategory, number>();
+    for (const e of expenses) map.set(e.category, (map.get(e.category) ?? 0) + Number(e.amount));
+    const rows = EXPENSE_CATEGORIES.map((c) => ({ category: c, amount: map.get(c) ?? 0 })).filter((r) => r.amount > 0);
+    rows.sort((a, b) => b.amount - a.amount);
+    const total = rows.reduce((s, r) => s + r.amount, 0);
+    const max = rows.reduce((m, r) => Math.max(m, r.amount), 0);
+    return { rows, total, max };
+  }, [expenses]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Hero row */}
@@ -171,6 +195,52 @@ export default function TripDashboard({
           })}
         </div>
       </Card>
+
+      {byCategory.rows.length > 0 && (
+        <Card>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+              Spending by category
+            </h3>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-light)', fontVariantNumeric: 'tabular-nums' }}>
+              {formatINR(byCategory.total)}
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+            {byCategory.rows.map(({ category, amount }) => {
+              const color = CATEGORY_COLORS[category];
+              const pct = byCategory.max > 0 ? (amount / byCategory.max) * 100 : 0;
+              const shareOfTotal = byCategory.total > 0 ? Math.round((amount / byCategory.total) * 100) : 0;
+              return (
+                <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 104, display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, minWidth: 0 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: 3, background: color, flexShrink: 0 }} />
+                    <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {category}
+                    </span>
+                  </div>
+                  <div style={{ flex: 1, height: 10, borderRadius: 999, background: 'var(--bg-tertiary)', overflow: 'hidden' }}>
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+                      style={{ height: '100%', borderRadius: 999, background: color }}
+                    />
+                  </div>
+                  <div style={{ width: 96, flexShrink: 0, textAlign: 'right' }}>
+                    <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(amount)}
+                    </span>
+                    <span style={{ marginLeft: 6, fontSize: 11, color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                      {shareOfTotal}%
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
 
       {/* More Button */}
       <button

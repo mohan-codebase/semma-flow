@@ -844,3 +844,40 @@ h1, h2, h3, h4, h5, h6 {
   .trip-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .trip-form-row { grid-template-columns: 1fr !important; }
 }
+
+/* ── Category badges ─────────────────────────────────────────────
+   Theme-aware tag colours. Dark theme = soft pastels; light theme =
+   saturated text + faint tint + hairline border so they stay legible
+   on white surfaces. */
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.3;
+  color: var(--cat-fg);
+  background: var(--cat-bg);
+  border: 1px solid var(--cat-bd, transparent);
+}
+.cat-travel        { --cat-fg:#7DD3FC; --cat-bg:rgba(56,189,248,0.14); }
+.cat-hotel         { --cat-fg:#C4B5FD; --cat-bg:rgba(167,139,250,0.16); }
+.cat-food          { --cat-fg:#FCD34D; --cat-bg:rgba(251,191,36,0.14); }
+.cat-fuel          { --cat-fg:#FDBA74; --cat-bg:rgba(251,146,60,0.14); }
+.cat-clothing      { --cat-fg:#6EE7B7; --cat-bg:rgba(52,211,153,0.14); }
+.cat-accessories   { --cat-fg:#5EEAD4; --cat-bg:rgba(45,212,191,0.14); }
+.cat-medicine      { --cat-fg:#FDA4AF; --cat-bg:rgba(251,113,133,0.14); }
+.cat-booking       { --cat-fg:#A5B4FC; --cat-bg:rgba(129,140,248,0.16); }
+.cat-miscellaneous { --cat-fg:#CBD5E1; --cat-bg:rgba(148,163,184,0.14); }
+
+[data-theme="light"] .cat-travel        { --cat-fg:#0369A1; --cat-bg:rgba(2,132,199,0.10);  --cat-bd:rgba(2,132,199,0.22); }
+[data-theme="light"] .cat-hotel         { --cat-fg:#6D28D9; --cat-bg:rgba(124,58,237,0.10); --cat-bd:rgba(124,58,237,0.22); }
+[data-theme="light"] .cat-food          { --cat-fg:#B45309; --cat-bg:rgba(245,158,11,0.14); --cat-bd:rgba(245,158,11,0.30); }
+[data-theme="light"] .cat-fuel          { --cat-fg:#C2410C; --cat-bg:rgba(249,115,22,0.12); --cat-bd:rgba(249,115,22,0.28); }
+[data-theme="light"] .cat-clothing      { --cat-fg:#047857; --cat-bg:rgba(16,185,129,0.12); --cat-bd:rgba(16,185,129,0.28); }
+[data-theme="light"] .cat-accessories   { --cat-fg:#0F766E; --cat-bg:rgba(20,184,166,0.12); --cat-bd:rgba(20,184,166,0.28); }
+[data-theme="light"] .cat-medicine      { --cat-fg:#BE123C; --cat-bg:rgba(244,63,94,0.10);  --cat-bd:rgba(244,63,94,0.24); }
+[data-theme="light"] .cat-booking       { --cat-fg:#4338CA; --cat-bg:rgba(99,102,241,0.10); --cat-bd:rgba(99,102,241,0.24); }
+[data-theme="light"] .cat-miscellaneous { --cat-fg:#475569; --cat-bg:rgba(100,116,139,0.12);--cat-bd:rgba(100,116,139,0.28); }
