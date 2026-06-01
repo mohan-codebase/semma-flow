@@ -109,7 +109,7 @@ export default function ExpenseDetailModal({
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <span style={rowLabel}>Status</span>
-            <span style={{ ...rowValue, color: e.settled ? '#34D399' : 'var(--text-muted)' }}>
+            <span style={{ ...rowValue, fontWeight: !e.settled && shares.length > 0 ? 700 : 500, color: e.settled ? '#34D399' : shares.length === 0 ? 'var(--text-muted)' : 'var(--danger)' }}>
               {e.settled
                 ? 'Settled'
                 : shares.length === 0

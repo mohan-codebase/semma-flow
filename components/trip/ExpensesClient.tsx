@@ -364,7 +364,7 @@ export default function ExpensesClient({
                           <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-muted)' }}>{splitLabel(e)}</span>
                         )}
                         {settleStatus(e) && (
-                          <span style={{ display: 'block', fontSize: 11.5, color: settleStatus(e)!.settled ? '#34D399' : 'var(--text-muted)' }}>
+                          <span style={{ display: 'block', fontSize: 11.5, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#34D399' : 'var(--danger)' }}>
                             {settleStatus(e)!.text}
                           </span>
                         )}
@@ -445,7 +445,7 @@ export default function ExpensesClient({
                       {settleStatus(e) && (
                         <>
                           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
-                          <span style={{ fontSize: 12, fontWeight: 500, color: settleStatus(e)!.settled ? '#34D399' : 'var(--text-muted)' }}>
+                          <span style={{ fontSize: 12, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#34D399' : 'var(--danger)' }}>
                             {settleStatus(e)!.text}
                           </span>
                         </>

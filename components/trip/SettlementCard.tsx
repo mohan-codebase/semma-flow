@@ -126,44 +126,62 @@ export default function SettlementCard({
             Suggested Transfers
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {settlement.transfers.map((t, idx) => (
-              <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '7px 10px', background: 'var(--bg-secondary)', borderRadius: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', minWidth: 0 }}>
-                  <span>{t.from}</span>
-                  <ArrowRight size={13} color="var(--accent-light)" />
-                  <span>{t.to}</span>
+            {settlement.transfers.map((t, idx) => {
+              const isBusy = busy === `${t.from}-${t.to}`;
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    padding: '8px 8px 8px 12px',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 12,
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', minWidth: 0 }}>
+                    <span>{t.from}</span>
+                    <ArrowRight size={13} color="var(--accent-light)" />
+                    <span>{t.to}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-light)', fontVariantNumeric: 'tabular-nums' }}>
+                      {formatINR(t.amount)}
+                    </span>
+                    {tripId && (
+                      <button
+                        type="button"
+                        onClick={() => settleUp(t)}
+                        disabled={isBusy}
+                        title="Mark as paid"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          padding: '7px 13px',
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          borderRadius: 999,
+                          cursor: isBusy ? 'default' : 'pointer',
+                          color: 'var(--accent-on-primary, #fff)',
+                          background: 'var(--accent-primary)',
+                          border: '1px solid rgba(255,255,255,0.14)',
+                          boxShadow: '0 1px 3px rgba(76,29,149,0.25)',
+                          whiteSpace: 'nowrap',
+                          opacity: isBusy ? 0.55 : 1,
+                          transition: 'opacity 0.15s ease, transform 0.15s ease',
+                        }}
+                      >
+                        <Check size={13} strokeWidth={2.5} /> Settle
+                      </button>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                  <span style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-light)', fontVariantNumeric: 'tabular-nums' }}>
-                    {formatINR(t.amount)}
-                  </span>
-                  {tripId && (
-                    <button
-                      type="button"
-                      onClick={() => settleUp(t)}
-                      disabled={busy === `${t.from}-${t.to}`}
-                      title="Mark as paid"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        padding: '4px 8px',
-                        fontSize: 11.5,
-                        fontWeight: 600,
-                        borderRadius: 7,
-                        cursor: 'pointer',
-                        color: '#fff',
-                        background: 'var(--accent-primary)',
-                        border: 'none',
-                        opacity: busy === `${t.from}-${t.to}` ? 0.6 : 1,
-                      }}
-                    >
-                      <Check size={12} /> Settle
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
