@@ -17,6 +17,7 @@ interface FitnessSummaryProps {
   displayName?: string;
   initials?: string;
   email?: string;
+  onBackToHub?: () => void;
 }
 
 const PURPLE = 'var(--accent-primary)';
@@ -1594,6 +1595,7 @@ export default function FitnessSummary({
   displayName = 'User',
   initials = '?',
   email = '',
+  onBackToHub,
 }: FitnessSummaryProps) {
   const [localHabits, setLocalHabits] = useState<HabitWithEntry[]>(habits);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -1745,6 +1747,29 @@ export default function FitnessSummary({
           transition={{ duration: 0.3 }}
           style={{ paddingTop: 24, paddingBottom: 4 }}
         >
+          {onBackToHub && (
+            <button
+              onClick={onBackToHub}
+              style={{
+                background: 'rgba(124, 58, 237, 0.08)',
+                border: '1px solid rgba(124, 58, 237, 0.20)',
+                borderRadius: 12,
+                color: 'var(--accent-light)',
+                padding: '6px 12px',
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                marginBottom: 16,
+                fontFamily: "'Outfit', sans-serif",
+                transition: 'all 0.15s ease',
+              }}
+            >
+              ← Back to App Hub
+            </button>
+          )}
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.03em', lineHeight: 1.15 }}>
               {greeting},<br />{displayName.split(' ')[0]} 👋

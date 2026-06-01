@@ -5,6 +5,7 @@ import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
 import type { HabitWithEntry } from '@/types/habit';
 import type { HabitEntry } from '@/types/entry';
 import DashboardApp from '@/components/dashboard/DashboardApp';
+import { ensureTrip } from '@/lib/trip/server';
 
 export default async function DashboardPage() {
   const supabase = await createServerClient();
@@ -33,14 +34,15 @@ export default async function DashboardPage() {
   });
   const weekStart = weekDays[0].date;
 
-  // 3 queries in parallel — habits once, today's entries once, week entries once
+  // Queries in parallel — habits, today's entries, week entries, and active trip
   type WeekEntry = { entry_date: string; habit_id: string; is_completed: boolean };
   let habitsRaw: HabitWithEntry[] = [];
   let todayEntriesRaw: HabitEntry[] = [];
   let weekEntriesRaw: WeekEntry[] = [];
+  let activeTripName = '';
 
   if (userId) {
-    const [habitsRes, todayRes, weekRes] = await Promise.all([
+    const [habitsRes, todayRes, weekRes, tripCtx] = await Promise.all([
       supabase
         .from('habits')
         .select('*, category:categories(*)')
@@ -58,10 +60,12 @@ export default async function DashboardPage() {
         .eq('user_id', userId)
         .gte('entry_date', weekStart)
         .lte('entry_date', today),
+      ensureTrip(),
     ]);
     habitsRaw = (habitsRes.data ?? []) as HabitWithEntry[];
     todayEntriesRaw = (todayRes.data ?? []) as HabitEntry[];
     weekEntriesRaw = (weekRes.data ?? []) as WeekEntry[];
+    activeTripName = tripCtx?.trip?.name ?? '';
   }
 
   // Build today's habit list with entry state attached
@@ -176,6 +180,7 @@ export default async function DashboardPage() {
       heroPct={heroPct}
       dayName={dayName}
       dateStr={dateStr}
+      activeTripName={activeTripName}
     />
   );
 }

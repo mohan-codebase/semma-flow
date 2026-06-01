@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CalendarDays, Plane } from 'lucide-react';
 import { formatDate } from '@/lib/trip/format';
+import { useTheme } from '@/components/ui/ThemeProvider';
 
 function diff(target: Date) {
   const ms = target.getTime() - Date.now();
@@ -28,6 +29,7 @@ export default function Countdown({
   const target = new Date(`${startDate}T00:00:00`);
   // Stable placeholder until mount to avoid hydration mismatch.
   const [t, setT] = useState({ started: false, days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const { theme } = useTheme();
 
   useEffect(() => {
     setT(diff(target));
@@ -40,40 +42,46 @@ export default function Countdown({
     { 
       label: 'Days', 
       value: t.days, 
-      color: '#F472B6', 
+      color: 'var(--pink)', 
       glow: 'rgba(244, 114, 182, 0.25)',
-      gradient: 'linear-gradient(135deg, #FFFFFF 20%, #F472B6 100%)',
-      bg: 'rgba(244, 114, 182, 0.04)',
-      border: 'rgba(244, 114, 182, 0.2)'
+      gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--pink) 100%)',
+      bg: 'color-mix(in srgb, var(--pink) 6%, transparent)',
+      hoverBg: 'color-mix(in srgb, var(--pink) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--pink) 25%, transparent)'
     },
     { 
       label: 'Hours', 
       value: t.hours, 
-      color: '#A78BFA', 
+      color: 'var(--indigo)', 
       glow: 'rgba(167, 139, 250, 0.25)',
-      gradient: 'linear-gradient(135deg, #FFFFFF 20%, #A78BFA 100%)',
-      bg: 'rgba(167, 139, 250, 0.04)',
-      border: 'rgba(167, 139, 250, 0.2)'
+      gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--indigo) 100%)',
+      bg: 'color-mix(in srgb, var(--indigo) 6%, transparent)',
+      hoverBg: 'color-mix(in srgb, var(--indigo) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--indigo) 25%, transparent)'
     },
     { 
       label: 'Mins', 
       value: t.minutes, 
-      color: '#22D3EE', 
+      color: 'var(--cyan)', 
       glow: 'rgba(34, 211, 238, 0.25)',
-      gradient: 'linear-gradient(135deg, #FFFFFF 20%, #22D3EE 100%)',
-      bg: 'rgba(34, 211, 238, 0.04)',
-      border: 'rgba(34, 211, 238, 0.2)'
+      gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--cyan) 100%)',
+      bg: 'color-mix(in srgb, var(--cyan) 6%, transparent)',
+      hoverBg: 'color-mix(in srgb, var(--cyan) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--cyan) 25%, transparent)'
     },
     { 
       label: 'Secs', 
       value: t.seconds, 
-      color: '#FCA5A5', 
+      color: 'var(--warm)', 
       glow: 'rgba(252, 165, 165, 0.25)',
-      gradient: 'linear-gradient(135deg, #FFFFFF 20%, #FCA5A5 100%)',
-      bg: 'rgba(252, 165, 165, 0.04)',
-      border: 'rgba(252, 165, 165, 0.2)'
+      gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--warm) 100%)',
+      bg: 'color-mix(in srgb, var(--warm) 6%, transparent)',
+      hoverBg: 'color-mix(in srgb, var(--warm) 12%, transparent)',
+      border: 'color-mix(in srgb, var(--warm) 25%, transparent)'
     },
   ];
+
+  const isDark = theme === 'dark';
 
   return (
     <div
@@ -87,7 +95,7 @@ export default function Countdown({
         flexDirection: 'column',
         justifyContent: 'space-between',
         gap: 14,
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+        boxShadow: isDark ? '0 4px 20px rgba(0, 0, 0, 0.25)' : 'var(--shadow-md)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -99,14 +107,14 @@ export default function Countdown({
           top: 0,
           left: 0,
           right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, #F472B6, #A78BFA, #22D3EE, #FCA5A5)',
+          height: '2.5px',
+          background: 'linear-gradient(90deg, var(--pink), var(--accent-light), var(--cyan), var(--warm))',
         }}
       />
 
       <div>
         <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: 14.5, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-          <Plane size={15} style={{ color: 'var(--accent-light)', transform: 'rotate(45deg)' }} /> {tripName}
+          <Plane size={15} style={{ color: 'var(--accent-primary)', transform: 'rotate(45deg)' }} /> {tripName}
         </p>
         <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
           <CalendarDays size={13} style={{ color: 'var(--text-muted)' }} />
@@ -115,7 +123,7 @@ export default function Countdown({
       </div>
 
       {t.started ? (
-        <p style={{ margin: '8px 0', fontSize: 14.5, fontWeight: 700, color: 'var(--accent-light)', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Outfit', sans-serif" }}>
+        <p style={{ margin: '8px 0', fontSize: 14.5, fontWeight: 700, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 6, fontFamily: "'Outfit', sans-serif" }}>
           The adventure has begun 🏔️
         </p>
       ) : (
@@ -134,13 +142,13 @@ export default function Countdown({
                 borderRadius: '12px',
                 background: u.bg,
                 border: `1px solid ${u.border}`,
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
+                boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(124, 58, 237, 0.04)',
                 transition: 'border-color 0.2s ease, background 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease',
                 cursor: 'default',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = u.color;
-                e.currentTarget.style.background = u.bg.replace('0.04', '0.09');
+                e.currentTarget.style.background = u.hoverBg;
                 e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
                 e.currentTarget.style.boxShadow = `0 4px 14px ${u.glow}`;
               }}
@@ -148,7 +156,7 @@ export default function Countdown({
                 e.currentTarget.style.borderColor = u.border;
                 e.currentTarget.style.background = u.bg;
                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.12)';
+                e.currentTarget.style.boxShadow = isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(124, 58, 237, 0.04)';
               }}
             >
               <span
@@ -157,10 +165,12 @@ export default function Countdown({
                   fontWeight: 850,
                   fontVariantNumeric: 'tabular-nums',
                   fontFamily: "'Outfit', sans-serif",
-                  background: u.gradient,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
+                  background: isDark ? u.gradient : 'none',
+                  WebkitBackgroundClip: isDark ? 'text' : 'unset',
+                  WebkitTextFillColor: isDark ? 'transparent' : 'unset',
+                  color: isDark ? undefined : u.color,
                   lineHeight: 1.1,
+                  display: 'inline-block',
                 }}
               >
                 {String(u.value).padStart(2, '0')}
