@@ -125,25 +125,27 @@ export default function ExpenseDetailModal({
           )}
         </div>
 
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: 8, paddingTop: 4, flexWrap: 'wrap' }}>
+        {/* Actions — settle gets a full-width primary row, Edit/Delete split evenly below. */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
           {canSettle && (
             <Button
-              variant="secondary"
+              variant={e.settled ? 'secondary' : 'primary'}
+              fullWidth
               loading={busy}
-              icon={e.settled ? <CheckCircle2 size={15} color="#34D399" /> : <Circle size={15} />}
+              icon={e.settled ? <CheckCircle2 size={15} /> : <Circle size={15} />}
               onClick={handleToggle}
-              className="flex-1"
             >
               {e.settled ? 'Mark as pending' : 'Mark as paid'}
             </Button>
           )}
-          <Button variant="secondary" icon={<Pencil size={15} />} onClick={() => onEdit(e)} className="flex-1">
-            Edit
-          </Button>
-          <Button variant="danger" icon={<Trash2 size={15} />} onClick={() => onDelete(e)} className="flex-1">
-            Delete
-          </Button>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <Button variant="secondary" fullWidth icon={<Pencil size={15} />} onClick={() => onEdit(e)}>
+              Edit
+            </Button>
+            <Button variant="danger" fullWidth icon={<Trash2 size={15} />} onClick={() => onDelete(e)}>
+              Delete
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>
