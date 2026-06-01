@@ -6,14 +6,8 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import CategoryBadge from '@/components/trip/CategoryBadge';
 import { formatDate, formatINR } from '@/lib/trip/format';
+import { expensePayers, expenseShares } from '@/lib/trip/settlement';
 import type { TripExpense, Trip } from '@/lib/trip/types';
-
-// What each non-payer owes for this expense (their share).
-function nonPayerShares(e: TripExpense, travelers: string[]): Array<{ name: string; amount: number }> {
-  const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : travelers;
-  const per = Number(e.amount) / (sharers.length || 1);
-  return sharers.filter((s) => s !== e.paid_by).map((name) => ({ name, amount: per }));
-}
 
 // Short label describing a non-default split (returns null when split among all).
 function splitLabel(e: TripExpense, travelers: string[]): string | null {
@@ -21,6 +15,14 @@ function splitLabel(e: TripExpense, travelers: string[]): string | null {
   if (sharers.length >= travelers.length) return null; // everyone — the default
   if (sharers.length === 1) return sharers[0] === e.paid_by ? 'Personal' : `For ${sharers[0]}`;
   return `Split: ${sharers.join(', ')}`;
+}
+
+// "Mohan" for a single payer, "Mohan ₹600 · Charles ₹486" when several paid.
+function paidByLabel(e: TripExpense): string {
+  const payers = expensePayers(e);
+  const names = Object.keys(payers);
+  if (names.length <= 1) return e.paid_by;
+  return names.map((n) => `${n} ${formatINR(payers[n])}`).join(' · ');
 }
 
 const rowLabel: React.CSSProperties = {
@@ -56,7 +58,7 @@ export default function ExpenseDetailModal({
   if (!expense) return <Modal isOpen={false} onClose={onClose} title="" size="md" children={null} />;
 
   const e = expense;
-  const shares = nonPayerShares(e, trip.travelers);
+  const shares = expenseShares(e, trip.travelers);
   const split = splitLabel(e, trip.travelers);
   const canSettle = shares.length > 0 || e.settled;
 
@@ -93,7 +95,7 @@ export default function ExpenseDetailModal({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 4, borderTop: '1px solid var(--border-subtle)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, paddingTop: 12 }}>
             <span style={rowLabel}>Paid by</span>
-            <span style={rowValue}>{e.paid_by}</span>
+            <span style={rowValue}>{paidByLabel(e)}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <span style={rowLabel}>Date</span>

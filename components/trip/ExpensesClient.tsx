@@ -24,7 +24,7 @@ import Modal from '@/components/ui/Modal';
 import { Select, Field } from '@/components/trip/fields';
 import { tripMutate } from '@/lib/trip/client';
 import { exportExpensesToExcel, exportExpensesToPDF } from '@/lib/trip/export';
-import { computeSettlement } from '@/lib/trip/settlement';
+import { computeSettlement, expensePayers, expenseShares } from '@/lib/trip/settlement';
 import { formatDate, formatINR } from '@/lib/trip/format';
 import { useTripRealtime } from '@/lib/trip/useTripRealtime';
 import { EXPENSE_CATEGORIES, type TripExpense, type Trip, type TripSettlement } from '@/lib/trip/types';
@@ -73,7 +73,7 @@ export default function ExpensesClient({
     const q = query.trim().toLowerCase();
     const rows = expenses.filter((e) => {
       if (category !== 'all' && e.category !== category) return false;
-      if (person !== 'all' && e.paid_by !== person) return false;
+      if (person !== 'all' && !(person in expensePayers(e))) return false;
       if (q && !`${e.item} ${e.category} ${e.notes ?? ''}`.toLowerCase().includes(q)) return false;
       return true;
     });
@@ -122,13 +122,6 @@ export default function ExpensesClient({
     }
   }
 
-  // What each non-payer owes for this expense (their share).
-  function nonPayerShares(e: TripExpense): Array<{ name: string; amount: number }> {
-    const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : trip.travelers;
-    const per = Number(e.amount) / (sharers.length || 1);
-    return sharers.filter((s) => s !== e.paid_by).map((name) => ({ name, amount: per }));
-  }
-
   async function toggleSettled(e: TripExpense) {
     const res = await tripMutate('PATCH', `expenses/${e.id}`, { settled: !e.settled });
     if (res.ok) {
@@ -141,10 +134,16 @@ export default function ExpensesClient({
     }
   }
 
+  // "Mohan" for one payer, "Mohan +1" when several chipped in.
+  function payerLabel(e: TripExpense): string {
+    const names = Object.keys(expensePayers(e));
+    return names.length <= 1 ? e.paid_by : `${e.paid_by} +${names.length - 1}`;
+  }
+
   // Quiet inline status: { text, settled } or null when there's nothing pending.
   function settleStatus(e: TripExpense): { text: string; settled: boolean } | null {
     if (e.settled) return { text: 'Settled', settled: true };
-    const shares = nonPayerShares(e);
+    const shares = expenseShares(e, trip.travelers);
     if (shares.length === 0) return null; // personal — nothing owed
     return { text: `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`, settled: false };
   }
@@ -360,7 +359,7 @@ export default function ExpensesClient({
                         <CategoryBadge category={e.category} />
                       </td>
                       <td style={{ padding: cellPad, color: 'var(--text-secondary)' }}>
-                        {e.paid_by}
+                        {payerLabel(e)}
                         {splitLabel(e) && (
                           <span style={{ display: 'block', fontSize: 11.5, color: 'var(--text-muted)' }}>{splitLabel(e)}</span>
                         )}
@@ -434,7 +433,7 @@ export default function ExpensesClient({
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <CategoryBadge category={e.category} />
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
-                      <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--text-secondary)' }}>{e.paid_by}</span>
+                      <span style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--text-secondary)' }}>{payerLabel(e)}</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
                       <span style={{ fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatDate(e.expense_date)}</span>
                       {splitLabel(e) && (

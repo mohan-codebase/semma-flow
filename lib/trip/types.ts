@@ -50,6 +50,8 @@ export interface TripExpense {
   item: string;
   amount: number;
   paid_by: Traveler;
+  // When >1 person paid, how much each paid (sums to `amount`). null = single payer (`paid_by`).
+  paid_by_amounts: Record<string, number> | null;
   // Travelers who share this expense's cost. null/empty = split among everyone.
   split_between: string[] | null;
   // Whether this expense's debt has been reimbursed (drops out of the pending balance).

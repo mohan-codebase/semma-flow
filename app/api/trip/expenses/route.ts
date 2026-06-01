@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       item: v.item,
       amount: v.amount,
       paid_by: v.paid_by,
+      paid_by_amounts: v.paid_by_amounts ?? null,
       split_between: v.split_between && v.split_between.length > 0 ? v.split_between : null,
       source_url: v.source_url || null,
       notes: v.notes || null,

@@ -19,6 +19,7 @@ import { BarChart2 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import EmptyState from '@/components/ui/EmptyState';
 import { formatINR } from '@/lib/trip/format';
+import { expensePayers } from '@/lib/trip/settlement';
 import { useTripRealtime } from '@/lib/trip/useTripRealtime';
 import { EXPENSE_CATEGORIES, type TripExpense } from '@/lib/trip/types';
 
@@ -162,7 +163,9 @@ export default function AnalyticsCharts({
     const map = new Map<string, number>();
     travelers.forEach((t) => map.set(t, 0));
     expenses.forEach((e) => {
-      map.set(e.paid_by, (map.get(e.paid_by) ?? 0) + Number(e.amount));
+      for (const [name, paid] of Object.entries(expensePayers(e))) {
+        map.set(name, (map.get(name) ?? 0) + paid);
+      }
     });
     return [...map.entries()]
       .map(([name, value]) => ({ name, value }));

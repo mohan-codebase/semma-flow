@@ -5,13 +5,22 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import type { TripExpense, Settlement } from '@/lib/trip/types';
 import { formatDate } from '@/lib/trip/format';
+import { expensePayers } from '@/lib/trip/settlement';
+
+// "Mohan" for one payer, "Mohan (600), Charles (486)" when several paid.
+const paidByText = (e: TripExpense): string => {
+  const payers = expensePayers(e);
+  const names = Object.keys(payers);
+  if (names.length <= 1) return e.paid_by;
+  return names.map((n) => `${n} (${Number(payers[n]).toLocaleString('en-IN')})`).join(', ');
+};
 
 const ROWS = (expenses: TripExpense[]) =>
   expenses.map((e) => ({
     Date: formatDate(e.expense_date),
     Category: e.category,
     Item: e.item,
-    'Paid By': e.paid_by,
+    'Paid By': paidByText(e),
     'Amount (INR)': Number(e.amount),
     Notes: e.notes ?? '',
     Source: e.source_url ?? '',
@@ -43,7 +52,7 @@ export function exportExpensesToPDF(expenses: TripExpense[], settlement: Settlem
       formatDate(e.expense_date),
       e.category,
       e.item,
-      e.paid_by,
+      paidByText(e),
       Number(e.amount).toLocaleString('en-IN'),
     ]),
     styles: { fontSize: 9 },

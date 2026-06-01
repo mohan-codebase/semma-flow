@@ -1,5 +1,40 @@
 import type { TripExpense, Settlement } from '@/lib/trip/types';
 
+// Who paid what for an expense. Falls back to the single `paid_by` when no
+// per-payer breakdown is recorded, so callers never branch on the null case.
+export function expensePayers(
+  e: Pick<TripExpense, 'paid_by' | 'amount' | 'paid_by_amounts'>,
+): Record<string, number> {
+  const m = e.paid_by_amounts;
+  return m && Object.keys(m).length > 0 ? m : { [e.paid_by]: Number(e.amount) };
+}
+
+// Net per-person position on a single expense: amount paid − share owed.
+// Positive = the trip owes them; negative = they owe the trip.
+function expenseNet(e: TripExpense, travelers: string[]): Record<string, number> {
+  const net: Record<string, number> = {};
+  const payers = expensePayers(e);
+  for (const [name, paid] of Object.entries(payers)) net[name] = (net[name] ?? 0) + paid;
+
+  const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : travelers;
+  if (sharers.length > 0) {
+    const per = Number(e.amount) / sharers.length;
+    for (const name of sharers) net[name] = (net[name] ?? 0) - per;
+  }
+  return net;
+}
+
+// People who still owe money on this expense (negative net), with the amount.
+// Drives the inline "… pending" status and the detail modal's status row.
+export function expenseShares(
+  e: TripExpense,
+  travelers: string[],
+): Array<{ name: string; amount: number }> {
+  return Object.entries(expenseNet(e, travelers))
+    .filter(([, n]) => n < -0.01)
+    .map(([name, n]) => ({ name, amount: -n }));
+}
+
 /**
  * Auto-settlement between N travelers, honouring per-expense splits.
  *
@@ -42,10 +77,12 @@ export function computeSettlement(
   expenses.forEach((e) => {
     const amount = Number(e.amount);
 
-    // Who paid.
-    ensure(e.paid_by);
-    payments[e.paid_by] += amount;
-    if (!e.settled) pendingPaid[e.paid_by] += amount;
+    // Who paid — one or several travelers, each credited their share.
+    for (const [name, paid] of Object.entries(expensePayers(e))) {
+      ensure(name);
+      payments[name] += paid;
+      if (!e.settled) pendingPaid[name] += paid;
+    }
 
     // Who shares it — the chosen subset, or everyone when unset/empty.
     const sharers = e.split_between && e.split_between.length > 0 ? e.split_between : travelers;

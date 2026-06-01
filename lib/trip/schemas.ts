@@ -38,10 +38,22 @@ export const expenseSchema = z.object({
   item: safeText(120, 1),
   amount: z.coerce.number().min(0, 'Amount must be >= 0'),
   paid_by: traveler,
+  // When >1 person paid: { name: amount } that must sum to `amount`. null/absent = single payer.
+  paid_by_amounts: z.record(traveler, z.coerce.number().min(0)).optional().nullable(),
   split_between: z.array(traveler).min(1, 'Pick at least one person to split with').optional(),
   source_url: z.string().trim().url('Must be a valid URL').optional().or(z.literal('')),
   notes: safeText(500).optional().or(z.literal('')),
   expense_date: z.string().min(1, 'Date is required'),
+}).superRefine((v, ctx) => {
+  const m = v.paid_by_amounts;
+  if (!m || Object.keys(m).length < 2) return;
+  const sum = Object.values(m).reduce((s, n) => s + n, 0);
+  if (Math.abs(sum - v.amount) > 0.01) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['paid_by_amounts'], message: 'Payer amounts must add up to the total' });
+  }
+  if (!(v.paid_by in m)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['paid_by'], message: 'Payer must be one of the people who paid' });
+  }
 });
 export type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
