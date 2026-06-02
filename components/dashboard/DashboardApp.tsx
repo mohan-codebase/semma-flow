@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckSquare, Compass, User, LogOut, Sun, Moon, ArrowRight, Lock, Unlock, Eye, EyeOff } from 'lucide-react';
+import { CheckSquare, Compass, User, LogOut, Sun, Moon, ArrowRight, Lock, Unlock, Eye, EyeOff, ScanFace } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FitnessSummary from '@/components/dashboard/FitnessSummary';
 import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
@@ -50,6 +50,40 @@ export default function DashboardApp({
   const [confirmPasscode, setConfirmPasscode] = useState('');
   const [passcodeError, setPasscodeError] = useState<string | null>(null);
   const [showPasscodeText, setShowPasscodeText] = useState(false);
+  // True while the server passcode lookup is in flight (used to gate the
+  // habits button so we never show "create" before the server answers).
+  const [passcodeChecking, setPasscodeChecking] = useState(false);
+  // Lock status from the server (never the code itself).
+  const [hasPasscode, setHasPasscode] = useState(false);
+  const [hasBiometric, setHasBiometric] = useState(false);
+  // Whether this device exposes a platform authenticator (Face ID / Touch ID).
+  const [biometricSupported, setBiometricSupported] = useState(false);
+  // True while a WebAuthn ceremony (enroll / unlock) is running.
+  const [biometricBusy, setBiometricBusy] = useState(false);
+
+  // Ask the server for lock status — { hasPasscode, hasBiometric } — and mirror
+  // it into state. The code itself never leaves the server; verification is
+  // done via POST /api/passcode/verify. `ok` is false when the server is
+  // unreachable so callers can avoid bypassing the lock while offline.
+  type LockStatus = { ok: boolean; hasPasscode: boolean; hasBiometric: boolean };
+  const fetchLockStatus = async (): Promise<LockStatus> => {
+    try {
+      const res = await fetch('/api/passcode');
+      const json = await res.json();
+      if (res.ok && json?.data) {
+        const next = {
+          hasPasscode: Boolean(json.data.hasPasscode),
+          hasBiometric: Boolean(json.data.hasBiometric),
+        };
+        setHasPasscode(next.hasPasscode);
+        setHasBiometric(next.hasBiometric);
+        return { ok: true, ...next };
+      }
+    } catch {
+      // unreachable — treat as unknown
+    }
+    return { ok: false, hasPasscode: false, hasBiometric: false };
+  };
 
   const formattedName = displayName
     .split(' ')
@@ -61,24 +95,46 @@ export default function DashboardApp({
     const theme = localStorage.getItem('semma_flow_theme') || 'dark';
     setIsDark(theme === 'dark');
 
-    const savedActive = localStorage.getItem('semma_flow_active_app');
-    const passcodeSaved = localStorage.getItem('semma_flow_habits_passcode');
-
-    if (savedActive === 'habits') {
-      if (passcodeSaved) {
-        setActiveApp(null);
-        setShowLockScreen(true);
-        setLockScreenMode('unlock');
-      } else {
-        setActiveApp('habits');
-      }
+    // Does this device have a platform authenticator (Face ID / Touch ID)?
+    if (typeof window !== 'undefined' && window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable) {
+      window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+        .then(setBiometricSupported)
+        .catch(() => setBiometricSupported(false));
     }
+
+    const savedActive = localStorage.getItem('semma_flow_active_app');
+
+    // Resolve lock status from the server so a fresh login/device unlocks with
+    // the existing passcode instead of creating a new one.
+    (async () => {
+      const status = await fetchLockStatus();
+      if (savedActive === 'habits') {
+        if (!status.ok) return; // offline — stay on the hub rather than guess
+        if (status.hasPasscode) {
+          setActiveApp(null);
+          setShowLockScreen(true);
+          setLockScreenMode('unlock');
+        } else {
+          setActiveApp('habits');
+        }
+      }
+    })();
   }, []);
 
-  const handleSelectApp = (app: 'habits' | 'trip') => {
+  const handleSelectApp = async (app: 'habits' | 'trip') => {
     if (app === 'habits') {
-      const passcodeSaved = localStorage.getItem('semma_flow_habits_passcode');
-      if (passcodeSaved) {
+      // Always check the server so a fresh login/device asks to UNLOCK with
+      // the existing passcode rather than creating a new one.
+      setPasscodeChecking(true);
+      const status = await fetchLockStatus();
+      setPasscodeChecking(false);
+      if (!status.ok) {
+        alert('Could not reach the server. Check your connection and try again.');
+        return;
+      }
+      setPasscode('');
+      setPasscodeError(null);
+      if (status.hasPasscode) {
         setLockScreenMode('unlock');
         setShowLockScreen(true);
       } else {
@@ -90,7 +146,7 @@ export default function DashboardApp({
     }
   };
 
-  const handleVerifyPasscode = () => {
+  const handleVerifyPasscode = async () => {
     if (lockScreenMode === 'create') {
       if (!passcode.trim()) {
         setPasscodeError('Passcode cannot be empty.');
@@ -100,7 +156,23 @@ export default function DashboardApp({
         setPasscodeError('Passcodes do not match.');
         return;
       }
-      localStorage.setItem('semma_flow_habits_passcode', passcode);
+      // Persist to the server (stored as a salted hash) so the lock works
+      // across devices.
+      try {
+        const res = await fetch('/api/passcode', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passcode }),
+        });
+        if (!res.ok) {
+          setPasscodeError('Could not save passcode. Please try again.');
+          return;
+        }
+      } catch {
+        setPasscodeError('Could not save passcode. Check your connection.');
+        return;
+      }
+      setHasPasscode(true);
       localStorage.setItem('semma_flow_active_app', 'habits');
       setActiveApp('habits');
       setShowLockScreen(false);
@@ -108,15 +180,27 @@ export default function DashboardApp({
       setConfirmPasscode('');
       setPasscodeError(null);
     } else {
-      const savedPasscode = localStorage.getItem('semma_flow_habits_passcode');
-      if (passcode === savedPasscode) {
-        localStorage.setItem('semma_flow_active_app', 'habits');
-        setActiveApp('habits');
-        setShowLockScreen(false);
-        setPasscode('');
-        setPasscodeError(null);
-      } else {
-        setPasscodeError('Incorrect passcode. Please try again.');
+      // Verify against the server-side hash — the code is never stored locally.
+      try {
+        const res = await fetch('/api/passcode/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ passcode }),
+        });
+        const json = await res.json();
+        if (res.ok && json?.data?.verified) {
+          localStorage.setItem('semma_flow_active_app', 'habits');
+          setActiveApp('habits');
+          setShowLockScreen(false);
+          setPasscode('');
+          setPasscodeError(null);
+        } else if (res.ok) {
+          setPasscodeError('Incorrect passcode. Please try again.');
+        } else {
+          setPasscodeError('Could not verify passcode. Please try again.');
+        }
+      } catch {
+        setPasscodeError('Could not verify passcode. Check your connection.');
       }
     }
   };
@@ -127,9 +211,8 @@ export default function DashboardApp({
     setShowLockScreen(false);
   };
 
-  const handleResetPasscode = () => {
-    const savedPasscode = localStorage.getItem('semma_flow_habits_passcode');
-    if (!savedPasscode) {
+  const handleResetPasscode = async () => {
+    if (!hasPasscode) {
       alert('No passcode is currently set.');
       return;
     }
@@ -137,15 +220,128 @@ export default function DashboardApp({
     const input = prompt('Enter your current passcode to confirm reset:');
     if (input === null) return; // cancelled
 
-    if (input === savedPasscode) {
-      localStorage.removeItem('semma_flow_habits_passcode');
-      localStorage.removeItem('semma_flow_active_app');
-      setActiveApp(null);
-      setShowLockScreen(false);
+    try {
+      // Confirm the current passcode server-side before removing anything.
+      const verifyRes = await fetch('/api/passcode/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ passcode: input }),
+      });
+      const verifyJson = await verifyRes.json();
+      if (!verifyRes.ok || !verifyJson?.data?.verified) {
+        alert('Incorrect passcode. Reset failed.');
+        return;
+      }
+
+      // Removes the passcode and any biometric credentials server-side.
+      const res = await fetch('/api/passcode', { method: 'DELETE' });
+      if (!res.ok) {
+        alert('Could not remove the lock. Please try again.');
+        return;
+      }
+    } catch {
+      alert('Could not remove the lock. Check your connection.');
+      return;
+    }
+
+    localStorage.removeItem('semma_flow_active_app');
+    setHasPasscode(false);
+    setHasBiometric(false);
+    setActiveApp(null);
+    setShowLockScreen(false);
+    setMenuOpen(false);
+    alert('Habit lock has been successfully removed.');
+  };
+
+  // Enroll this device's Face ID / Touch ID as a habit-lock unlock method.
+  const handleEnrollBiometric = async () => {
+    setBiometricBusy(true);
+    try {
+      const optRes = await fetch('/api/passcode/webauthn/register');
+      const optJson = await optRes.json();
+      if (!optRes.ok || !optJson?.data) {
+        alert(optJson?.error || 'Could not start biometric setup.');
+        return;
+      }
+      const { startRegistration } = await import('@simplewebauthn/browser');
+      const response = await startRegistration({ optionsJSON: optJson.data });
+      const verRes = await fetch('/api/passcode/webauthn/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response }),
+      });
+      const verJson = await verRes.json();
+      if (verRes.ok && verJson?.data?.verified) {
+        setHasBiometric(true);
+        setMenuOpen(false);
+        alert('Face ID / Touch ID unlock is now enabled.');
+      } else {
+        alert(verJson?.error || 'Could not enable biometric unlock.');
+      }
+    } catch (e) {
+      // NotAllowedError = user dismissed the OS prompt; stay quiet.
+      if ((e as Error)?.name !== 'NotAllowedError') {
+        alert('Biometric setup was cancelled or is unavailable on this device.');
+      }
+    } finally {
+      setBiometricBusy(false);
+    }
+  };
+
+  // Unlock the habits app with Face ID / Touch ID.
+  const handleBiometricUnlock = async () => {
+    setBiometricBusy(true);
+    setPasscodeError(null);
+    try {
+      const optRes = await fetch('/api/passcode/webauthn/authenticate');
+      const optJson = await optRes.json();
+      if (!optRes.ok || !optJson?.data) {
+        setPasscodeError('Biometric unavailable. Enter your passcode.');
+        return;
+      }
+      const { startAuthentication } = await import('@simplewebauthn/browser');
+      const response = await startAuthentication({ optionsJSON: optJson.data });
+      const verRes = await fetch('/api/passcode/webauthn/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response }),
+      });
+      const verJson = await verRes.json();
+      if (verRes.ok && verJson?.data?.verified) {
+        localStorage.setItem('semma_flow_active_app', 'habits');
+        setActiveApp('habits');
+        setShowLockScreen(false);
+        setPasscode('');
+        setPasscodeError(null);
+      } else {
+        setPasscodeError('Face ID failed. Try your passcode.');
+      }
+    } catch (e) {
+      if ((e as Error)?.name !== 'NotAllowedError') {
+        setPasscodeError('Face ID failed. Try your passcode.');
+      }
+    } finally {
+      setBiometricBusy(false);
+    }
+  };
+
+  // Remove this account's biometric credentials (passcode stays).
+  const handleDisableBiometric = async () => {
+    if (!confirm('Disable Face ID / Touch ID unlock? Your passcode will still work.')) return;
+    setBiometricBusy(true);
+    try {
+      const res = await fetch('/api/passcode/webauthn/register', { method: 'DELETE' });
+      if (!res.ok) {
+        alert('Could not disable biometric unlock. Please try again.');
+        return;
+      }
+      setHasBiometric(false);
       setMenuOpen(false);
-      alert('Habit lock has been successfully removed.');
-    } else {
-      alert('Incorrect passcode. Reset failed.');
+      alert('Biometric unlock disabled.');
+    } catch {
+      alert('Could not disable biometric unlock. Check your connection.');
+    } finally {
+      setBiometricBusy(false);
     }
   };
 
@@ -251,6 +447,39 @@ export default function DashboardApp({
             }}
             style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
           >
+            {lockScreenMode === 'unlock' && hasBiometric && biometricSupported && (
+              <>
+                <button
+                  type="button"
+                  disabled={biometricBusy}
+                  onClick={handleBiometricUnlock}
+                  style={{
+                    width: '100%',
+                    padding: '13px 0',
+                    borderRadius: 14,
+                    border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, var(--border-default))',
+                    background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                    color: 'var(--accent-primary)',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: biometricBusy ? 'wait' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <ScanFace size={18} />
+                  {biometricBusy ? 'Waiting…' : 'Unlock with Face ID'}
+                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>or enter passcode</span>
+                  <span style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
+                </div>
+              </>
+            )}
             <div style={{ position: 'relative', width: '100%' }}>
               <input
                 autoFocus
@@ -502,6 +731,57 @@ export default function DashboardApp({
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT_DARK }}>{formattedName}</p>
                   <p style={{ margin: '2px 0 0', fontSize: 12, color: TEXT_MUTED, overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</p>
                 </div>
+                {hasBiometric ? (
+                  <button
+                    onClick={handleDisableBiometric}
+                    disabled={biometricBusy}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1px solid var(--border-default)',
+                      background: 'var(--bg-tertiary)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: biometricBusy ? 'wait' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      marginBottom: 10,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <ScanFace size={14} />
+                    Disable Face ID
+                  </button>
+                ) : hasPasscode && biometricSupported ? (
+                  <button
+                    onClick={handleEnrollBiometric}
+                    disabled={biometricBusy}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, var(--border-default))',
+                      background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
+                      color: 'var(--accent-primary)',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: biometricBusy ? 'wait' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      marginBottom: 10,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    <ScanFace size={14} />
+                    {biometricBusy ? 'Setting up…' : 'Enable Face ID'}
+                  </button>
+                ) : null}
                 <button
                   onClick={handleResetPasscode}
                   style={{
@@ -565,13 +845,14 @@ export default function DashboardApp({
           <motion.div
             whileHover={{ y: -4, scale: 1.01 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            onClick={() => handleSelectApp('habits')}
+            onClick={() => { if (!passcodeChecking) handleSelectApp('habits'); }}
             style={{
               background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent-primary) 12%, transparent) 0%, var(--bg-card) 100%)',
               border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-default))',
               borderRadius: 24,
               padding: 28,
-              cursor: 'pointer',
+              cursor: passcodeChecking ? 'wait' : 'pointer',
+              opacity: passcodeChecking ? 0.7 : 1,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
