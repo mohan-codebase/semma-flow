@@ -24,7 +24,7 @@ const paddingMap: Record<PaddingSize, string> = {
 };
 
 const toneGlow: Record<Tone, string> = {
-  neutral: 'rgba(0,0,0,0.0)',
+  neutral: 'rgba(0, 0, 0,0.0)',
   mint:    'var(--accent-glow)',
   indigo:  'var(--indigo-glow)',
   pink:    'var(--pink-glow)',

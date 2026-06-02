@@ -23,10 +23,10 @@ import { expensePayers } from '@/lib/trip/settlement';
 import { useTripRealtime } from '@/lib/trip/useTripRealtime';
 import { EXPENSE_CATEGORIES, type TripExpense } from '@/lib/trip/types';
 
-const COLORS = ['#A78BFA', '#67E8F9', '#F472B6', '#FCA5A5', '#FBBF24', '#34D399'];
+const COLORS = ['#999999', '#cecece', '#929292', '#b7b7b7', '#c1c1c1', '#adadad'];
 const TABLES = ['trip_expenses'];
 // Brand purple — literal hex (CSS vars don't resolve in SVG stroke/fill attrs).
-const WEEKLY_ACCENT = '#7C3AED';
+const WEEKLY_ACCENT = '#555555';
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 // Short money labels for the Y axis / avg pill, e.g. ₹1.2k, ₹12k.
@@ -277,7 +277,7 @@ export default function AnalyticsCharts({
           <BarChart data={byCategory} margin={{ left: -16, right: 8 }}>
             <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} interval={0} angle={-30} textAnchor="end" height={60} stroke="var(--border-default)" />
             <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} stroke="var(--border-default)" />
-            <Tooltip content={<TooltipContent />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
+            <Tooltip content={<TooltipContent />} cursor={{ fill: 'rgba(255, 255, 255,0.04)' }} />
             <Bar dataKey="value" radius={[6, 6, 0, 0]}>
               {byCategory.map((_, i) => (
                 <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -310,14 +310,14 @@ export default function AnalyticsCharts({
             <AreaChart data={monthly} margin={{ left: -16, right: 8 }}>
               <defs>
                 <linearGradient id="tripTrend" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#A78BFA" stopOpacity={0.45} />
-                  <stop offset="100%" stopColor="#A78BFA" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#999999" stopOpacity={0.45} />
+                  <stop offset="100%" stopColor="#999999" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} stroke="var(--border-default)" />
               <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} stroke="var(--border-default)" />
               <Tooltip content={<TooltipContent />} cursor={{ stroke: 'var(--border-default)' }} />
-              <Area type="monotone" dataKey="value" stroke="#A78BFA" strokeWidth={2} fill="url(#tripTrend)" />
+              <Area type="monotone" dataKey="value" stroke="#999999" strokeWidth={2} fill="url(#tripTrend)" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>

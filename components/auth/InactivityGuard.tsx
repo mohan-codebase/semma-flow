@@ -12,7 +12,7 @@ interface Props {
   warningMs?: number;
 }
 
-const PURPLE = '#7C3AED';
+const PURPLE = '#555555';
 
 /**
  * Signs the user out after a period of inactivity, showing a countdown
@@ -49,7 +49,7 @@ export default function InactivityGuard({ timeoutMs, warningMs }: Props) {
           style={{
             position: 'fixed', inset: 0, zIndex: 1000,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 20, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+            padding: 20, background: 'rgba(0, 0, 0,0.55)', backdropFilter: 'blur(4px)',
           }}
         >
           <motion.div
@@ -62,7 +62,7 @@ export default function InactivityGuard({ timeoutMs, warningMs }: Props) {
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 20, padding: 24, textAlign: 'center',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
+              boxShadow: '0 20px 60px rgba(0, 0, 0,0.35)',
             }}
           >
             <div style={{

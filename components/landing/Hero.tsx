@@ -58,12 +58,12 @@ function MiniHabitCard({
         padding: '12px 14px',
         background: done
           ? `linear-gradient(135deg, ${color}20 0%, ${color}0A 100%)`
-          : 'linear-gradient(155deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)',
+          : 'linear-gradient(155deg, rgba(255, 255, 255,0.07) 0%, rgba(255, 255, 255,0.03) 100%)',
         backdropFilter: 'blur(20px) saturate(160%)',
         WebkitBackdropFilter: 'blur(20px) saturate(160%)',
         boxShadow: done
-          ? `0 4px 16px ${color}25, inset 0 1px 0 rgba(255,255,255,0.12), 0 0 0 1px ${color}30`
-          : '0 2px 12px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(255,255,255,0.07)',
+          ? `0 4px 16px ${color}25, inset 0 1px 0 rgba(255, 255, 255,0.12), 0 0 0 1px ${color}30`
+          : '0 2px 12px rgba(0, 0, 0,0.25), inset 0 1px 0 rgba(255, 255, 255,0.08), 0 0 0 1px rgba(255, 255, 255,0.07)',
         borderRadius: 'var(--r-lg)',
         transition: 'all 0.2s ease',
       }}
@@ -115,10 +115,10 @@ function MiniHabitCard({
 /* ─── Dashboard preview panel ──────────────────────────────────────────── */
 function DashboardPreview() {
   const habits = [
-    { icon: '🧘', name: 'Morning Meditation', streak: 34, color: '#8B7FE8', done: true },
+    { icon: '🧘', name: 'Morning Meditation', streak: 34, color: '#8a8a8a', done: true },
     { icon: '🏃', name: 'Morning Run', streak: 12, color: 'var(--accent-primary)', done: true },
-    { icon: '📚', name: 'Read 30 mins', streak: 7, color: '#F4B740', done: false },
-    { icon: '💧', name: 'Drink 8 glasses', streak: 21, color: '#5BC7DA', done: true },
+    { icon: '📚', name: 'Read 30 mins', streak: 7, color: '#bbbbbb', done: false },
+    { icon: '💧', name: 'Drink 8 glasses', streak: 21, color: '#b1b1b1', done: true },
   ];
 
   return (
@@ -128,10 +128,10 @@ function DashboardPreview() {
       transition={{ delay: 0.5, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       style={{
         perspective: 1000,
-        background: 'linear-gradient(155deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.04) 100%)',
+        background: 'linear-gradient(155deg, rgba(255, 255, 255,0.09) 0%, rgba(255, 255, 255,0.04) 100%)',
         backdropFilter: 'blur(32px) saturate(180%)',
         WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-        boxShadow: '0 16px 48px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(255,255,255,0.09)',
+        boxShadow: '0 16px 48px rgba(0, 0, 0,0.50), inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(255, 255, 255,0.09)',
         borderRadius: 'var(--r-2xl)',
         padding: 20,
         maxWidth: 360,
@@ -142,7 +142,7 @@ function DashboardPreview() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div>
           <p style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono', monospace", letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
-            Today's Habits
+            Today&apos;s Habits
           </p>
           <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit'", margin: '2px 0 0' }}>
             3 of 4 done
@@ -197,10 +197,10 @@ function DashboardPreview() {
         style={{
           marginTop: 16,
           padding: '10px 14px',
-          background: 'linear-gradient(135deg, rgba(244,183,64,0.18) 0%, rgba(244,183,64,0.07) 100%)',
+          background: 'linear-gradient(135deg, rgba(187, 187, 187,0.18) 0%, rgba(187, 187, 187,0.07) 100%)',
           backdropFilter: 'blur(16px) saturate(160%)',
           WebkitBackdropFilter: 'blur(16px) saturate(160%)',
-          boxShadow: '0 4px 16px rgba(244,183,64,0.15), inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(244,183,64,0.25)',
+          boxShadow: '0 4px 16px rgba(187, 187, 187,0.15), inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(187, 187, 187,0.25)',
           borderRadius: 'var(--r-md)',
           display: 'flex',
           alignItems: 'center',
@@ -251,7 +251,7 @@ export default function Hero() {
         <div style={{
           position: 'absolute', bottom: '-10%', right: '-5%',
           width: '45%', height: '50%',
-          background: 'radial-gradient(ellipse, rgba(139,127,232,0.10) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(137, 137, 137,0.10) 0%, transparent 70%)',
           filter: 'blur(1px)',
         }} />
       </div>
@@ -397,10 +397,10 @@ export default function Hero() {
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 1,
             marginTop: 'clamp(48px, 8vw, 80px)',
-            background: 'rgba(255,255,255,0.04)',
+            background: 'rgba(255, 255, 255,0.04)',
             backdropFilter: 'blur(24px) saturate(160%)',
             WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.10), 0 0 0 1px rgba(255,255,255,0.07)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0,0.35), inset 0 1px 0 rgba(255, 255, 255,0.10), 0 0 0 1px rgba(255, 255, 255,0.07)',
             borderRadius: 'var(--r-xl)',
             overflow: 'hidden',
           }}
@@ -413,7 +413,7 @@ export default function Hero() {
           ].map(({ value, suffix, label }) => (
             <div key={label} style={{
               padding: 'clamp(20px, 3vw, 32px)',
-              background: 'linear-gradient(155deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)',
+              background: 'linear-gradient(155deg, rgba(255, 255, 255,0.06) 0%, rgba(255, 255, 255,0.02) 100%)',
               textAlign: 'center',
             }}>
               <p style={{

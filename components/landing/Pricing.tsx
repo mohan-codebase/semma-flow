@@ -78,7 +78,7 @@ const TIERS: PricingTier[] = [
     icon: <Trophy size={18} />,
     accent: 'var(--indigo)',
     glow: 'var(--indigo-glow)',
-    border: 'rgba(139,127,232,0.35)',
+    border: 'rgba(137, 137, 137,0.35)',
     features: [
       'Everything in Pro',
       'AI habit coach',

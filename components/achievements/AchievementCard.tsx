@@ -21,10 +21,10 @@ interface Props {
 }
 
 const RARITY_STYLES: Record<string, { border: string; glow: string; label: string }> = {
-  common:    { border: 'rgba(148,163,184,0.2)',   glow: 'rgba(148,163,184,0.05)', label: '#94A3B8' },
-  rare:      { border: 'rgba(59,130,246,0.3)',    glow: 'rgba(59,130,246,0.06)',  label: '#3B82F6' },
-  epic:      { border: 'rgba(139,92,246,0.35)',   glow: 'rgba(139,92,246,0.08)',  label: '#8B5CF6' },
-  legendary: { border: 'rgba(234,179,8,0.4)',     glow: 'rgba(234,179,8,0.1)',    label: '#EAB308' },
+  common:    { border: 'rgba(161, 161, 161,0.2)',   glow: 'rgba(161, 161, 161,0.05)', label: '#a0a0a0' },
+  rare:      { border: 'rgba(123, 123, 123,0.3)',    glow: 'rgba(123, 123, 123,0.06)',  label: '#7b7b7b' },
+  epic:      { border: 'rgba(113, 113, 113,0.35)',   glow: 'rgba(113, 113, 113,0.08)',  label: '#707070' },
+  legendary: { border: 'rgba(178, 178, 178,0.4)',     glow: 'rgba(178, 178, 178,0.1)',    label: '#b2b2b2' },
 };
 
 

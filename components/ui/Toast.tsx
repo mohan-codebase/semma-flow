@@ -67,9 +67,9 @@ const typeConfig: Record<
         <circle cx="8" cy="5" r="0.75" fill="currentColor" />
       </svg>
     ),
-    color: '#60A5FA',
-    bg: 'rgba(96,165,250,0.1)',
-    border: 'rgba(96,165,250,0.25)',
+    color: '#9c9c9c',
+    bg: 'rgba(150, 150, 150,0.1)',
+    border: 'rgba(150, 150, 150,0.25)',
   },
   warning: {
     icon: (
@@ -79,9 +79,9 @@ const typeConfig: Record<
         <circle cx="8" cy="11.5" r="0.75" fill="currentColor" />
       </svg>
     ),
-    color: '#F59E0B',
-    bg: 'rgba(245,158,11,0.1)',
-    border: 'rgba(245,158,11,0.25)',
+    color: '#a6a6a6',
+    bg: 'rgba(166, 166, 166,0.1)',
+    border: 'rgba(166, 166, 166,0.25)',
   },
 };
 

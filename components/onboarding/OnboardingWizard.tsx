@@ -33,38 +33,38 @@ const CATEGORIES = [
 
 const TEMPLATES: Record<string, Template[]> = {
   health:       [
-    { name: 'Drink 8 glasses of water', icon: 'glass-water',   color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Drink 8 glasses of water', icon: 'glass-water',   color: '#b1b1b1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
     { name: 'Take vitamins',             icon: 'pill',           color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Sleep 8 hours',            icon: 'moon',           color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'No alcohol',               icon: 'ban',            color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Sleep 8 hours',            icon: 'moon',           color: '#8a8a8a', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'No alcohol',               icon: 'ban',            color: '#8c8c8c', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   fitness:      [
     { name: 'Morning run',              icon: 'footprints',     color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Workout 30 mins',          icon: 'dumbbell',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: '10,000 steps',             icon: 'activity',       color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Stretch / mobility',       icon: 'wind',           color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Workout 30 mins',          icon: 'dumbbell',       color: '#a6a6a6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: '10,000 steps',             icon: 'activity',       color: '#7b7b7b', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Stretch / mobility',       icon: 'wind',           color: '#717171', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   mindfulness:  [
-    { name: 'Morning meditation',       icon: 'brain',          color: '#8B7FE8', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Gratitude journal',        icon: 'pen-tool',       color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'No phone first hour',      icon: 'ban',            color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Evening reflection',       icon: 'moon',           color: '#5BC7DA', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Morning meditation',       icon: 'brain',          color: '#8a8a8a', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Gratitude journal',        icon: 'pen-tool',       color: '#bbbbbb', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'No phone first hour',      icon: 'ban',            color: '#6f6f6f', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Evening reflection',       icon: 'moon',           color: '#b1b1b1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   learning:     [
     { name: 'Read 30 minutes',          icon: 'book-open',      color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Practice a language',      icon: 'globe',          color: '#3B82F6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Write 500 words',          icon: 'pen-tool',       color: '#F59E0B', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Watch a tutorial',         icon: 'graduation-cap', color: '#EC4899', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Practice a language',      icon: 'globe',          color: '#7b7b7b', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Write 500 words',          icon: 'pen-tool',       color: '#a6a6a6', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Watch a tutorial',         icon: 'graduation-cap', color: '#717171', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
   productivity: [
     { name: 'Plan the day (5 min)',     icon: 'calendar-check', color: 'var(--accent-primary)', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: '2-hour deep work block',  icon: 'target',          color: '#6366F1', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Weekly review',           icon: 'refresh-cw',      color: '#F4B740', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
-    { name: 'Inbox zero',              icon: 'inbox',           color: '#F07272', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: '2-hour deep work block',  icon: 'target',          color: '#6f6f6f', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Weekly review',           icon: 'refresh-cw',      color: '#bbbbbb', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
+    { name: 'Inbox zero',              icon: 'inbox',           color: '#8c8c8c', frequency: { type: 'daily' }, target_type: 'boolean', target_value: 1 },
   ],
 };
 
-const PRESET_COLORS = ['var(--accent-primary)','#3B82F6','#8B7FE8','#EC4899','#F59E0B','#F07272','#5BC7DA','var(--accent-primary)','#F4B740','#6366F1'];
+const PRESET_COLORS = ['var(--accent-primary)','#7b7b7b','#8a8a8a','#717171','#a6a6a6','#8c8c8c','#b1b1b1','var(--accent-primary)','#bbbbbb','#6f6f6f'];
 
 /* ─── Mini confetti burst (CSS only, no dep) ────────────────── */
 function Confetti() {
@@ -188,7 +188,7 @@ export default function OnboardingWizard({ userName, onComplete, onDismiss }: On
         position: 'fixed', inset: 0, zIndex: 60,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: 16,
-        background: 'rgba(0,0,0,0.65)',
+        background: 'rgba(0, 0, 0,0.65)',
       }}
     >
       <motion.div

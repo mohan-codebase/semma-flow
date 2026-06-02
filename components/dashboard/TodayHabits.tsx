@@ -475,9 +475,9 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
               style={{
                 padding: '2px 10px',
                 borderRadius: 'var(--r-pill)',
-                background: 'rgba(239,68,68,0.10)',
-                border: '1px solid rgba(239,68,68,0.25)',
-                color: '#f87171',
+                background: 'rgba(104, 104, 104,0.10)',
+                border: '1px solid rgba(104, 104, 104,0.25)',
+                color: '#8e8e8e',
                 fontSize: '12px',
                 fontWeight: 600,
                 display: 'flex',
@@ -615,6 +615,7 @@ export default function TodayHabits({ habits: initialHabits, loading }: TodayHab
             : 'Log past day'
         }
         size="md"
+        closeOnOutsideClick={false}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div>

@@ -43,7 +43,7 @@ export default function Countdown({
       label: 'Days', 
       value: t.days, 
       color: 'var(--pink)', 
-      glow: 'rgba(244, 114, 182, 0.25)',
+      glow: 'rgba(147, 147, 147, 0.25)',
       gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--pink) 100%)',
       bg: 'color-mix(in srgb, var(--pink) 6%, transparent)',
       hoverBg: 'color-mix(in srgb, var(--pink) 12%, transparent)',
@@ -53,7 +53,7 @@ export default function Countdown({
       label: 'Hours', 
       value: t.hours, 
       color: 'var(--indigo)', 
-      glow: 'rgba(167, 139, 250, 0.25)',
+      glow: 'rgba(153, 153, 153, 0.25)',
       gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--indigo) 100%)',
       bg: 'color-mix(in srgb, var(--indigo) 6%, transparent)',
       hoverBg: 'color-mix(in srgb, var(--indigo) 12%, transparent)',
@@ -63,7 +63,7 @@ export default function Countdown({
       label: 'Mins', 
       value: t.minutes, 
       color: 'var(--cyan)', 
-      glow: 'rgba(34, 211, 238, 0.25)',
+      glow: 'rgba(175, 175, 175, 0.25)',
       gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--cyan) 100%)',
       bg: 'color-mix(in srgb, var(--cyan) 6%, transparent)',
       hoverBg: 'color-mix(in srgb, var(--cyan) 12%, transparent)',
@@ -73,7 +73,7 @@ export default function Countdown({
       label: 'Secs', 
       value: t.seconds, 
       color: 'var(--warm)', 
-      glow: 'rgba(252, 165, 165, 0.25)',
+      glow: 'rgba(183, 183, 183, 0.25)',
       gradient: 'linear-gradient(135deg, var(--text-primary) 20%, var(--warm) 100%)',
       bg: 'color-mix(in srgb, var(--warm) 6%, transparent)',
       hoverBg: 'color-mix(in srgb, var(--warm) 12%, transparent)',
@@ -88,7 +88,7 @@ export default function Countdown({
       style={{
         borderRadius: 'var(--r-xl)',
         border: '1px solid var(--border-medium)',
-        background: 'linear-gradient(170deg, var(--bg-secondary) 0%, rgba(124, 58, 237, 0.05) 100%)',
+        background: 'linear-gradient(170deg, var(--bg-secondary) 0%, rgba(85, 85, 85, 0.05) 100%)',
         padding: 16,
         height: '100%',
         display: 'flex',
@@ -142,7 +142,7 @@ export default function Countdown({
                 borderRadius: '12px',
                 background: u.bg,
                 border: `1px solid ${u.border}`,
-                boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(124, 58, 237, 0.04)',
+                boxShadow: isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(85, 85, 85, 0.04)',
                 transition: 'border-color 0.2s ease, background 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease',
                 cursor: 'default',
               }}
@@ -156,7 +156,7 @@ export default function Countdown({
                 e.currentTarget.style.borderColor = u.border;
                 e.currentTarget.style.background = u.bg;
                 e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.boxShadow = isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(124, 58, 237, 0.04)';
+                e.currentTarget.style.boxShadow = isDark ? '0 2px 8px rgba(0, 0, 0, 0.12)' : '0 2px 6px rgba(85, 85, 85, 0.04)';
               }}
             >
               <span

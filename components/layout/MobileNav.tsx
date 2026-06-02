@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-const ACTIVE_COLOR = '#FFFFFF';
-const MUTED_COLOR  = 'rgba(255,255,255,0.45)';
+const ACTIVE_COLOR = '#ffffff';
+const MUTED_COLOR  = 'rgba(255, 255, 255,0.45)';
 
 function HomeIcon({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : MUTED_COLOR;
@@ -23,10 +23,10 @@ function HabitsIcon({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="5" width="16" height="15" rx="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255,255,255,0.15)' : 'none'} />
+      <rect x="4" y="5" width="16" height="15" rx="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255, 255, 255,0.15)' : 'none'} />
       <path d="M8 10h8M8 14h8M8 18h5" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
       <circle cx="16.5" cy="17.5" r="3.5" fill={active ? ACTIVE_COLOR : 'none'} stroke={c} strokeWidth="1.8" />
-      <path d="M15.5 17.5l.8.8 1.4-1.4" stroke={active ? '#1E1B4B' : c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M15.5 17.5l.8.8 1.4-1.4" stroke={active ? '#1f1f1f' : c} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -46,7 +46,7 @@ function SettingsIcon({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : MUTED_COLOR;
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255,255,255,0.2)' : 'none'} />
+      <circle cx="12" cy="12" r="3" stroke={c} strokeWidth="1.8" fill={active ? 'rgba(255, 255, 255,0.2)' : 'none'} />
       <path
         d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
         stroke={c} strokeWidth="1.8" strokeLinecap="round"
@@ -76,14 +76,14 @@ export default function MobileNav({ activeTab, onTabChange }: MobileNavProps) {
       <div
         style={{
           margin: '0 16px 12px',
-          background: '#1E1B4B',
+          background: '#1f1f1f',
           borderRadius: 26,
-          border: '1px solid rgba(124,58,237,0.25)',
+          border: '1px solid rgba(85, 85, 85,0.25)',
           display: 'flex',
           height: 64,
           padding: '0 8px',
           pointerEvents: 'auto',
-          boxShadow: '0 8px 32px rgba(30,27,75,0.35)',
+          boxShadow: '0 8px 32px rgba(31, 31, 31,0.35)',
         }}
       >
         {TABS.map(({ label, tab, Icon }) => {
@@ -101,7 +101,7 @@ export default function MobileNav({ activeTab, onTabChange }: MobileNavProps) {
                 gap: 3,
                 height: '100%',
                 borderRadius: 20,
-                background: active ? 'rgba(124,58,237,0.30)' : 'transparent',
+                background: active ? 'rgba(85, 85, 85,0.30)' : 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 transition: 'background 0.15s ease',

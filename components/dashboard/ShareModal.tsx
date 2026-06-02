@@ -40,19 +40,19 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
         <div
           id="share-card"
           style={{
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            background: 'linear-gradient(135deg, #171717 0%, #282828 100%)',
             borderRadius: 24,
             padding: 32,
             position: 'relative',
             overflow: 'hidden',
-            border: '1px solid rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255, 255, 255,0.1)',
             boxShadow: 'none',
             color: 'white',
           }}
         >
           {/* Abstract background glows */}
           <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 15%, transparent) 0%, transparent 70%)' }} />
-          <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,127,232,0.1) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', bottom: '-10%', left: '-5%', width: 150, height: 150, borderRadius: '50%', background: 'radial-gradient(circle, rgba(137, 137, 137,0.1) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32 }}>
@@ -64,31 +64,31 @@ export default function ShareModal({ isOpen, onClose, stats }: ShareModalProps) 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(139,127,232,0.15)', border: '1px solid rgba(139,127,232,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 900, color: '#A5B4FC' }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: 'rgba(137, 137, 137,0.15)', border: '1px solid rgba(137, 137, 137,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 900, color: '#b6b6b6' }}>
                   {level}
                 </div>
                 <div>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Level & Rank</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255, 255, 255,0.5)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Level & Rank</p>
                   <p style={{ fontSize: 20, fontWeight: 700, fontFamily: "'Outfit'" }}>{rank} Optimizer</p>
                 </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div style={{ background: 'rgba(255,255,255,0.04)', padding: 16, borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <Flame size={16} color="#F59E0B" style={{ marginBottom: 8 }} />
-                  <p style={{ fontSize: 24, fontWeight: 800, fontFamily: "'Outfit'" }}>{stats.bestStreak}<span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.4)', marginLeft: 4 }}>days</span></p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>Top Streak</p>
+                <div style={{ background: 'rgba(255, 255, 255,0.04)', padding: 16, borderRadius: 16, border: '1px solid rgba(255, 255, 255,0.06)' }}>
+                  <Flame size={16} color="#a6a6a6" style={{ marginBottom: 8 }} />
+                  <p style={{ fontSize: 24, fontWeight: 800, fontFamily: "'Outfit'" }}>{stats.bestStreak}<span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255, 255, 255,0.4)', marginLeft: 4 }}>days</span></p>
+                  <p style={{ fontSize: 11, color: 'rgba(255, 255, 255,0.5)', fontWeight: 500 }}>Top Streak</p>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,0.04)', padding: 16, borderRadius: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ background: 'rgba(255, 255, 255,0.04)', padding: 16, borderRadius: 16, border: '1px solid rgba(255, 255, 255,0.06)' }}>
                   <Trophy size={16} color="var(--accent-primary)" style={{ marginBottom: 8 }} />
                   <p style={{ fontSize: 24, fontWeight: 800, fontFamily: "'Outfit'" }}>{stats.totalCompletions}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 500 }}>Total Habits</p>
+                  <p style={{ fontSize: 11, color: 'rgba(255, 255, 255,0.5)', fontWeight: 500 }}>Total Habits</p>
                 </div>
               </div>
             </div>
 
-            <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.08)', textAlign: 'center' }}>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: 500 }}>Tracked at semma-flow.app</p>
+            <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid rgba(255, 255, 255,0.08)', textAlign: 'center' }}>
+              <p style={{ fontSize: 11, color: 'rgba(255, 255, 255,0.4)', fontWeight: 500 }}>Tracked at semma-flow.app</p>
             </div>
           </div>
         </div>

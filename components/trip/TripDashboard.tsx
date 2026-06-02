@@ -27,20 +27,20 @@ import { EXPENSE_CATEGORIES, type Trip, type TripExpense, type TripSettlement, t
 
 const TABLES = ['trip_expenses', 'trip_trips', 'trip_settlements'];
 
-const SPENDING_COLORS = ['#FB923C', '#F472B6', '#FBBF24', '#FCA5A5', '#EC4899'];
-const PENDING_COLORS = ['#A78BFA', '#67E8F9', '#34D399', '#2DD4BF', '#60A5FA'];
+const SPENDING_COLORS = ['#a2a2a2', '#929292', '#c1c1c1', '#b7b7b7', '#717171'];
+const PENDING_COLORS = ['#999999', '#cecece', '#adadad', '#afafaf', '#9c9c9c'];
 
 // Per-category accent, matching the hue of the category tags (CategoryBadge).
 const CATEGORY_COLORS: Record<ExpenseCategory, string> = {
-  Travel: '#38BDF8',
-  Hotel: '#A78BFA',
-  Food: '#FBBF24',
-  Fuel: '#FB923C',
-  Clothing: '#34D399',
-  Accessories: '#2DD4BF',
-  Medicine: '#FB7185',
-  Booking: '#818CF8',
-  Miscellaneous: '#94A3B8',
+  Travel: '#a5a5a5',
+  Hotel: '#999999',
+  Food: '#c1c1c1',
+  Fuel: '#a2a2a2',
+  Clothing: '#adadad',
+  Accessories: '#afafaf',
+  Medicine: '#909090',
+  Booking: '#919191',
+  Miscellaneous: '#a0a0a0',
 };
 
 function CircularShareProgress({
@@ -333,14 +333,14 @@ export default function TripDashboard({
                       width: 40,
                       height: 40,
                       borderRadius: 12,
-                      background: active ? 'var(--accent-glow-md)' : 'rgba(124, 58, 237, 0.08)',
+                      background: active ? 'var(--accent-glow-md)' : 'rgba(85, 85, 85, 0.08)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <Icon size={18} color={active ? 'var(--accent-primary)' : '#7C3AED'} />
+                    <Icon size={18} color={active ? 'var(--accent-primary)' : '#555555'} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <p

@@ -185,8 +185,8 @@ export default function BookingsClient({ bookings, userId, trip }: { bookings: T
                           borderRadius: 'var(--r-pill)',
                           fontSize: 11.5,
                           fontWeight: 600,
-                          color: isConfirmed ? '#34D399' : '#FBBF24',
-                          background: isConfirmed ? 'rgba(52,211,153,0.14)' : 'rgba(251,191,36,0.14)',
+                          color: isConfirmed ? '#adadad' : '#c1c1c1',
+                          background: isConfirmed ? 'rgba(173, 173, 173,0.14)' : 'rgba(193, 193, 193,0.14)',
                         }}
                       >
                         {isConfirmed ? <CheckCircle2 size={12} /> : <Clock size={12} />}
@@ -201,7 +201,7 @@ export default function BookingsClient({ bookings, userId, trip }: { bookings: T
         </div>
       )}
 
-      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? 'Edit booking' : 'Add booking'} size="md">
+      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? 'Edit booking' : 'Add booking'} size="md" closeOnOutsideClick={false}>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="trip-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <Field label="Type">
@@ -216,7 +216,7 @@ export default function BookingsClient({ bookings, userId, trip }: { bookings: T
           </Field>
           <div className="trip-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <Field label="Amount (₹)">
-              <TextField type="number" min={0} value={form.amount} onChange={set('amount')} placeholder="0" />
+              <TextField type="number" min={0} step="any" value={form.amount} onChange={set('amount')} placeholder="0" />
             </Field>
             <Field label="Paid by">
               <Select value={form.paid_by} onChange={set('paid_by')} options={trip.travelers} />

@@ -22,9 +22,9 @@ interface HabitFormProps {
 }
 
 const PRESET_COLORS = [
-  'var(--accent-primary)', '#3B82F6', '#8B5CF6', '#EC4899',
-  '#F59E0B', '#EF4444', '#06B6D4', '#84CC16',
-  '#F97316', '#6366F1',
+  'var(--accent-primary)', '#7b7b7b', '#707070', '#717171',
+  '#a6a6a6', '#6a6a6a', '#939393', '#b0b0b0',
+  '#898989', '#6f6f6f',
 ];
 
 type FrequencyTab = 'daily' | 'weekly' | 'x_per_week' | 'x_per_month';
@@ -141,7 +141,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
       : {
           name: '',
           icon: 'circle-check',
-          color: '#7C3AED',
+          color: '#555555',
           frequency: { type: 'daily' },
           target_type: 'boolean',
           target_value: 1,
@@ -224,6 +224,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
       onClose={loading ? () => {} : onClose}
       title={isEdit ? 'Edit Habit' : 'New Habit'}
       size="md"
+      closeOnOutsideClick={false}
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -243,7 +244,7 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                       onClick={() => {
                         field.onChange(isBad);
                         if (!isEdit) {
-                          setValue('color', isBad ? '#EF4444' : '#7C3AED');
+                          setValue('color', isBad ? '#6a6a6a' : '#555555');
                           setValue('icon', isBad ? 'ban' : 'circle-check');
                         }
                       }}
@@ -255,12 +256,12 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
                         gap: 8,
                         padding: '10px 14px',
                         borderRadius: 12,
-                        border: `1.5px solid ${active ? (isBad ? '#EF4444' : 'var(--accent-primary)') : 'var(--border-default)'}`,
+                        border: `1.5px solid ${active ? (isBad ? '#6a6a6a' : 'var(--accent-primary)') : 'var(--border-default)'}`,
                         background: active
-                          ? isBad ? 'rgba(239,68,68,0.10)' : 'var(--accent-glow-md)'
+                          ? isBad ? 'rgba(104, 104, 104,0.10)' : 'var(--accent-glow-md)'
                           : 'var(--bg-tertiary)',
                         color: active
-                          ? isBad ? '#EF4444' : 'var(--accent-primary)'
+                          ? isBad ? '#6a6a6a' : 'var(--accent-primary)'
                           : 'var(--text-muted)',
                         fontSize: 13,
                         fontWeight: active ? 700 : 500,
@@ -282,10 +283,10 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
             <div style={{
               padding: '10px 14px',
               borderRadius: 10,
-              background: 'rgba(239,68,68,0.08)',
-              border: '1px solid rgba(239,68,68,0.22)',
+              background: 'rgba(104, 104, 104,0.08)',
+              border: '1px solid rgba(104, 104, 104,0.22)',
               fontSize: 12.5,
-              color: '#f87171',
+              color: '#8e8e8e',
               lineHeight: 1.5,
             }}>
               <strong style={{ display: 'block', marginBottom: 2 }}>Avoidance tracking</strong>
@@ -445,15 +446,15 @@ export default function HabitForm({ habit, categories, categoryError, onRetryCat
             />
             {categoryError && (
               <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--danger)' }}>
-                <span>Couldn't load categories.</span>
+                <span>Couldn&apos;t load categories.</span>
                 {onRetryCategories && (
                   <button
                     type="button"
                     onClick={onRetryCategories}
                     style={{
-                      background: 'rgba(239,68,68,0.12)',
+                      background: 'rgba(104, 104, 104,0.12)',
                       color: 'var(--danger)',
-                      border: '1px solid rgba(239,68,68,0.25)',
+                      border: '1px solid rgba(104, 104, 104,0.25)',
                       padding: '2px 10px',
                       borderRadius: 'var(--r-pill)',
                       fontSize: 11.5,

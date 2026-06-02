@@ -16,15 +16,15 @@ const data = [
 
 export default function ChartTest() {
   return (
-    <div style={{ padding: 24, background: '#F3F1FF', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#f2f2f2', minHeight: '100vh' }}>
       {/* Replicate the dashboard's animating wrapper */}
       <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: 480 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800 }}>Weekly report</h2>
         <div style={{ background: '#fff', borderRadius: 20, padding: '18px 12px 12px', marginTop: 8 }}>
-          <WeeklyReportChart data={data} avg={7} color="#7C3AED" />
+          <WeeklyReportChart data={data} avg={7} color="#555555" />
         </div>
         <div style={{ background: '#fff', borderRadius: 20, padding: '18px 12px 12px', marginTop: 16 }}>
-          <WeeklyReportChart data={data} avg={7} color="#059669" />
+          <WeeklyReportChart data={data} avg={7} color="#747474" />
         </div>
       </motion.div>
     </div>

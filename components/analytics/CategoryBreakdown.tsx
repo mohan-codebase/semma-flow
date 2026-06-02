@@ -37,12 +37,12 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
 }
 
 // Fallback palette when category.color is missing or near-grey.
-const PALETTE = ['var(--accent-primary)', '#5BC7DA', '#8B7FE8', '#F4B740', '#F07272', '#4FD1C5', '#F687B3', '#B794F4'];
+const PALETTE = ['var(--accent-primary)', '#b1b1b1', '#8a8a8a', '#bbbbbb', '#8c8c8c', '#b4b4b4', '#a2a2a2', '#a2a2a2'];
 
 function resolveColor(raw: string | undefined | null, index: number): string {
   if (!raw || !/^#[0-9A-Fa-f]{6}$/.test(raw)) return PALETTE[index % PALETTE.length];
   // Treat dark slate defaults as "uncolored"
-  const greyList = ['#475569', '#64748b', '#94a3b8', '#334155'];
+  const greyList = ['#535353', '#727272', '#a0a0a0', '#3f3f3f'];
   if (greyList.includes(raw.toLowerCase())) return PALETTE[index % PALETTE.length];
   return raw;
 }

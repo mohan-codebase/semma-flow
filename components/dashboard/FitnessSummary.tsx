@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Plus } from 'lucide-react';
 import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
+import DevicesModal from '@/components/settings/DevicesModal';
 import ToggleSwitch from '@/components/ui/ToggleSwitch';
 import WeeklyReportChart from '@/components/dashboard/WeeklyReportChart';
 import type { OverviewStats } from '@/types/analytics';
@@ -26,12 +27,12 @@ const PURPLE_MID = 'var(--surface-tint-mid)';
 const TEXT_DARK = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
 // Raw hex needed only for SVG attributes and rgba() calls
-const PURPLE_HEX = '#7C3AED';
+const PURPLE_HEX = '#555555';
 
 // Bad-habit theming — red accents, kept consistent with HabitCard/HabitList
-const RED = '#EF4444';
-const RED_SOFT = '#f87171';
-const RED_LIGHT = 'rgba(239,68,68,0.12)';
+const RED = '#6a6a6a';
+const RED_SOFT = '#8e8e8e';
+const RED_LIGHT = 'rgba(104, 104, 104,0.12)';
 
 // Liquid glass helpers (inline style objects)
 const GLASS: React.CSSProperties = {
@@ -83,8 +84,8 @@ function CircularProgress({
         flexDirection: 'column',
         alignItems: 'center',
         gap: 0,
-        background: 'rgba(124,58,237,0.05)',
-        border: '1px solid rgba(124,58,237,0.10)',
+        background: 'rgba(85, 85, 85,0.05)',
+        border: '1px solid rgba(85, 85, 85,0.10)',
       }}
     >
       {/* Header row */}
@@ -100,7 +101,7 @@ function CircularProgress({
         <div style={{
           padding: '6px 14px',
           borderRadius: 20,
-          background: 'rgba(124,58,237,0.10)',
+          background: 'rgba(85, 85, 85,0.10)',
         }}>
           <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{pct}%</span>
         </div>
@@ -115,7 +116,7 @@ function CircularProgress({
             cy={size / 2}
             r={RADIUS}
             fill="none"
-            stroke="rgba(124,58,237,0.10)"
+            stroke="rgba(85, 85, 85,0.10)"
             strokeWidth={STROKE}
           />
           {/* Progress arc */}
@@ -166,7 +167,7 @@ function CircularProgress({
                 height: 12,
                 borderRadius: '50%',
                 background: i < completed ? PURPLE_HEX : 'transparent',
-                border: `2px solid ${i < completed ? PURPLE_HEX : 'rgba(124,58,237,0.25)'}`,
+                border: `2px solid ${i < completed ? PURPLE_HEX : 'rgba(85, 85, 85,0.25)'}`,
               }}
             />
           ))}
@@ -223,7 +224,7 @@ function HabitRow({
         gap: 14,
         padding: '14px 16px',
         ...(done && !bad ? GLASS_PURPLE : GLASS_SM),
-        ...(bad ? { border: `1px solid ${done ? 'rgba(239,68,68,0.35)' : 'rgba(239,68,68,0.18)'}` } : null),
+        ...(bad ? { border: `1px solid ${done ? 'rgba(104, 104, 104,0.35)' : 'rgba(104, 104, 104,0.18)'}` } : null),
         borderRadius: 18,
         cursor: 'pointer',
         width: '100%',
@@ -299,7 +300,7 @@ function HabitRow({
          Lives in the shared row, so every habit (incl. brand-new ones) gets it. */}
       <div style={{
         position: 'absolute', left: 0, right: 0, bottom: 0, height: 4,
-        background: 'rgba(127,127,127,0.10)',
+        background: 'rgba(127, 127, 127,0.10)',
       }}>
         <motion.div
           initial={{ width: 0 }}
@@ -345,7 +346,7 @@ function HabitDetailSheet({
   // These locals deliberately shadow the module-level purple tokens, so every
   // accent below (stat numbers, calendar, nav, month bar, chart) follows the
   // habit's color. Falls back to brand purple when a habit has none.
-  const PURPLE = habit.color || '#7C3AED';
+  const PURPLE = habit.color || '#555555';
   const PURPLE_HEX = PURPLE;
   const PURPLE_LIGHT = `color-mix(in srgb, ${PURPLE} 14%, transparent)`;
   const PURPLE_MID = `color-mix(in srgb, ${PURPLE} 24%, transparent)`;
@@ -357,7 +358,7 @@ function HabitDetailSheet({
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editIcon, setEditIcon] = useState(habit.icon ?? 'circle-check');
-  const [editColor, setEditColor] = useState(habit.color || '#7C3AED');
+  const [editColor, setEditColor] = useState(habit.color || '#555555');
   const [editNotes, setEditNotes] = useState(habit.description ?? '');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -501,7 +502,7 @@ function HabitDetailSheet({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0, 0, 0,0.45)' }}
       />
 
       {/* Floating card */}
@@ -525,7 +526,7 @@ function HabitDetailSheet({
             overflowY: 'auto',
             padding: '24px 20px 32px',
             fontFamily: "system-ui, -apple-system, sans-serif",
-            boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
+            boxShadow: '0 24px 64px rgba(31, 31, 31,0.40), inset 0 1px 0 rgba(255, 255, 255,0.12)',
           }}
         >
           {/* Header */}
@@ -568,7 +569,7 @@ function HabitDetailSheet({
             <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
               {!editMode && (
                 <button
-                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#555555'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
                   style={{
                     width: 34, height: 34, borderRadius: '50%',
                     background: PURPLE_LIGHT, border: 'none',
@@ -626,7 +627,7 @@ function HabitDetailSheet({
                       background: PURPLE_LIGHT,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer',
-                      boxShadow: active ? `0 2px 10px rgba(124,58,237,0.2)` : 'none',
+                      boxShadow: active ? `0 2px 10px rgba(85, 85, 85,0.2)` : 'none',
                       transition: 'all 0.15s', transform: active ? 'scale(1.1)' : 'scale(1)',
                     }}>
                       <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
@@ -640,7 +641,7 @@ function HabitDetailSheet({
               <div style={{ marginBottom: 16 }}>
                 <ColorPicker value={editColor} onChange={setEditColor} />
               </div>
-              {saveError && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#EF4444' }}>{saveError}</p>}
+              {saveError && <p style={{ margin: '0 0 10px', fontSize: 12, color: '#6a6a6a' }}>{saveError}</p>}
               <button
                 onClick={saveEdit}
                 disabled={saving}
@@ -665,7 +666,7 @@ function HabitDetailSheet({
                   Notes
                 </p>
                 <button
-                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#7C3AED'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
+                  onClick={() => { setEditName(habit.name); setEditIcon(habit.icon ?? 'circle-check'); setEditColor(habit.color || '#555555'); setEditNotes(habit.description ?? ''); setEditMode(true); }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: PURPLE, fontSize: 12.5, fontWeight: 700, padding: 0 }}
                 >
                   {habit.description ? 'Edit' : 'Add'}
@@ -793,7 +794,7 @@ function HabitDetailSheet({
                               borderRadius: 8,
                               background: bg,
                               border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
-                              boxShadow: cell.completed ? '0 2px 6px rgba(124,58,237,0.28)' : 'none',
+                              boxShadow: cell.completed ? '0 2px 6px rgba(85, 85, 85,0.28)' : 'none',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: 11,
                               fontWeight: cell.isToday ? 800 : 500,
@@ -867,16 +868,16 @@ function HabitDetailSheet({
               onClick={() => setConfirmDelete(true)}
               style={{
                 marginTop: 16, width: '100%', padding: '14px 0', borderRadius: 16, border: 'none',
-                background: 'rgba(239,68,68,0.08)',
-                color: '#EF4444', fontSize: 14, fontWeight: 700,
+                background: 'rgba(104, 104, 104,0.08)',
+                color: '#6a6a6a', fontSize: 14, fontWeight: 700,
                 cursor: 'pointer', fontFamily: 'inherit',
               }}
             >
               Delete Habit
             </button>
           ) : (
-            <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.08)', borderRadius: 16, padding: '16px' }}>
-              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#EF4444', fontWeight: 600, textAlign: 'center' }}>
+            <div style={{ marginTop: 16, background: 'rgba(104, 104, 104,0.08)', borderRadius: 16, padding: '16px' }}>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#6a6a6a', fontWeight: 600, textAlign: 'center' }}>
                 Delete &quot;{habit.name}&quot;? This removes all history and cannot be undone.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
@@ -895,7 +896,7 @@ function HabitDetailSheet({
                   disabled={deleting}
                   style={{
                     flex: 1, padding: '12px 0', borderRadius: 12, border: 'none',
-                    background: '#EF4444', color: '#fff', fontSize: 14, fontWeight: 700,
+                    background: '#6a6a6a', color: '#fff', fontSize: 14, fontWeight: 700,
                     cursor: deleting ? 'default' : 'pointer', fontFamily: 'inherit',
                     opacity: deleting ? 0.7 : 1,
                   }}
@@ -917,14 +918,14 @@ const HABIT_ICONS = HABIT_ICON_NAMES;
 // Premium jewel-tone palette — tuned to read well on both the light
 // (purple-tinted) and dark surfaces. First entry is the brand violet (default).
 const HABIT_COLORS = [
-  '#7C3AED', // amethyst (brand)
-  '#4F46E5', // indigo
-  '#2563EB', // sapphire
-  '#0D9488', // teal
-  '#059669', // emerald
-  '#CA8A04', // gold
-  '#E11D48', // rose
-  '#C026D3', // fuchsia
+  '#555555', // amethyst (brand)
+  '#535353', // indigo
+  '#606060', // sapphire
+  '#767676', // teal
+  '#747474', // emerald
+  '#8e8e8e', // gold
+  '#4a4a4a', // rose
+  '#535353', // fuchsia
 ];
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -959,8 +960,8 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
               ...orbBase,
               background: orbGloss(c),
               boxShadow: active
-                ? `inset 0 1px 1px rgba(255,255,255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${c}`
-                : 'inset 0 1px 1px rgba(255,255,255,0.45)',
+                ? `inset 0 1px 1px rgba(255, 255, 255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${c}`
+                : 'inset 0 1px 1px rgba(255, 255, 255,0.45)',
               transform: active ? 'scale(1.08)' : 'scale(1)',
             }}
           >
@@ -978,20 +979,20 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
           position: 'relative', overflow: 'hidden',
           background: isCustom
             ? orbGloss(value)
-            : 'conic-gradient(from 90deg, #ef4444, #f59e0b, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+            : 'conic-gradient(from 90deg, #6a6a6a, #a6a6a6, #b2b2b2, #9b9b9b, #939393, #7b7b7b, #707070, #717171, #6a6a6a)',
           boxShadow: isCustom
-            ? `inset 0 1px 1px rgba(255,255,255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${value}`
-            : 'inset 0 1px 1px rgba(255,255,255,0.45)',
+            ? `inset 0 1px 1px rgba(255, 255, 255,0.45), 0 0 0 2px var(--glass-bg-sheet), 0 0 0 4px ${value}`
+            : 'inset 0 1px 1px rgba(255, 255, 255,0.45)',
           transform: isCustom ? 'scale(1.08)' : 'scale(1)',
         }}
       >
         <input
           type="color"
-          value={isCustom ? value : '#7C3AED'}
+          value={isCustom ? value : '#555555'}
           onChange={(e) => onChange(e.target.value)}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer', border: 'none', padding: 0 }}
         />
-        {isCustom ? <CheckIcon /> : <Plus size={18} color="#fff" strokeWidth={2.6} style={{ filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.35))' }} />}
+        {isCustom ? <CheckIcon /> : <Plus size={18} color="#fff" strokeWidth={2.6} style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0,0.35))' }} />}
       </label>
     </div>
   );
@@ -1017,7 +1018,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
   const [notes, setNotes] = useState('');
   const [icon, setIcon] = useState('circle-check');
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [color, setColor] = useState('#7C3AED');
+  const [color, setColor] = useState('#555555');
   const [freqType, setFreqType] = useState<FreqType>('daily');
   const [days, setDays] = useState<number[]>([]);
   const [perWeek, setPerWeek] = useState(3);
@@ -1085,7 +1086,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0, 0, 0,0.45)' }}
       />
       <div style={{
         position: 'fixed', inset: 0, zIndex: 201,
@@ -1106,7 +1107,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
             maxHeight: '90dvh', overflowY: 'auto',
             padding: '24px 16px 32px',
             fontFamily: "system-ui, -apple-system, sans-serif",
-            boxShadow: '0 24px 64px rgba(30,27,75,0.40), inset 0 1px 0 rgba(255,255,255,0.12)',
+            boxShadow: '0 24px 64px rgba(31, 31, 31,0.40), inset 0 1px 0 rgba(255, 255, 255,0.12)',
           }}
         >
           {/* Header */}
@@ -1130,7 +1131,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
               value={name}
               onChange={(e) => { setName(e.target.value); setError(null); }}
               placeholder="e.g. Morning Run"
-              style={{ ...inputStyle, border: `1.5px solid ${error && !name.trim() ? '#EF4444' : 'var(--input-border)'}` }}
+              style={{ ...inputStyle, border: `1.5px solid ${error && !name.trim() ? '#6a6a6a' : 'var(--input-border)'}` }}
               onFocus={(e) => { e.target.style.borderColor = PURPLE; }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--input-border)'; }}
             />
@@ -1208,11 +1209,11 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
                   return (
                     <button key={idx} onClick={() => toggleDay(idx)} style={{
                       width: 38, height: 38, borderRadius: '50%', border: 'none',
-                      background: active ? color : '#F5F3FF',
+                      background: active ? color : '#f4f4f4',
                       color: active ? '#fff' : TEXT_MUTED,
                       fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer',
                       transition: 'all 0.15s',
-                      boxShadow: active ? `0 2px 8px rgba(124,58,237,0.3)` : 'none',
+                      boxShadow: active ? `0 2px 8px rgba(85, 85, 85,0.3)` : 'none',
                     }}>{label}</button>
                   );
                 })}
@@ -1248,11 +1249,11 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
               {(['boolean', 'duration'] as TargetType[]).map((t) => (
                 <button key={t} onClick={() => setTargetType(t)} style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: targetType === t ? color : '#F5F3FF',
+                  background: targetType === t ? color : '#f4f4f4',
                   color: targetType === t ? '#fff' : TEXT_MUTED,
                   fontSize: 13, fontWeight: targetType === t ? 700 : 500,
                   cursor: 'pointer', transition: 'all 0.15s',
-                  boxShadow: targetType === t ? `0 2px 10px rgba(124,58,237,0.25)` : 'none',
+                  boxShadow: targetType === t ? `0 2px 10px rgba(85, 85, 85,0.25)` : 'none',
                 }}>
                   {t === 'boolean' ? 'Check-off' : 'Duration'}
                 </button>
@@ -1281,8 +1282,8 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
 
           {/* Error */}
           {error && (
-            <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', marginBottom: 14 }}>
-              <p style={{ margin: 0, fontSize: 13, color: '#EF4444', fontWeight: 600 }}>{error}</p>
+            <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(104, 104, 104,0.08)', border: '1px solid rgba(104, 104, 104,0.2)', marginBottom: 14 }}>
+              <p style={{ margin: 0, fontSize: 13, color: '#6a6a6a', fontWeight: 600 }}>{error}</p>
             </div>
           )}
 
@@ -1308,10 +1309,10 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
 }
 
 function ProfileMenu({
-  displayName, initials, email, totalHabits, onClose,
+  displayName, initials, email, totalHabits, onClose, onShowDevices,
 }: {
   displayName: string; initials: string; email: string;
-  totalHabits: number; onClose: () => void;
+  totalHabits: number; onClose: () => void; onShowDevices: () => void;
 }) {
   const [signingOut, setSigningOut] = useState(false);
   const [isDark, setIsDark] = useState(() => {
@@ -1338,10 +1339,11 @@ function ProfileMenu({
     } catch { setSigningOut(false); }
   };
 
-  const menuItems: { icon: string; label: string; sub: string; href?: string }[] = [
+  const menuItems: { icon: string; label: string; sub: string; href?: string; onClick?: () => void }[] = [
     { icon: 'mountain', label: 'Trip Planner', sub: 'Expenses & settlement', href: '/trip' },
     { icon: 'zap', label: 'Your Coach', sub: 'Weekly AI insights', href: '/dashboard/coach' },
     { icon: 'calendar-check', label: 'Year in Review', sub: 'Highlights & PDF export', href: '/dashboard/year-in-review' },
+    { icon: 'shield', label: 'Security & Devices', sub: 'Manage login sessions', onClick: onShowDevices },
     { icon: 'bell', label: 'Notifications', sub: 'Reminders & alerts' },
     { icon: 'help-circle', label: 'Help & Feedback', sub: 'Support & suggestions' },
   ];
@@ -1355,7 +1357,7 @@ function ProfileMenu({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
         onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0,0,0,0.45)' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0, 0, 0,0.45)' }}
       />
 
       {/* Sheet — slides up from bottom */}
@@ -1379,7 +1381,7 @@ function ProfileMenu({
 
           {/* Drag handle */}
           <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
-            <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />
+            <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255, 255, 255,0.18)' : 'rgba(85, 85, 85,0.18)' }} />
           </div>
 
           {/* Top bar */}
@@ -1389,12 +1391,12 @@ function ProfileMenu({
             transition={{ delay: 0.08 }}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 8 }}
           >
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.60)' : 'rgba(60,40,120,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255,0.60)' : 'rgba(50, 50, 50,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Profile
             </p>
             <button onClick={onClose} style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(124,58,237,0.08)',
+              background: isDark ? 'rgba(255, 255, 255,0.10)' : 'rgba(85, 85, 85,0.08)',
               border: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer',
@@ -1411,13 +1413,13 @@ function ProfileMenu({
             style={{
               marginTop: 16,
               background: isDark
-                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
               borderRadius: 28,
               padding: '28px 24px 24px',
               boxShadow: isDark
-                ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                : '0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                ? '0 8px 32px rgba(0, 0, 0,0.45), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                : '0 4px 24px rgba(99, 99, 99,0.12), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
               border: 'none',
             }}
           >
@@ -1425,7 +1427,7 @@ function ProfileMenu({
             <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
               <div style={{
                 width: 68, height: 68, borderRadius: '50%',
-                background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
+                background: `linear-gradient(135deg, ${PURPLE} 0%, #727272 100%)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
                 boxShadow: 'none',
@@ -1443,7 +1445,7 @@ function ProfileMenu({
             </div>
 
             {/* Divider */}
-            <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(124,58,237,0.10)', margin: '20px 0' }} />
+            <div style={{ height: 1, background: isDark ? 'rgba(255, 255, 255,0.08)' : 'rgba(85, 85, 85,0.10)', margin: '20px 0' }} />
 
             {/* Stats row */}
             <div style={{ display: 'flex', gap: 12 }}>
@@ -1455,13 +1457,13 @@ function ProfileMenu({
                 <div key={label} style={{
                   flex: 1,
                   background: isDark
-                    ? 'linear-gradient(155deg, rgba(124,58,237,0.22) 0%, rgba(124,58,237,0.10) 100%)'
-                    : 'linear-gradient(155deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.06) 100%)',
+                    ? 'linear-gradient(155deg, rgba(85, 85, 85,0.22) 0%, rgba(85, 85, 85,0.10) 100%)'
+                    : 'linear-gradient(155deg, rgba(85, 85, 85,0.12) 0%, rgba(85, 85, 85,0.06) 100%)',
                   borderRadius: 14,
                   padding: '12px 10px', textAlign: 'center',
                   boxShadow: isDark
-                    ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(124,58,237,0.28)'
-                    : 'inset 0 1px 0 rgba(255,255,255,0.90), 0 0 0 1px rgba(124,58,237,0.14)',
+                    ? 'inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(85, 85, 85,0.28)'
+                    : 'inset 0 1px 0 rgba(255, 255, 255,0.90), 0 0 0 1px rgba(85, 85, 85,0.14)',
                 }}>
                   <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: TEXT_DARK }}>{value}</p>
                   <p style={{ margin: '2px 0 0', fontSize: 11, color: TEXT_MUTED, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
@@ -1478,12 +1480,12 @@ function ProfileMenu({
             style={{
               marginTop: 16,
               background: isDark
-                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
               borderRadius: 24, padding: '16px 20px',
               boxShadow: isDark
-                ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
               border: 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}
@@ -1504,7 +1506,7 @@ function ProfileMenu({
               onIcon="moon"
               offIcon="sun"
               onIconColor={PURPLE_HEX}
-              offIconColor="#F59E0B"
+              offIconColor="#a6a6a6"
             />
           </motion.div>
 
@@ -1516,20 +1518,26 @@ function ProfileMenu({
             style={{
               marginTop: 16,
               background: isDark
-                ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
               borderRadius: 24, overflow: 'hidden',
               boxShadow: isDark
-                ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
               border: 'none',
             }}
           >
-            {menuItems.map(({ icon, label, sub, href }, idx) => (
+            {menuItems.map(({ icon, label, sub, href, onClick }, idx) => (
               <div key={label}>
-                {idx > 0 && <div style={{ height: 1, background: 'rgba(124,58,237,0.06)', marginLeft: 62 }} />}
+                {idx > 0 && <div style={{ height: 1, background: 'rgba(85, 85, 85,0.06)', marginLeft: 62 }} />}
                 <button
-                  onClick={() => { if (href) window.location.href = href; }}
+                  onClick={() => {
+                    if (onClick) {
+                      onClick();
+                    } else if (href) {
+                      window.location.href = href;
+                    }
+                  }}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 14,
                     padding: '16px 20px', background: 'none', border: 'none',
@@ -1564,19 +1572,19 @@ function ProfileMenu({
               style={{
                 width: '100%', padding: '16px 0', borderRadius: 20, border: 'none',
                 background: isDark
-                  ? 'linear-gradient(155deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.10) 100%)'
-                  : 'linear-gradient(155deg, rgba(255,255,255,0.80) 0%, rgba(255,230,230,0.60) 100%)',
-                color: isDark ? '#F87171' : '#DC2626',
+                  ? 'linear-gradient(155deg, rgba(104, 104, 104,0.18) 0%, rgba(104, 104, 104,0.10) 100%)'
+                  : 'linear-gradient(155deg, rgba(255, 255, 255,0.80) 0%, rgba(235, 235, 235,0.60) 100%)',
+                color: isDark ? '#8e8e8e' : '#4d4d4d',
                 fontSize: 15, fontWeight: 700,
                 cursor: signingOut ? 'default' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 fontFamily: 'inherit',
                 boxShadow: isDark
-                  ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(239,68,68,0.22)'
-                  : 'inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(239,68,68,0.18)',
+                  ? 'inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(104, 104, 104,0.22)'
+                  : 'inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(104, 104, 104,0.18)',
               }}
             >
-              <DynamicIcon name="log-out" size={18} color="#EF4444" />
+              <DynamicIcon name="log-out" size={18} color="#6a6a6a" />
               {signingOut ? 'Signing out…' : 'Sign Out'}
             </button>
           </motion.div>
@@ -1601,6 +1609,7 @@ export default function FitnessSummary({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [devicesOpen, setDevicesOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(todayString());
   const [dateEntries, setDateEntries] = useState<Record<string, boolean>>({});
   const [loadingDate, setLoadingDate] = useState(false);
@@ -1751,8 +1760,8 @@ export default function FitnessSummary({
             <button
               onClick={onBackToHub}
               style={{
-                background: 'rgba(124, 58, 237, 0.08)',
-                border: '1px solid rgba(124, 58, 237, 0.20)',
+                background: 'rgba(85, 85, 85, 0.08)',
+                border: '1px solid rgba(85, 85, 85, 0.20)',
                 borderRadius: 12,
                 color: 'var(--accent-light)',
                 padding: '6px 12px',
@@ -1830,7 +1839,7 @@ export default function FitnessSummary({
                     {isToday ? (
                       <>
                         <svg width="42" height="42" style={{ position: 'absolute', inset: 0 }}>
-                          <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(124,58,237,0.15)" strokeWidth="2.5" />
+                          <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(85, 85, 85,0.15)" strokeWidth="2.5" />
                           <circle cx="21" cy="21" r={R} fill="none" stroke={PURPLE_HEX}
                             strokeWidth="2.5" strokeLinecap="round"
                             strokeDasharray={CIRC}
@@ -1854,7 +1863,7 @@ export default function FitnessSummary({
                           : pct > 0 ? 'var(--glass-bg-purple)' : 'var(--bg-secondary)',
                         border: isSelected
                           ? 'none'
-                          : `1px solid ${pct > 0 ? 'rgba(124,58,237,0.2)' : 'var(--border-subtle)'}`,
+                          : `1px solid ${pct > 0 ? 'rgba(85, 85, 85,0.2)' : 'var(--border-subtle)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'background 0.18s ease',
                       }}>
@@ -1913,7 +1922,7 @@ export default function FitnessSummary({
                     <div key={date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
                       <div style={{
                         width: '100%', height: TRACK_H, borderRadius: 10,
-                        background: 'rgba(124,58,237,0.10)',
+                        background: 'rgba(85, 85, 85,0.10)',
                         position: 'relative', overflow: 'hidden',
                       }}>
                         <motion.div
@@ -1923,7 +1932,7 @@ export default function FitnessSummary({
                           style={{
                             position: 'absolute', bottom: 0, left: 0, right: 0,
                             borderRadius: '8px 8px 0 0',
-                            background: isToday ? PURPLE_HEX : 'rgba(124,58,237,0.55)',
+                            background: isToday ? PURPLE_HEX : 'rgba(85, 85, 85,0.55)',
                           }}
                         />
                       </div>
@@ -1946,7 +1955,7 @@ export default function FitnessSummary({
                   position: 'absolute',
                   left: 0, right: 0,
                   top: 88 - Math.round((avgPct / 100) * 88),
-                  borderTop: '1.5px dashed rgba(124,58,237,0.40)',
+                  borderTop: '1.5px dashed rgba(85, 85, 85,0.40)',
                   pointerEvents: 'none', zIndex: 2,
                 }}>
                   <span style={{
@@ -2065,9 +2074,15 @@ export default function FitnessSummary({
             email={email}
             totalHabits={localHabits.length}
             onClose={() => setMenuOpen(false)}
+            onShowDevices={() => {
+              setMenuOpen(false);
+              setDevicesOpen(true);
+            }}
           />
         )}
       </AnimatePresence>
+
+      <DevicesModal isOpen={devicesOpen} onClose={() => setDevicesOpen(false)} />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export default function HabitCheckbox({
   const r = cx - strokeWidth;
 
   // Particle colors derived from habit color with variation
-  const particleColors = [color, '#F59E0B', '#ffffff', color];
+  const particleColors = [color, '#a6a6a6', '#ffffff', color];
 
   return (
     <button

@@ -12,11 +12,11 @@ import ThemeToggle from '@/components/layout/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV = [
-  { label: 'Dashboard',    tab: 'home',         icon: LayoutDashboard, color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
-  { label: 'Habits',       tab: 'habits',       icon: Dumbbell,        color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
-  { label: 'Analytics',    tab: 'analytics',    icon: BarChart2,       color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
-  { label: 'Achievements', tab: 'achievements', icon: Trophy,          color: '#F59E0B',               glow: 'rgba(245,158,11,0.15)' },
-  { label: 'Settings',     tab: 'settings',     icon: Settings2,       color: 'var(--accent-primary)', glow: 'rgba(124,58,237,0.15)' },
+  { label: 'Dashboard',    tab: 'home',         icon: LayoutDashboard, color: 'var(--accent-primary)', glow: 'rgba(85, 85, 85,0.15)' },
+  { label: 'Habits',       tab: 'habits',       icon: Dumbbell,        color: 'var(--accent-primary)', glow: 'rgba(85, 85, 85,0.15)' },
+  { label: 'Analytics',    tab: 'analytics',    icon: BarChart2,       color: 'var(--accent-primary)', glow: 'rgba(85, 85, 85,0.15)' },
+  { label: 'Achievements', tab: 'achievements', icon: Trophy,          color: '#a6a6a6',               glow: 'rgba(166, 166, 166,0.15)' },
+  { label: 'Settings',     tab: 'settings',     icon: Settings2,       color: 'var(--accent-primary)', glow: 'rgba(85, 85, 85,0.15)' },
 ];
 
 interface TopbarProps {
@@ -79,7 +79,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
               style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0,0,0,0.6)',
+                background: 'rgba(0, 0, 0,0.6)',
                 zIndex: 100,
               }}
             />
@@ -281,7 +281,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
                     gap: 10,
                     padding: '12px 14px',
                     borderRadius: 12,
-                    border: '1px solid rgba(239,68,68,0.3)',
+                    border: '1px solid rgba(104, 104, 104,0.3)',
                     background: 'var(--danger-glow)',
                     color: 'var(--danger)',
                     cursor: 'pointer',
@@ -475,7 +475,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                border: '1px solid rgba(239,68,68,0.3)',
+                border: '1px solid rgba(104, 104, 104,0.3)',
                 background: 'var(--danger-glow)',
                 color: 'var(--danger)',
                 display: 'flex',

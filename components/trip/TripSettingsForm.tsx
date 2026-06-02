@@ -256,7 +256,7 @@ export default function TripSettingsForm({ trip }: { trip: Trip }) {
             </Field>
           </div>
           <Field label="Total budget (₹)" error={errors.total_budget}>
-            <TextField type="number" min={0} value={form.total_budget} onChange={set('total_budget')} />
+            <TextField type="number" min={0} step="any" value={form.total_budget} onChange={set('total_budget')} />
           </Field>
 
           <Field label="Travelers / Persons">
@@ -318,7 +318,7 @@ export default function TripSettingsForm({ trip }: { trip: Trip }) {
         </form>
       </Card>
 
-      <Card padding="lg" style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'var(--danger-glow)' }}>
+      <Card padding="lg" style={{ border: '1px solid rgba(104, 104, 104,0.2)', background: 'var(--danger-glow)' }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--danger)' }}>Danger Zone</h3>
         <p style={{ margin: '8px 0 16px', fontSize: 13, color: 'var(--text-muted)' }}>
           Permanently delete this trip and all its expenses, bookings, documents, itinerary days, and packing items. This cannot be undone.
@@ -330,8 +330,8 @@ export default function TripSettingsForm({ trip }: { trip: Trip }) {
             padding: '12px 20px',
             borderRadius: 12,
             border: 'none',
-            background: '#EF4444',
-            color: '#FFFFFF',
+            background: '#6a6a6a',
+            color: '#ffffff',
             cursor: 'pointer',
             fontSize: 14,
             fontWeight: 700,

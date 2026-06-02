@@ -21,8 +21,10 @@ import {
   ChevronRight,
   Moon,
   Sun,
+  Shield,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import DevicesModal from '@/components/settings/DevicesModal';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import CommandPalette from '@/components/layout/CommandPalette';
@@ -62,6 +64,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
   const [user, setUser] = useState<User | null>(null);
   const [open, setOpen] = useState(false);
   const [paletteOpen, setPalette] = useState(false);
+  const [devicesOpen, setDevicesOpen] = useState(false);
 
   // New Trip form states
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -74,10 +77,10 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
   const [creating, setCreating] = useState(false);
 
   const isDark = theme === 'dark';
-  const PURPLE = '#7C3AED';
-  const PURPLE_LIGHT = 'rgba(124,58,237,0.08)';
-  const TEXT_DARK = isDark ? '#FFFFFF' : '#1E1B4B';
-  const TEXT_MUTED = isDark ? 'rgba(255,255,255,0.60)' : 'rgba(30,10,80,0.55)';
+  const PURPLE = '#555555';
+  const PURPLE_LIGHT = 'rgba(85, 85, 85,0.08)';
+  const TEXT_DARK = isDark ? '#ffffff' : '#1f1f1f';
+  const TEXT_MUTED = isDark ? 'rgba(255, 255, 255,0.60)' : 'rgba(19, 19, 19,0.55)';
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -266,7 +269,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setOpen(false)}
-              style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0,0,0,0.45)' }}
+              style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0, 0, 0,0.45)' }}
             />
             <motion.div
               initial={{ y: '100%' }}
@@ -292,7 +295,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
 
                 {/* Drag handle */}
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
-                  <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.18)' }} />
+                  <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255, 255, 255,0.18)' : 'rgba(85, 85, 85,0.18)' }} />
                 </div>
 
                 {/* Top bar */}
@@ -302,12 +305,12 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                   transition={{ delay: 0.08 }}
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 8 }}
                 >
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255,255,255,0.60)' : 'rgba(60,40,120,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255,0.60)' : 'rgba(50, 50, 50,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     Trip Planner
                   </p>
                   <button onClick={() => setOpen(false)} style={{
                     width: 36, height: 36, borderRadius: '50%',
-                    background: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(124,58,237,0.08)',
+                    background: isDark ? 'rgba(255, 255, 255,0.10)' : 'rgba(85, 85, 85,0.08)',
                     border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer',
@@ -325,20 +328,20 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                     style={{
                       marginTop: 16,
                       background: isDark
-                        ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                        : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                        ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                        : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
                       borderRadius: 28,
                       padding: '28px 24px 24px',
                       boxShadow: isDark
-                        ? '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                        : '0 4px 24px rgba(100,80,200,0.12), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                        ? '0 8px 32px rgba(0, 0, 0,0.45), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                        : '0 4px 24px rgba(99, 99, 99,0.12), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
                       border: 'none',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
                       <div style={{
                         width: 68, height: 68, borderRadius: '50%',
-                        background: `linear-gradient(135deg, ${PURPLE} 0%, #A855F7 100%)`,
+                        background: `linear-gradient(135deg, ${PURPLE} 0%, #727272 100%)`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
                       }}>
@@ -355,7 +358,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                     </div>
 
                     {/* Divider */}
-                    <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(124,58,237,0.10)', margin: '20px 0' }} />
+                    <div style={{ height: 1, background: isDark ? 'rgba(255, 255, 255,0.08)' : 'rgba(85, 85, 85,0.10)', margin: '20px 0' }} />
 
                     {/* Stats row */}
                     <div style={{ display: 'flex', gap: 12 }}>
@@ -367,13 +370,13 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                         <div key={label} style={{
                           flex: 1,
                           background: isDark
-                            ? 'linear-gradient(155deg, rgba(124,58,237,0.22) 0%, rgba(124,58,237,0.10) 100%)'
-                            : 'linear-gradient(155deg, rgba(124,58,237,0.12) 0%, rgba(124,58,237,0.06) 100%)',
+                            ? 'linear-gradient(155deg, rgba(85, 85, 85,0.22) 0%, rgba(85, 85, 85,0.10) 100%)'
+                            : 'linear-gradient(155deg, rgba(85, 85, 85,0.12) 0%, rgba(85, 85, 85,0.06) 100%)',
                           borderRadius: 14,
                           padding: '12px 10px', textAlign: 'center',
                           boxShadow: isDark
-                            ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(124,58,237,0.28)'
-                            : 'inset 0 1px 0 rgba(255,255,255,0.90), 0 0 0 1px rgba(124,58,237,0.14)',
+                            ? 'inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(85, 85, 85,0.28)'
+                            : 'inset 0 1px 0 rgba(255, 255, 255,0.90), 0 0 0 1px rgba(85, 85, 85,0.14)',
                         }}>
                           <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: TEXT_DARK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</p>
                           <p style={{ margin: '2px 0 0', fontSize: 10, color: TEXT_MUTED, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</p>
@@ -391,12 +394,12 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                   style={{
                     marginTop: 16,
                     background: isDark
-                      ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                      : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                      ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                      : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
                     borderRadius: 24, padding: '16px 20px',
                     boxShadow: isDark
-                      ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                      : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                      ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                      : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
                     border: 'none',
                   }}
                 >
@@ -475,19 +478,19 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                   style={{
                     marginTop: 16,
                     background: isDark
-                      ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                      : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                      ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                      : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
                     borderRadius: 24, padding: '16px 20px',
                     boxShadow: isDark
-                      ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                      : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                      ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                      : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
                     border: 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {isDark ? <Moon size={18} color="#A78BFA" /> : <Sun size={18} color="#F59E0B" />}
+                      {isDark ? <Moon size={18} color="#999999" /> : <Sun size={18} color="#a6a6a6" />}
                     </div>
                     <div>
                       <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>{isDark ? 'Dark Mode' : 'Light Mode'}</p>
@@ -495,6 +498,41 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                     </div>
                   </div>
                   <ThemeToggle />
+                </motion.div>
+
+                {/* Security & Devices Toggle Row */}
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18, type: 'spring', damping: 28, stiffness: 280 }}
+                  onClick={() => {
+                    setOpen(false);
+                    setDevicesOpen(true);
+                  }}
+                  style={{
+                    marginTop: 16,
+                    background: isDark
+                      ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                      : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
+                    borderRadius: 24, padding: '16px 20px',
+                    boxShadow: isDark
+                      ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                      : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
+                    border: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Shield size={18} color="#999999" />
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_DARK }}>Devices & Sessions</p>
+                      <p style={{ margin: '1px 0 0', fontSize: 12, color: TEXT_MUTED }}>Manage active logins</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} color={TEXT_MUTED} />
                 </motion.div>
 
                 {/* Navigation Pages List */}
@@ -505,12 +543,12 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                   style={{
                     marginTop: 16,
                     background: isDark
-                      ? 'linear-gradient(155deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.04) 100%)'
-                      : 'linear-gradient(155deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.55) 100%)',
+                      ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
+                      : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
                     borderRadius: 24, overflow: 'hidden',
                     boxShadow: isDark
-                      ? '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.16), 0 0 0 1px rgba(255,255,255,0.08)'
-                      : '0 4px 24px rgba(100,80,200,0.10), inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(255,255,255,0.90)',
+                      ? '0 8px 32px rgba(0, 0, 0,0.40), inset 0 1px 0 rgba(255, 255, 255,0.16), 0 0 0 1px rgba(255, 255, 255,0.08)'
+                      : '0 4px 24px rgba(99, 99, 99,0.10), inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(255, 255, 255,0.90)',
                     border: 'none',
                   }}
                 >
@@ -518,7 +556,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                     const active = isActive(pathname, href);
                     return (
                       <div key={href}>
-                        {idx > 0 && <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(124,58,237,0.06)', marginLeft: 62 }} />}
+                        {idx > 0 && <div style={{ height: 1, background: isDark ? 'rgba(255, 255, 255,0.06)' : 'rgba(85, 85, 85,0.06)', marginLeft: 62 }} />}
                         <Link
                           href={href}
                           onClick={() => setOpen(false)}
@@ -581,7 +619,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                         cursor: 'pointer',
                         fontSize: 15,
                         fontWeight: 700,
-                        boxShadow: '0 4px 14px rgba(124,58,237,0.25)',
+                        boxShadow: '0 4px 14px rgba(85, 85, 85,0.25)',
                       }}
                     >
                       <Repeat size={16} />
@@ -604,10 +642,10 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                         gap: 10,
                         padding: '16px 0',
                         borderRadius: 20,
-                        border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(124,58,237,0.12)',
+                        border: isDark ? '1px solid rgba(255, 255, 255,0.08)' : '1px solid rgba(85, 85, 85,0.12)',
                         background: isDark
-                          ? 'linear-gradient(155deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)'
-                          : 'linear-gradient(155deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%)',
+                          ? 'linear-gradient(155deg, rgba(255, 255, 255,0.08) 0%, rgba(255, 255, 255,0.03) 100%)'
+                          : 'linear-gradient(155deg, rgba(255, 255, 255,0.7) 0%, rgba(255, 255, 255,0.4) 100%)',
                         color: TEXT_DARK,
                         cursor: 'pointer',
                         fontSize: 15,
@@ -632,9 +670,9 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                         borderRadius: 20,
                         border: 'none',
                         background: isDark
-                          ? 'linear-gradient(155deg, rgba(239,68,68,0.18) 0%, rgba(239,68,68,0.10) 100%)'
-                          : 'linear-gradient(155deg, rgba(255,255,255,0.80) 0%, rgba(255,230,230,0.60) 100%)',
-                        color: isDark ? '#F87171' : '#DC2626',
+                          ? 'linear-gradient(155deg, rgba(104, 104, 104,0.18) 0%, rgba(104, 104, 104,0.10) 100%)'
+                          : 'linear-gradient(155deg, rgba(255, 255, 255,0.80) 0%, rgba(235, 235, 235,0.60) 100%)',
+                        color: isDark ? '#8e8e8e' : '#4d4d4d',
                         fontSize: 15,
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -643,8 +681,8 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                         justifyContent: 'center',
                         gap: 10,
                         boxShadow: isDark
-                          ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(239,68,68,0.22)'
-                          : 'inset 0 1px 0 rgba(255,255,255,1), 0 0 0 1px rgba(239,68,68,0.18)',
+                          ? 'inset 0 1px 0 rgba(255, 255, 255,0.14), 0 0 0 1px rgba(104, 104, 104,0.22)'
+                          : 'inset 0 1px 0 rgba(255, 255, 255,1), 0 0 0 1px rgba(104, 104, 104,0.18)',
                       }}
                     >
                       <LogOut size={16} />
@@ -663,7 +701,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
         )}
       </AnimatePresence>
 
-      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Trip">
+      <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Create New Trip" closeOnOutsideClick={false}>
         <form onSubmit={handleCreateTrip} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
@@ -821,6 +859,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
       </Modal>
 
       <CommandPalette isOpen={paletteOpen} onClose={() => setPalette(false)} />
+      <DevicesModal isOpen={devicesOpen} onClose={() => setDevicesOpen(false)} />
     </>
   );
 }

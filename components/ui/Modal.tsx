@@ -11,6 +11,7 @@ interface ModalProps {
   title?: string;
   children: React.ReactNode;
   size?: ModalSize;
+  closeOnOutsideClick?: boolean;
 }
 
 const sizeMap: Record<ModalSize, string> = {
@@ -36,6 +37,7 @@ export default function Modal({
   title,
   children,
   size = 'md',
+  closeOnOutsideClick = true,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -118,7 +120,7 @@ export default function Modal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          onClick={onClose}
+          onClick={closeOnOutsideClick ? onClose : undefined}
           className="hf-modal-backdrop"
           style={{
             position: 'fixed',

@@ -7,9 +7,9 @@ import { DynamicIcon } from '@/lib/icons';
 interface Insight { title: string; detail: string; tone: 'positive' | 'suggestion' | 'warning' }
 
 const TONE: Record<Insight['tone'], { icon: string; color: string }> = {
-  positive:   { icon: 'trophy',   color: '#10B981' },
-  suggestion: { icon: 'zap',      color: '#7C3AED' },
-  warning:    { icon: 'flame',    color: '#F59E0B' },
+  positive:   { icon: 'trophy',   color: '#919191' },
+  suggestion: { icon: 'zap',      color: '#555555' },
+  warning:    { icon: 'flame',    color: '#a6a6a6' },
 };
 
 export default function CoachCard() {
@@ -43,7 +43,7 @@ export default function CoachCard() {
           width: 40, height: 40, borderRadius: 12, background: 'var(--surface-tint)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <DynamicIcon name="zap" size={20} color="#7C3AED" />
+          <DynamicIcon name="zap" size={20} color="#555555" />
         </div>
         <div>
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>

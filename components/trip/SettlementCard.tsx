@@ -101,7 +101,7 @@ export default function SettlementCard({
                 style={{
                   fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
-                  color: owes ? 'var(--danger)' : owed ? '#34D399' : 'var(--text-muted)',
+                  color: owes ? 'var(--danger)' : owed ? '#adadad' : 'var(--text-muted)',
                 }}
               >
                 {owes ? `pending -${formatINR(-balance)}` : owed ? `credit +${formatINR(balance)}` : 'settled up'}
@@ -168,8 +168,8 @@ export default function SettlementCard({
                           cursor: isBusy ? 'default' : 'pointer',
                           color: 'var(--accent-on-primary, #fff)',
                           background: 'var(--accent-primary)',
-                          border: '1px solid rgba(255,255,255,0.14)',
-                          boxShadow: '0 1px 3px rgba(76,29,149,0.25)',
+                          border: '1px solid rgba(255, 255, 255,0.14)',
+                          boxShadow: '0 1px 3px rgba(48, 48, 48,0.25)',
                           whiteSpace: 'nowrap',
                           opacity: isBusy ? 0.55 : 1,
                           transition: 'opacity 0.15s ease, transform 0.15s ease',
@@ -195,7 +195,7 @@ export default function SettlementCard({
           {settledPayments.map((p) => (
             <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, fontSize: 12.5 }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)' }}>
-                <Check size={13} color="#34D399" />
+                <Check size={13} color="#adadad" />
                 {p.from_person} → {p.to_person}
                 <span style={{ fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{formatINR(Number(p.amount))}</span>
               </span>

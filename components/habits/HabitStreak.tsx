@@ -15,8 +15,8 @@ const sizeConfig = {
 };
 
 function getStreakColor(streak: number): string {
-  if (streak >= 7) return '#F59E0B';   // amber
-  if (streak > 3)  return '#F97316';   // orange
+  if (streak >= 7) return '#a6a6a6';   // amber
+  if (streak > 3)  return '#898989';   // orange
   return 'var(--text-muted)';           // muted
 }
 

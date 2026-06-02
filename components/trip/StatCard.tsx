@@ -5,9 +5,9 @@ type Accent = 'default' | 'green' | 'red' | 'amber';
 
 const accentColor: Record<Accent, string> = {
   default: 'var(--text-primary)',
-  green: '#34D399',
+  green: '#adadad',
   red: 'var(--danger)',
-  amber: '#FBBF24',
+  amber: '#c1c1c1',
 };
 
 export default function StatCard({

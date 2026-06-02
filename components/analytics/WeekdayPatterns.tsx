@@ -59,7 +59,7 @@ const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
   return (
     <ResponsiveContainer width="100%" height={200}>
       <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }} barCategoryGap="30%">
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255,0.04)" vertical={false} />
         <XAxis
           dataKey="day"
           tick={{ fill: 'var(--text-muted)', fontSize: 12, fontFamily: "'IBM Plex Sans'" }}
@@ -73,7 +73,7 @@ const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
           axisLine={false}
           tickLine={false}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 255, 255,0.03)' }} />
         <Bar dataKey="completionRate" radius={[6, 6, 0, 0]}>
           {data.map((entry, index) => {
             const intensity = entry.completionRate / maxRate;

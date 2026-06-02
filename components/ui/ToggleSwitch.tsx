@@ -24,7 +24,7 @@ interface ToggleSwitchProps {
  */
 export default function ToggleSwitch({
   checked, onChange, ariaLabel,
-  onIcon, offIcon, onIconColor = '#7C3AED', offIconColor = '#F59E0B',
+  onIcon, offIcon, onIconColor = '#555555', offIconColor = '#a6a6a6',
 }: ToggleSwitchProps) {
   const icon = checked ? onIcon : offIcon;
   const iconColor = checked ? onIconColor : offIconColor;
@@ -44,22 +44,22 @@ export default function ToggleSwitch({
         display: 'block', position: 'relative',
         width: 58, height: 32, borderRadius: 'var(--r-pill)',
         background: checked
-          ? 'linear-gradient(135deg, rgba(124,58,237,0.55) 0%, rgba(167,85,247,0.35) 100%)'
-          : 'linear-gradient(135deg, rgba(196,181,253,0.45) 0%, rgba(221,214,254,0.30) 100%)',
+          ? 'linear-gradient(135deg, rgba(85, 85, 85,0.55) 0%, rgba(114, 114, 114,0.35) 100%)'
+          : 'linear-gradient(135deg, rgba(188, 188, 188,0.45) 0%, rgba(218, 218, 218,0.30) 100%)',
         boxShadow: checked
-          ? '0 0 0 1px rgba(167,85,247,0.5), inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(124,58,237,0.45)'
-          : '0 0 0 1px rgba(196,181,253,0.6), inset 0 1px 0 rgba(255,255,255,0.55), 0 2px 8px rgba(124,58,237,0.15)',
+          ? '0 0 0 1px rgba(114, 114, 114,0.5), inset 0 1px 0 rgba(255, 255, 255,0.18), 0 4px 16px rgba(85, 85, 85,0.45)'
+          : '0 0 0 1px rgba(188, 188, 188,0.6), inset 0 1px 0 rgba(255, 255, 255,0.55), 0 2px 8px rgba(85, 85, 85,0.15)',
         transition: 'all 0.3s ease',
       }}>
         <span style={{
           position: 'absolute', top: 4, left: checked ? 30 : 4,
           width: 24, height: 24, borderRadius: '50%',
           background: checked
-            ? 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(237,233,254,0.85) 100%)'
-            : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.80) 100%)',
+            ? 'linear-gradient(145deg, rgba(255, 255, 255,0.95) 0%, rgba(235, 235, 235,0.85) 100%)'
+            : 'linear-gradient(145deg, rgba(255, 255, 255,0.98) 0%, rgba(255, 255, 255,0.80) 100%)',
           boxShadow: checked
-            ? '0 0 0 1px rgba(255,255,255,0.25), 0 2px 8px rgba(124,58,237,0.5), inset 0 1px 0 rgba(255,255,255,0.9)'
-            : '0 0 0 1px rgba(196,181,253,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,1)',
+            ? '0 0 0 1px rgba(255, 255, 255,0.25), 0 2px 8px rgba(85, 85, 85,0.5), inset 0 1px 0 rgba(255, 255, 255,0.9)'
+            : '0 0 0 1px rgba(188, 188, 188,0.4), 0 2px 6px rgba(0, 0, 0,0.12), inset 0 1px 0 rgba(255, 255, 255,1)',
           transition: 'left 0.3s cubic-bezier(0.34,1.56,0.64,1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>

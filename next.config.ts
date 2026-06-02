@@ -32,15 +32,9 @@ const securityHeaders = [
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
 ];
 
-// Cache-Control for static assets — aggressive caching for immutable assets
+// Cache-Control for public assets and low-risk analytics responses.
+// Next.js owns /_next/static caching and warns when it is overridden.
 const cacheControlHeaders = [
-  // Static JS/CSS chunks (hashed filenames — safe to cache forever)
-  {
-    source: '/_next/static/:path*',
-    headers: [
-      { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-    ],
-  },
   // Static public assets (images, fonts, etc.)
   {
     source: '/:path*.(png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot)',
@@ -86,8 +80,8 @@ const nextConfig: NextConfig = {
   // Powered-by header — remove for security
   poweredByHeader: false,
 
-  // React strict mode — keep enabled in dev for catching bugs
-  reactStrictMode: !isDev,
+  // React strict mode — keep enabled in dev for catching bugs.
+  reactStrictMode: true,
 
   // Image optimization
   images: {

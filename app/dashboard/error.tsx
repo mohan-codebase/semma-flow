@@ -33,7 +33,7 @@ export default function DashboardError({
           height: 48,
           borderRadius: '50%',
           background: 'var(--danger-glow)',
-          border: '1px solid rgba(240,114,114,0.24)',
+          border: '1px solid rgba(140, 140, 140,0.24)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

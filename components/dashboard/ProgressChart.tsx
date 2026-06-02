@@ -55,7 +55,7 @@ function DeltaPill({ value, positive }: { value: number; positive: boolean }) {
         letterSpacing: '-0.01em',
         color: zero ? 'var(--text-muted)' : positive ? 'var(--accent-light)' : 'var(--danger)',
         background: zero ? 'var(--bg-tertiary)' : positive ? 'var(--accent-glow-md)' : 'var(--danger-glow)',
-        border: `1px solid ${zero ? 'var(--border-default)' : positive ? 'color-mix(in srgb, var(--accent-primary) 24%, transparent)' : 'rgba(240,114,114,0.24)'}`,
+        border: `1px solid ${zero ? 'var(--border-default)' : positive ? 'color-mix(in srgb, var(--accent-primary) 24%, transparent)' : 'rgba(140, 140, 140,0.24)'}`,
       }}
     >
       {zero ? <Minus size={9} /> : positive ? <TrendingUp size={9} /> : <TrendingDown size={9} />}
@@ -232,7 +232,7 @@ export default function ProgressChart({ data, habitCount }: ProgressChartProps) 
               padding: '3px 9px',
               borderRadius: 'var(--r-pill)',
               background: onTrack ? 'var(--accent-glow-md)' : 'var(--warm-glow)',
-              border: `1px solid ${onTrack ? 'color-mix(in srgb, var(--accent-primary) 28%, transparent)' : 'rgba(244,183,64,0.28)'}`,
+              border: `1px solid ${onTrack ? 'color-mix(in srgb, var(--accent-primary) 28%, transparent)' : 'rgba(187, 187, 187,0.28)'}`,
               color: onTrack ? 'var(--accent-light)' : 'var(--warm)',
               fontSize: 11,
               fontWeight: 600,

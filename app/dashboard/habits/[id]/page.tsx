@@ -323,7 +323,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
           label="Current Streak"
           value={`${habit.current_streak}d`}
           icon={<Flame size={18} />}
-          color="#F59E0B"
+          color="#a6a6a6"
         />
         <StatCard
           label="Longest Streak"
@@ -500,6 +500,7 @@ export default function HabitDetailPage({ params }: { params: Promise<{ id: stri
         onClose={closeEditModal}
         title={editEntry ? `Edit · ${format(parseISO(editEntry.entry_date), 'EEE, MMM d yyyy')}` : 'Edit'}
         size="sm"
+        closeOnOutsideClick={false}
       >
         {editEntry && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

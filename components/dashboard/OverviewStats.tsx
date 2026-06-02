@@ -116,7 +116,7 @@ function StatCard({
         overflow: 'hidden',
         transition: 'all 0.2s ease',
         cursor: 'default',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+        boxShadow: '0 2px 12px rgba(0, 0, 0,0.08)',
       }}
       whileHover={{
         y: -2,
@@ -215,7 +215,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
         </StatCard>
 
         {/* Best Streak */}
-        <StatCard delay={0.05} label="Best Streak" accentColor="var(--warm)" accentColorLight="#fbbf24" glowColor="var(--warm-glow)">
+        <StatCard delay={0.05} label="Best Streak" accentColor="var(--warm)" accentColorLight="#c1c1c1" glowColor="var(--warm-glow)">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
@@ -223,7 +223,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
                 height: 40,
                 borderRadius: 'var(--r-md)',
                 background: 'var(--warm-glow)',
-                border: '1px solid rgba(244,183,64,0.22)',
+                border: '1px solid rgba(187, 187, 187,0.22)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -261,7 +261,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
         </StatCard>
 
         {/* Level & Mastery */}
-        <StatCard delay={0.15} label="Level & Rank" accentColor="var(--cyan)" accentColorLight="#67e8f9" glowColor="var(--cyan-glow)">
+        <StatCard delay={0.15} label="Level & Rank" accentColor="var(--cyan)" accentColorLight="#cecece" glowColor="var(--cyan-glow)">
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div
@@ -270,7 +270,7 @@ export default function OverviewStats({ stats, loading }: OverviewStatsProps) {
                   height: 38,
                   borderRadius: 'var(--r-md)',
                   background: 'var(--cyan-glow)',
-                  border: '1px solid rgba(34,211,238,0.22)',
+                  border: '1px solid rgba(175, 175, 175,0.22)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

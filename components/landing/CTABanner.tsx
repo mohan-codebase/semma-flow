@@ -58,7 +58,7 @@ export default function CTABanner() {
             height: 52,
             borderRadius: 'var(--r-xl)',
             background: 'var(--warm-glow)',
-            border: '1px solid rgba(244,183,64,0.3)',
+            border: '1px solid rgba(187, 187, 187,0.3)',
             marginBottom: 20,
           }}>
             <Flame size={24} color="var(--warm)" className="fire-glow" />

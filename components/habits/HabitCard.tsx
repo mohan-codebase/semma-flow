@@ -2,27 +2,27 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MoreHorizontal, Pencil, Archive, Trash2, Flame, Link, Shield } from 'lucide-react';
+import { MoreHorizontal, Pencil, Archive, Trash2, Flame, Shield, Target, BadgeCheck, GripVertical } from 'lucide-react';
 import { DynamicIcon } from '@/lib/icons';
 import type { HabitWithEntry } from '@/types/habit';
-import HabitCheckbox from '@/components/habits/HabitCheckbox';
-import NextLink from 'next/link';
 
 interface HabitCardProps {
   habit: HabitWithEntry;
-  onToggle:  (habitId: string, completed: boolean) => void;
-  onEdit:    (habit: HabitWithEntry) => void;
-  onArchive: (habitId: string) => void;
-  onDelete:  (habitId: string) => void;
+  onToggle: (habitId: string, completed: boolean) => void;
+  onEdit?: (habit: HabitWithEntry) => void;
+  onArchive?: (habitId: string) => void;
+  onDelete?: (habitId: string) => void;
+  onOpen?: (habitId: string) => void;
+  dragHandleProps?: any;
 }
 
 function hexToRgba(hex: string, alpha: number): string {
   if (hex === 'var(--accent-primary)') return `color-mix(in srgb, var(--accent-primary) ${alpha * 100}%, transparent)`;
   if (hex === 'var(--accent-light)') return `color-mix(in srgb, var(--accent-light) ${alpha * 100}%, transparent)`;
   if (!hex?.startsWith('#')) return `rgba(var(--accent-primary-rgb), ${alpha})`;
-  const s    = hex.replace('#', '');
+  const s = hex.replace('#', '');
   const full = s.length === 3 ? s.split('').map((c) => c + c).join('') : s;
-  const n    = parseInt(full, 16);
+  const n = parseInt(full, 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 }
 
@@ -33,11 +33,42 @@ function freqLabel(habit: HabitWithEntry): string {
     const names = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     return (f.days ?? []).map((d) => names[d]).join(' · ') || 'Weekly';
   }
-  if (f.type === 'x_per_week')  return `${f.count ?? 1}× / week`;
+  if (f.type === 'x_per_week') return `${f.count ?? 1}× / week`;
   if (f.type === 'x_per_month') return `${f.count ?? 1}× / month`;
   return '';
 }
 
+// Maps habit categories or names to high-quality cover photos
+function getHabitCoverImage(habit: HabitWithEntry): string {
+  const name = habit.name.toLowerCase();
+  const category = habit.category?.name.toLowerCase() ?? '';
+  const isBad = habit.is_bad_habit === true;
+
+  if (isBad) {
+    return 'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=600&auto=format&fit=crop&q=80';
+  }
+
+  const query = `${name} ${category}`;
+
+  if (query.match(/(gym|workout|fitness|exercise|run|lift|cardio|sport|train|body|muscle|yoga|stretching)/)) {
+    return 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80';
+  }
+  if (query.match(/(learn|code|read|study|book|write|productivity|work|focus|computer|coding|language)/)) {
+    return 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&auto=format&fit=crop&q=80';
+  }
+  if (query.match(/(meditate|mind|breathe|sleep|relax|calm|peace|zen|journal)/)) {
+    return 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&auto=format&fit=crop&q=80';
+  }
+  if (query.match(/(food|water|diet|eat|nutrition|drink|hydrate|health|fruit|vege|cooking)/)) {
+    return 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&auto=format&fit=crop&q=80';
+  }
+  if (query.match(/(money|finance|budget|save|spend|invest|coin|crypto)/)) {
+    return 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&auto=format&fit=crop&q=80';
+  }
+
+  // Elegant abstract cover
+  return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80';
+}
 
 function MenuItem({ icon, label, onClick, danger = false }: { icon: React.ReactNode; label: string; onClick: () => void; danger?: boolean }) {
   const [hov, setHov] = useState(false);
@@ -48,12 +79,19 @@ function MenuItem({ icon, label, onClick, danger = false }: { icon: React.ReactN
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        width: '100%', padding: '7px 10px',
-        background: hov ? (danger ? 'rgba(239,68,68,0.10)' : 'var(--bg-elevated)') : 'transparent',
-        border: 'none', borderRadius: 8, cursor: 'pointer',
-        color: danger ? (hov ? 'var(--danger)' : '#f87171') : 'var(--text-secondary)',
-        fontSize: 13, fontWeight: 500, textAlign: 'left',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        width: '100%',
+        padding: '8px 10px',
+        background: hov ? (danger ? 'rgba(104, 104, 104,0.12)' : 'var(--bg-elevated)') : 'transparent',
+        border: 'none',
+        borderRadius: 8,
+        cursor: 'pointer',
+        color: danger ? (hov ? 'var(--danger)' : '#8e8e8e') : 'var(--text-secondary)',
+        fontSize: 13,
+        fontWeight: 500,
+        textAlign: 'left',
         transition: 'all 0.12s ease',
       }}
     >
@@ -63,8 +101,8 @@ function MenuItem({ icon, label, onClick, danger = false }: { icon: React.ReactN
   );
 }
 
-const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: HabitCardProps) => {
-  const [checked,  setChecked]  = useState(habit.todayEntry?.is_completed ?? false);
+const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete, onOpen, dragHandleProps }: HabitCardProps) => {
+  const [checked, setChecked] = useState(habit.todayEntry?.is_completed ?? false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -72,10 +110,12 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
     setChecked(habit.todayEntry?.is_completed ?? false);
   }, [habit.todayEntry?.is_completed]);
 
-  const handleToggle = useCallback((val: boolean) => {
+  const handleToggle = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent card click / sheet opening
+    const val = !checked;
     setChecked(val);
     onToggle(habit.id, val);
-  }, [habit.id, onToggle]);
+  }, [habit.id, checked, onToggle]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -88,182 +128,400 @@ const HabitCard = React.memo(({ habit, onToggle, onEdit, onArchive, onDelete }: 
 
   const isBad = habit.is_bad_habit === true;
   let color = habit.color ?? 'var(--accent-primary)';
-  if (!isBad && (color.toUpperCase() === '#10B981' || color.toUpperCase() === '#10E5B0' || color.toUpperCase() === '#F43F5E' || color.toUpperCase() === '#7C3AED')) color = 'var(--accent-primary)';
-  if (isBad && color === 'var(--accent-primary)') color = '#EF4444';
+  if (!isBad && (color.toUpperCase() === '#919191' || color.toUpperCase() === '#b4b4b4' || color.toUpperCase() === '#686868' || color.toUpperCase() === '#555555')) color = 'var(--accent-primary)';
+  if (isBad && color === 'var(--accent-primary)') color = '#6a6a6a';
   const completed = checked;
-  const streak    = habit.current_streak ?? 0;
+  const streak = habit.current_streak ?? 0;
+  const coverImage = getHabitCoverImage(habit);
 
-  return (
-    <motion.div layout style={{ position: 'relative' }}>
-      <motion.div
+  const hasMenu = Boolean(onEdit || onArchive || onDelete);
+
+  const cardContent = (
+    <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 22, overflow: 'hidden' }}>
+      {/* Background Image (100% Card Height) */}
+      <img
+        src={coverImage}
+        alt={habit.name}
         style={{
-          background:       'var(--bg-card)',
-          border:           `1px solid ${completed ? hexToRgba(color, 0.22) : 'var(--border-default)'}`,
-          borderRadius:     'var(--r-lg)',
-          padding:          '13px 16px',
-          display:          'flex',
-          alignItems:       'center',
-          gap:              12,
-          position:         'relative',
-          overflow:         'visible',
-          transition:       'all 0.2s ease',
-          opacity:          completed ? 0.8 : 1,
-          boxShadow: '0 1px 8px rgba(0,0,0,0.06)',
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          zIndex: 0,
+          transition: 'transform 0.4s ease',
         }}
-        whileHover={{
-          y: -2,
-          borderColor: completed ? hexToRgba(color, 0.32) : 'var(--border-accent)',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+        className="habit-card-image"
+      />
+
+      {/* Dark gradient overlay for bottom text legibility */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0, 0, 0,0.1) 0%, rgba(0, 0, 0,0.3) 40%, rgba(0, 0, 0,0.65) 70%, rgba(0, 0, 0,0.92) 100%)',
+          zIndex: 1,
         }}
-        transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+      />
+
+      {/* Content wrapper */}
+      <div
+        style={{
+          position: 'relative',
+          height: '100%',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: 20,
+          boxSizing: 'border-box',
+        }}
       >
-        {/* Left accent bar when completed */}
-        {completed && (
-          <div
-            style={{
-              position: 'absolute', left: 0, top: 8, bottom: 8,
-              width: 2,
-              background: color,
-              borderRadius: 2,
-              opacity: 0.72,
-            }}
-          />
-        )}
-
-        {/* Icon */}
-        <div
-          style={{
-            width: 40, height: 40, borderRadius: 11,
-            background: hexToRgba(color, 0.12),
-            border: `1px solid ${hexToRgba(color, 0.22)}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <DynamicIcon name={habit.icon} size={19} color={color} />
-        </div>
-
-        {/* Content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
-            <NextLink
-              href={`/dashboard/habits/${habit.id}`}
+        {/* Top Header Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+          {/* Habit Icon (Glassmorphic) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div
               style={{
-                fontSize: 14,
-                fontWeight: 600,
-                color: completed ? 'var(--text-muted)' : 'var(--text-primary)',
-                textDecoration: 'none',
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                transition: 'color 0.2s ease',
-                letterSpacing: '-0.1px',
+                width: 38,
+                height: 38,
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.2)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 10px rgba(0, 0, 0,0.1)',
               }}
             >
-              {habit.name}
-            </NextLink>
-            {isBad && (
-              <span style={{
-                fontSize: 9.5, fontWeight: 700,
-                padding: '1px 6px', borderRadius: 'var(--r-pill)',
-                background: 'rgba(239,68,68,0.12)',
-                border: '1px solid rgba(239,68,68,0.28)',
-                color: '#f87171',
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}>
-                Avoid
-              </span>
-            )}
+              <DynamicIcon name={habit.icon} size={18} color="#ffffff" />
+            </div>
+
+            {/* Category badge */}
             {habit.category && (
-              <span
+              <div
                 style={{
-                  fontSize: 10.5, fontWeight: 600,
-                  padding: '2px 7px', borderRadius: 'var(--r-pill)',
-                  background: `${habit.category.color}18`,
-                  border: `1px solid ${habit.category.color}30`,
-                  color: habit.category.color,
-                  flexShrink: 0,
+                  padding: '4px 10px',
+                  borderRadius: 'var(--r-pill)',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  color: '#ffffff',
+                  fontSize: 10,
+                  fontWeight: 750,
+                  letterSpacing: '0.02em',
                 }}
               >
                 {habit.category.name}
-              </span>
+              </div>
             )}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{freqLabel(habit)}</span>
-            {streak > 0 && (
-              <>
-                <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11.5, color: isBad ? (streak >= 7 ? '#f87171' : 'var(--text-muted)') : (streak >= 7 ? '#F59E0B' : 'var(--text-muted)') }}>
-                  {isBad
-                    ? <Shield size={11} color={streak >= 7 ? '#EF4444' : 'var(--text-muted)'} />
-                    : <Flame size={11} color={streak >= 7 ? '#F59E0B' : 'var(--text-muted)'} />
-                  }
-                  {streak}d {isBad ? 'clean' : ''}
-                </span>
-              </>
+
+          {/* Action Tools (Right) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {/* Drag Handle */}
+            {dragHandleProps && (
+              <div
+                {...dragHandleProps}
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'grab',
+                  color: '#ffffff',
+                  opacity: 0.8,
+                }}
+              >
+                <GripVertical size={14} />
+              </div>
             )}
-            {(habit.completionRate ?? 0) > 0 && (
-              <>
-                <span style={{ fontSize: 10, color: 'var(--text-dimmed)' }}>·</span>
-                <span style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: "'IBM Plex Mono'" }}>
-                  {habit.completionRate}%
-                </span>
-              </>
-            )}
-          </div>
-        </div>
 
-        {/* Right: checkbox + menu */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <HabitCheckbox checked={checked} onChange={handleToggle} color={color} size={34} />
-
-          <div ref={menuRef} style={{ position: 'relative' }}>
-            <button
-              type="button"
-              aria-label="Options"
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((o) => !o)}
-              style={{
-                width: 28, height: 28,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                borderRadius: 7, border: 'none',
-                background: menuOpen ? 'var(--bg-elevated)' : 'transparent',
-                color: 'var(--text-muted)', cursor: 'pointer',
-                transition: 'background 0.12s ease',
-              }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-elevated)'; }}
-              onMouseLeave={(e) => { if (!menuOpen) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-            >
-              <MoreHorizontal size={15} />
-            </button>
-
-            <AnimatePresence>
-              {menuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.94, y: -4 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.94, y: -4 }}
-                  transition={{ duration: 0.13 }}
+            {/* Options Menu */}
+            {hasMenu && (
+              <div ref={menuRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  aria-label="Options"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuOpen((o) => !o);
+                  }}
                   style={{
-                    position: 'absolute', right: 0, top: 'calc(100% + 6px)',
-                    background: 'var(--bg-elevated)',
-                    border: '1px solid var(--border-default)',
-                    borderRadius: 11,
-                    boxShadow: 'none',
-                    padding: 5, minWidth: 152, zIndex: 30,
+                    width: 32,
+                    height: 32,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    backdropFilter: 'blur(8px)',
+                    WebkitBackdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.25)',
+                    color: '#ffffff',
+                    cursor: 'pointer',
                   }}
                 >
-                  <MenuItem icon={<Pencil size={13} />} label="Edit"    onClick={() => { setMenuOpen(false); onEdit(habit); }} />
-                  <MenuItem icon={<Archive size={13} />} label="Archive" onClick={() => { setMenuOpen(false); onArchive(habit.id); }} />
-                  <div style={{ height: 1, background: 'var(--border-subtle)', margin: '4px 2px' }} />
-                  <MenuItem icon={<Trash2 size={13} />} label="Delete"  onClick={() => { setMenuOpen(false); onDelete(habit.id); }} danger />
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <MoreHorizontal size={14} />
+                </button>
+
+                <AnimatePresence>
+                  {menuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.94, y: -4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.94, y: -4 }}
+                      transition={{ duration: 0.13 }}
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 'calc(100% + 6px)',
+                        background: 'var(--bg-elevated)',
+                        border: '1px solid var(--border-default)',
+                        borderRadius: 11,
+                        boxShadow: '0 10px 25px rgba(0, 0, 0,0.25)',
+                        padding: 5,
+                        minWidth: 140,
+                        zIndex: 30,
+                      }}
+                    >
+                      {onEdit && (
+                        <MenuItem
+                          icon={<Pencil size={13} />}
+                          label="Edit"
+                          onClick={() => {
+                            setMenuOpen(false);
+                            onEdit(habit);
+                          }}
+                        />
+                      )}
+                      {onArchive && (
+                        <MenuItem
+                          icon={<Archive size={13} />}
+                          label="Archive"
+                          onClick={() => {
+                            setMenuOpen(false);
+                            onArchive(habit.id);
+                          }}
+                        />
+                      )}
+                      {onDelete && (
+                        <>
+                          <div style={{ height: 1, background: 'var(--border-subtle)', margin: '4px 2px' }} />
+                          <MenuItem
+                            icon={<Trash2 size={13} />}
+                            label="Delete"
+                            onClick={() => {
+                              setMenuOpen(false);
+                              onDelete(habit.id);
+                            }}
+                            danger
+                          />
+                        </>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
         </div>
-      </motion.div>
+
+        {/* Bottom Details Section */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div>
+            {/* Habit Title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+              <h3
+                style={{
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  letterSpacing: '-0.025em',
+                  margin: 0,
+                  textShadow: '0 2px 4px rgba(0, 0, 0,0.5)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {habit.name}
+              </h3>
+              {completed && (
+                <BadgeCheck
+                  size={20}
+                  color="#919191"
+                  fill="white"
+                  style={{ flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0,0.25))' }}
+                />
+              )}
+              {isBad && (
+                <span
+                  style={{
+                    fontSize: 8.5,
+                    fontWeight: 800,
+                    padding: '1px 5px',
+                    borderRadius: 'var(--r-pill)',
+                    background: 'rgba(104, 104, 104,0.2)',
+                    border: '1px solid rgba(104, 104, 104,0.4)',
+                    color: '#8e8e8e',
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
+                    flexShrink: 0,
+                  }}
+                >
+                  Avoid
+                </span>
+              )}
+            </div>
+
+            {/* Description/Bio (White text) */}
+            <p
+              style={{
+                fontSize: 13.5,
+                color: 'rgba(255, 255, 255, 0.75)',
+                lineHeight: 1.4,
+                margin: 0,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                height: 38,
+                textShadow: '0 1px 2px rgba(0, 0, 0,0.4)',
+              }}
+            >
+              {habit.description || (isBad ? 'Avoid this trigger to build healthy resilience.' : `Frequency: ${freqLabel(habit)}`)}
+            </p>
+          </div>
+
+          {/* Stats Indicators (Streak & Rate) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Streak */}
+            <div
+              title="Current streak"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 12.5,
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontWeight: 700,
+              }}
+            >
+              {isBad ? (
+                <Shield size={14} color="#8e8e8e" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0,0.3))' }} />
+              ) : (
+                <Flame size={14} color="#a6a6a6" style={{ filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0,0.3))' }} />
+              )}
+              <span>{streak}</span>
+            </div>
+
+            {/* Rate */}
+            <div
+              title="Completion rate"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+                fontSize: 12.5,
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontWeight: 700,
+              }}
+            >
+              <Target size={14} color="rgba(255, 255, 255, 0.6)" />
+              <span style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                {habit.completionRate ?? 0}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Button (Centered Pill) */}
+          <button
+            type="button"
+            onClick={handleToggle}
+            style={{
+              width: '100%',
+              height: 42,
+              borderRadius: 21,
+              border: 'none',
+              background: completed ? color : '#ffffff',
+              color: completed ? '#ffffff' : '#000000',
+              fontSize: 13.5,
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              boxShadow: completed ? `0 4px 14px ${hexToRgba(color, 0.45)}` : '0 4px 14px rgba(0, 0, 0, 0.25)',
+              transition: 'all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}
+            className="habit-pill-btn"
+          >
+            {completed ? (
+              <>Completed ✓</>
+            ) : (
+              <>Done +</>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const containerStyles = {
+    background: 'var(--bg-card)',
+    // Bezel effect
+    border: '6px solid var(--bg-card)',
+    borderRadius: 28,
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05)',
+    overflow: 'visible',
+    position: 'relative' as const,
+    height: 380, // slightly taller to comfortably host full-height imagery + action button
+    display: 'flex',
+    flexDirection: 'column' as const,
+    opacity: completed ? 0.9 : 1,
+    transition: 'all 0.2s ease',
+    cursor: onOpen ? 'pointer' : 'default',
+  };
+
+  return (
+    <motion.div layout style={{ position: 'relative' }}>
+      {onOpen ? (
+        <motion.div
+          onClick={() => onOpen(habit.id)}
+          style={containerStyles}
+          whileHover={{
+            y: -5,
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0,0.06)',
+          }}
+          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+        >
+          {cardContent}
+        </motion.div>
+      ) : (
+        <motion.div
+          style={containerStyles}
+          whileHover={{
+            y: -5,
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0,0.06)',
+          }}
+          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+        >
+          {cardContent}
+        </motion.div>
+      )}
     </motion.div>
   );
 });

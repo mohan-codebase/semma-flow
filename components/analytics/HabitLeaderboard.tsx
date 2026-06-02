@@ -52,7 +52,7 @@ export default function HabitLeaderboard({ data }: Props) {
               width: 24,
               fontSize: 12,
               fontWeight: 700,
-              color: index === 0 ? '#EAB308' : index === 1 ? '#94A3B8' : index === 2 ? '#F97316' : 'var(--text-muted)',
+              color: index === 0 ? '#b2b2b2' : index === 1 ? '#a0a0a0' : index === 2 ? '#898989' : 'var(--text-muted)',
               fontFamily: "'IBM Plex Mono'",
               textAlign: 'center',
               flexShrink: 0,
@@ -109,13 +109,13 @@ export default function HabitLeaderboard({ data }: Props) {
                 gap: 3,
                 flexShrink: 0,
                 padding: '2px 8px',
-                background: 'rgba(245,158,11,0.1)',
-                border: '1px solid rgba(245,158,11,0.2)',
+                background: 'rgba(166, 166, 166,0.1)',
+                border: '1px solid rgba(166, 166, 166,0.2)',
                 borderRadius: 20,
               }}
             >
-              <Flame size={11} color="#F59E0B" />
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#F59E0B', fontFamily: "'IBM Plex Mono'" }}>
+              <Flame size={11} color="#a6a6a6" />
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#a6a6a6', fontFamily: "'IBM Plex Mono'" }}>
                 {item.streak}
               </span>
             </div>

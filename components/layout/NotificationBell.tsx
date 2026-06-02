@@ -223,13 +223,13 @@ export default function NotificationBell() {
                       height: 28,
                       borderRadius: 8,
                       background:
-                        n.icon === 'streak' ? 'rgba(245,158,11,0.14)' : 'var(--accent-glow)',
-                      border: `1px solid ${n.icon === 'streak' ? 'rgba(245,158,11,0.3)' : 'color-mix(in srgb, var(--accent-primary) 25%, transparent)'}`,
+                        n.icon === 'streak' ? 'rgba(166, 166, 166,0.14)' : 'var(--accent-glow)',
+                      border: `1px solid ${n.icon === 'streak' ? 'rgba(166, 166, 166,0.3)' : 'color-mix(in srgb, var(--accent-primary) 25%, transparent)'}`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      color: n.icon === 'streak' ? '#F59E0B' : 'var(--accent-primary)',
+                      color: n.icon === 'streak' ? '#a6a6a6' : 'var(--accent-primary)',
                     }}
                   >
                     {n.icon === 'streak' ? <Flame size={13} /> : <Clock size={13} />}

@@ -34,7 +34,7 @@ const base: Record<ButtonVariant, { bg: string; color: string; border: string; s
   primary: {
     bg:     'var(--accent-primary)',
     color:  'var(--accent-on-primary)',
-    border: '1px solid rgba(255,255,255,0.14)',
+    border: '1px solid rgba(255, 255, 255,0.14)',
     shadow: 'none',
   },
   secondary: {
@@ -49,9 +49,9 @@ const base: Record<ButtonVariant, { bg: string; color: string; border: string; s
     border: '1px solid transparent',
   },
   danger: {
-    bg:     'rgba(248,113,113,0.12)',
+    bg:     'rgba(142, 142, 142,0.12)',
     color:  'var(--danger)',
-    border: '1px solid rgba(248,113,113,0.30)',
+    border: '1px solid rgba(142, 142, 142,0.30)',
     shadow: 'none',
   },
 };
@@ -105,13 +105,13 @@ export default function Button({
       el.style.transform = 'translateY(-1px)';
       el.style.boxShadow = 'none';
     } else if (variant === 'secondary') {
-      el.style.background = 'rgba(255,255,255,0.10)';
+      el.style.background = 'rgba(255, 255, 255,0.10)';
       el.style.borderColor = 'var(--border-medium)';
     } else if (variant === 'ghost') {
-      el.style.background = 'rgba(255,255,255,0.06)';
+      el.style.background = 'rgba(255, 255, 255,0.06)';
       el.style.color = 'var(--text-primary)';
     } else if (variant === 'danger') {
-      el.style.background = 'rgba(248,113,113,0.20)';
+      el.style.background = 'rgba(142, 142, 142,0.20)';
     }
   };
 

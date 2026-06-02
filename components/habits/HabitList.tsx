@@ -36,7 +36,7 @@ export default function HabitList({
   }, [initialHabits]);
 
   const goodHabits = useMemo(() => localHabits.filter((h) => !h.is_bad_habit), [localHabits]);
-  const badHabits  = useMemo(() => localHabits.filter((h) => h.is_bad_habit), [localHabits]);
+  const badHabits = useMemo(() => localHabits.filter((h) => h.is_bad_habit), [localHabits]);
 
   const pending = useMemo(
     () => goodHabits.filter((h) => !(h.todayEntry?.is_completed ?? false)),
@@ -135,11 +135,11 @@ export default function HabitList({
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <div 
+                          <div
                             {...dragProvided.dragHandleProps}
-                            style={{ 
-                              color: 'var(--text-muted)', 
-                              cursor: 'grab', 
+                            style={{
+                              color: 'var(--text-muted)',
+                              cursor: 'grab',
                               padding: '0 2px',
                               opacity: 0.5,
                             }}
@@ -188,10 +188,10 @@ export default function HabitList({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {/* Red divider with label */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(239,68,68,0.25)' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(104, 104, 104,0.25)' }} />
             <span style={{
               fontSize: 11, fontWeight: 700,
-              color: '#f87171',
+              color: '#8e8e8e',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               whiteSpace: 'nowrap',
@@ -202,7 +202,7 @@ export default function HabitList({
               <Ban size={11} />
               Bad Habits · {badAvoided.length}/{badHabits.length} avoided
             </span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(239,68,68,0.25)' }} />
+            <div style={{ flex: 1, height: 1, background: 'rgba(104, 104, 104,0.25)' }} />
           </div>
 
           {/* Not yet avoided today */}
@@ -220,7 +220,7 @@ export default function HabitList({
           {badAvoided.length > 0 && (
             <>
               {badPending.length > 0 && (
-                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(239,68,68,0.3)" textColor="#f87171" />
+                <SectionDivider label={`Avoided · ${badAvoided.length}`} color="rgba(104, 104, 104,0.3)" textColor="#8e8e8e" />
               )}
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }} aria-label="Avoided bad habits">
                 {badAvoided.map((habit) => (

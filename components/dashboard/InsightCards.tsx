@@ -22,9 +22,9 @@ interface Insight {
 
 const toneMap: Record<Insight['tone'], { color: string; glow: string; border: string }> = {
   good:    { color: 'var(--accent-light)', glow: 'var(--accent-glow-md)', border: 'color-mix(in srgb, var(--accent-primary) 24%, transparent)' },
-  bad:     { color: 'var(--danger)',       glow: 'var(--danger-glow)',    border: 'rgba(240,114,114,0.24)' },
-  warn:    { color: 'var(--warm)',         glow: 'var(--warm-glow)',      border: 'rgba(244,183,64,0.24)' },
-  neutral: { color: 'var(--indigo)',       glow: 'var(--indigo-glow)',    border: 'rgba(139,127,232,0.24)' },
+  bad:     { color: 'var(--danger)',       glow: 'var(--danger-glow)',    border: 'rgba(140, 140, 140,0.24)' },
+  warn:    { color: 'var(--warm)',         glow: 'var(--warm-glow)',      border: 'rgba(187, 187, 187,0.24)' },
+  neutral: { color: 'var(--indigo)',       glow: 'var(--indigo-glow)',    border: 'rgba(137, 137, 137,0.24)' },
 };
 
 export default function InsightCards({ habits, heatmap, todayISO }: InsightCardsProps) {

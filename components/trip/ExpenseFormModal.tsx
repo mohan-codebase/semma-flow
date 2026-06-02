@@ -196,7 +196,7 @@ export default function ExpenseFormModal({
   }
 
   return (
-    <Modal isOpen={open} onClose={onClose} title={editing ? 'Edit expense' : 'Add expense'} size="md">
+    <Modal isOpen={open} onClose={onClose} title={editing ? 'Edit expense' : 'Add expense'} size="md" closeOnOutsideClick={false}>
       <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <Field label="Category">
           <Select value={form.category} onChange={set('category')} options={EXPENSE_CATEGORIES} />
@@ -208,7 +208,7 @@ export default function ExpenseFormModal({
 
         <div className="trip-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <Field label="Amount (₹)" error={errors.amount}>
-            <TextField type="number" min={0} value={form.amount} onChange={set('amount')} placeholder="0" />
+            <TextField type="number" min={0} step="any" value={form.amount} onChange={set('amount')} placeholder="0" />
           </Field>
           <Field label="Date" required error={errors.expense_date}>
             <TextField type="date" value={form.expense_date} onChange={set('expense_date')} />
@@ -250,6 +250,7 @@ export default function ExpenseFormModal({
                     <TextField
                       type="number"
                       min={0}
+                      step="any"
                       value={payerAmounts[p] ?? ''}
                       onChange={setPayerAmount(p)}
                       placeholder={evenSplit > 0 ? evenSplit.toFixed(0) : '0'}

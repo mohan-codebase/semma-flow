@@ -19,8 +19,8 @@ function fullDate(d: string) {
 
 function barColor(pct: number): string {
   if (pct === 0)   return 'var(--bg-elevated)';
-  if (pct <= 40)   return 'rgba(239,68,68,0.55)';
-  if (pct <= 70)   return 'rgba(245,158,11,0.65)';
+  if (pct <= 40)   return 'rgba(104, 104, 104,0.55)';
+  if (pct <= 70)   return 'rgba(166, 166, 166,0.65)';
   return 'var(--accent-primary)';
 }
 
@@ -159,7 +159,7 @@ export default function WeeklyOverview({ weekData }: { weekData: WeekDayData[] }
                         : color,
                       boxShadow: day.isToday && day.percentage > 0
                         ? '0 0 12px color-mix(in srgb, var(--accent-primary) 35%, transparent)'
-                        : isHov ? '0 0 8px rgba(255,255,255,0.08)' : 'none',
+                        : isHov ? '0 0 8px rgba(255, 255, 255,0.08)' : 'none',
                       transition: 'background 0.2s, box-shadow 0.2s',
                       opacity: isHov ? 1 : day.isToday ? 1 : 0.8,
                     }}

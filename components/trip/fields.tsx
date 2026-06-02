@@ -62,18 +62,21 @@ export function TextField({
   placeholder,
   type = 'text',
   min,
+  step,
 }: {
   value: string | number;
   onChange: (v: string) => void;
   placeholder?: string;
   type?: string;
   min?: number;
+  step?: string | number;
 }) {
   return (
     <input
       type={type}
       value={value}
       min={min}
+      step={step}
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
       style={controlBase}

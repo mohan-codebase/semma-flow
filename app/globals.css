@@ -398,15 +398,14 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--glass-shadow-purple);
 }
 
-/* Gradient text — purple to violet */
+/* Gradient text — flattened to solid ink (monochrome) */
 .gradient-text {
-  background: linear-gradient(100deg, var(--accent-primary) 0%, var(--accent-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
-/* Gradient border with subtle sheen */
+/* Gradient border — flattened to a solid hairline (monochrome) */
 .gradient-border { position: relative; }
 .gradient-border::before {
   content: '';
@@ -414,12 +413,12 @@ h1, h2, h3, h4, h5, h6 {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-light) 100%);
+  background: var(--border-medium);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 1;
 }
 
 .lift {
@@ -862,22 +861,103 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--cat-bg);
   border: 1px solid var(--cat-bd, transparent);
 }
-.cat-travel        { --cat-fg:#7DD3FC; --cat-bg:rgba(56,189,248,0.14); }
-.cat-hotel         { --cat-fg:#C4B5FD; --cat-bg:rgba(167,139,250,0.16); }
-.cat-food          { --cat-fg:#FCD34D; --cat-bg:rgba(251,191,36,0.14); }
-.cat-fuel          { --cat-fg:#FDBA74; --cat-bg:rgba(251,146,60,0.14); }
-.cat-clothing      { --cat-fg:#6EE7B7; --cat-bg:rgba(52,211,153,0.14); }
-.cat-accessories   { --cat-fg:#5EEAD4; --cat-bg:rgba(45,212,191,0.14); }
-.cat-medicine      { --cat-fg:#FDA4AF; --cat-bg:rgba(251,113,133,0.14); }
-.cat-booking       { --cat-fg:#A5B4FC; --cat-bg:rgba(129,140,248,0.16); }
-.cat-miscellaneous { --cat-fg:#CBD5E1; --cat-bg:rgba(148,163,184,0.14); }
+.cat-travel        { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-hotel         { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-food          { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-fuel          { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-clothing      { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-accessories   { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-medicine      { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-booking       { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
+.cat-miscellaneous { --cat-fg:#D4D4D4; --cat-bg:rgba(255,255,255,0.08); }
 
-[data-theme="light"] .cat-travel        { --cat-fg:#0369A1; --cat-bg:rgba(2,132,199,0.10);  --cat-bd:rgba(2,132,199,0.22); }
-[data-theme="light"] .cat-hotel         { --cat-fg:#6D28D9; --cat-bg:rgba(124,58,237,0.10); --cat-bd:rgba(124,58,237,0.22); }
-[data-theme="light"] .cat-food          { --cat-fg:#B45309; --cat-bg:rgba(245,158,11,0.14); --cat-bd:rgba(245,158,11,0.30); }
-[data-theme="light"] .cat-fuel          { --cat-fg:#C2410C; --cat-bg:rgba(249,115,22,0.12); --cat-bd:rgba(249,115,22,0.28); }
-[data-theme="light"] .cat-clothing      { --cat-fg:#047857; --cat-bg:rgba(16,185,129,0.12); --cat-bd:rgba(16,185,129,0.28); }
-[data-theme="light"] .cat-accessories   { --cat-fg:#0F766E; --cat-bg:rgba(20,184,166,0.12); --cat-bd:rgba(20,184,166,0.28); }
-[data-theme="light"] .cat-medicine      { --cat-fg:#BE123C; --cat-bg:rgba(244,63,94,0.10);  --cat-bd:rgba(244,63,94,0.24); }
-[data-theme="light"] .cat-booking       { --cat-fg:#4338CA; --cat-bg:rgba(99,102,241,0.10); --cat-bd:rgba(99,102,241,0.24); }
-[data-theme="light"] .cat-miscellaneous { --cat-fg:#475569; --cat-bg:rgba(100,116,139,0.12);--cat-bd:rgba(100,116,139,0.28); }
+[data-theme="light"] .cat-travel        { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-hotel         { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-food          { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-fuel          { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-clothing      { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-accessories   { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-medicine      { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-booking       { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+[data-theme="light"] .cat-miscellaneous { --cat-fg:#404040; --cat-bg:rgba(0,0,0,0.06); --cat-bd:rgba(0,0,0,0.14); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   MONOCHROME OVERRIDE — black & white only.
+   Declared last so it wins the cascade over the palette above.
+   Dark = black surface / white ink · Light = white surface / black ink.
+   No hue, no gradients, no shadows, no glows.
+   ════════════════════════════════════════════════════════════════════════ */
+:root {
+  --bg-primary:#000000; --bg-secondary:#0d0d0d; --bg-tertiary:#161616; --bg-elevated:#1f1f1f;
+  --bg-card:#0d0d0d; --bg-glass:rgba(255,255,255,0.04); --bg-glass-strong:#0a0a0a; --bg-overlay:rgba(0,0,0,0.80);
+
+  --accent-primary:#ffffff; --accent-hover:#e5e5e5; --accent-light:#d4d4d4; --accent-on-primary:#000000;
+  --accent-glow:transparent; --accent-glow-md:transparent; --accent-glow-lg:transparent;
+
+  --indigo:#ffffff; --indigo-dim:#d4d4d4; --indigo-glow:transparent;
+  --pink:#ffffff; --pink-glow:transparent;
+  --cyan:#ffffff; --cyan-glow:transparent;
+  --warm:#ffffff; --warm-glow:transparent;
+  --danger:#ffffff; --danger-glow:transparent;
+
+  --text-primary:#ffffff; --text-secondary:#d4d4d4; --text-muted:#a3a3a3; --text-dimmed:#666666;
+
+  --border-subtle:rgba(255,255,255,0.10); --border-default:rgba(255,255,255,0.18);
+  --border-medium:rgba(255,255,255,0.28); --border-accent:rgba(255,255,255,0.45); --border-active:rgba(255,255,255,0.70);
+
+  --shadow-xs:none; --shadow-sm:none; --shadow-md:none; --shadow-lg:none; --shadow-accent:none;
+  --glass-highlight:none;
+
+  --surface-card:#0d0d0d; --surface-tint:rgba(255,255,255,0.06); --surface-tint-mid:rgba(255,255,255,0.12);
+  --habit-card:rgba(255,255,255,0.05); --habit-card-done:rgba(255,255,255,0.14); --drag-handle:rgba(255,255,255,0.25);
+  --divider:rgba(255,255,255,0.10); --input-bg:rgba(255,255,255,0.05); --input-border:rgba(255,255,255,0.25);
+
+  --glass-bg:#0d0d0d; --glass-bg-purple:rgba(255,255,255,0.05); --glass-bg-sheet:#0d0d0d;
+  --glass-shadow:none; --glass-shadow-sm:none; --glass-shadow-purple:none; --glass-border:none;
+
+  --accent-secondary:#ffffff; --accent-secondary-glow:transparent; --accent-warm:#ffffff;
+  --gradient-card:var(--bg-secondary); --gradient-glow:none;
+}
+
+[data-theme="light"] {
+  --bg-primary:#ffffff; --bg-secondary:#ffffff; --bg-tertiary:#f5f5f5; --bg-elevated:#ffffff;
+  --bg-card:#ffffff; --bg-glass:rgba(255,255,255,0.85); --bg-glass-strong:#ffffff; --bg-overlay:rgba(0,0,0,0.45);
+
+  --accent-primary:#000000; --accent-hover:#1a1a1a; --accent-light:#404040; --accent-on-primary:#ffffff;
+  --accent-glow:transparent; --accent-glow-md:transparent; --accent-glow-lg:transparent;
+
+  --indigo:#000000; --indigo-dim:#404040; --indigo-glow:transparent;
+  --pink:#000000; --pink-glow:transparent;
+  --cyan:#000000; --cyan-glow:transparent;
+  --warm:#000000; --warm-glow:transparent;
+  --danger:#000000; --danger-glow:transparent;
+
+  --text-primary:#000000; --text-secondary:#404040; --text-muted:#737373; --text-dimmed:#a3a3a3;
+
+  --border-subtle:rgba(0,0,0,0.10); --border-default:rgba(0,0,0,0.16);
+  --border-medium:rgba(0,0,0,0.24); --border-accent:rgba(0,0,0,0.40); --border-active:rgba(0,0,0,0.60);
+
+  --shadow-xs:none; --shadow-sm:none; --shadow-md:none; --shadow-lg:none; --shadow-accent:none;
+  --glass-highlight:none;
+
+  --surface-card:#ffffff; --surface-tint:rgba(0,0,0,0.05); --surface-tint-mid:rgba(0,0,0,0.10);
+  --habit-card:rgba(0,0,0,0.04); --habit-card-done:rgba(0,0,0,0.12); --drag-handle:rgba(0,0,0,0.25);
+  --divider:rgba(0,0,0,0.10); --input-bg:#ffffff; --input-border:rgba(0,0,0,0.22);
+
+  --glass-bg:#ffffff; --glass-bg-purple:rgba(0,0,0,0.04); --glass-bg-sheet:#ffffff;
+  --glass-shadow:none; --glass-shadow-sm:none; --glass-shadow-purple:none; --glass-border:none;
+
+  --accent-secondary:#000000; --accent-secondary-glow:transparent; --accent-warm:#000000;
+  --gradient-card:var(--bg-secondary); --gradient-glow:none;
+}
+
+/* Enforcement — beats inline styles too */
+*, *::before, *::after {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+/* Strip any gradient fill (inline or class), leaving the element's solid bg */
+[style*="gradient"] { background-image: none !important; }
+.gradient-text { background: none !important; -webkit-text-fill-color: var(--text-primary) !important; color: var(--text-primary) !important; }
+/* Drop the decorative ambient grid */
+body::after { background-image: none !important; }

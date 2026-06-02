@@ -25,15 +25,19 @@ export async function GET() {
       .maybeSingle();
     if (error) return err(safeErrorMessage(error, 'Failed to load lock status'), 500);
 
+    // Biometric is optional and lives in a separate table (migration 021). If
+    // that table isn't applied yet it must NOT break the passcode lock — the
+    // passcode status always comes from the server regardless.
+    let hasBiometric = false;
     const { count, error: credErr } = await supabase
       .from('habit_lock_credentials')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id);
-    if (credErr) return err(safeErrorMessage(credErr, 'Failed to load lock status'), 500);
+    if (!credErr) hasBiometric = (count ?? 0) > 0;
 
     return ok({
       hasPasscode: Boolean(profile?.habits_passcode),
-      hasBiometric: (count ?? 0) > 0,
+      hasBiometric,
     });
   } catch (e) {
     return err(safeErrorMessage(e, 'Failed to load lock status'), 500);

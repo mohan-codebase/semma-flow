@@ -205,7 +205,7 @@ export default function CommandPalette({ isOpen, onClose }: Props) {
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0,0,0,0.6)',
+              background: 'rgba(0, 0, 0,0.6)',
               zIndex: 100,
             }}
           />

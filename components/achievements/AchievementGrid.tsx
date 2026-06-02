@@ -85,7 +85,7 @@ export default function AchievementGrid({ achievements }: Props) {
         </div>
 
         <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-          <span style={{ color: '#EAB308', fontWeight: 700, fontFamily: "'IBM Plex Mono'" }}>{unlockedCount}</span>
+          <span style={{ color: '#b2b2b2', fontWeight: 700, fontFamily: "'IBM Plex Mono'" }}>{unlockedCount}</span>
           {' / '}
           {achievements.length} earned
         </span>
@@ -125,7 +125,7 @@ export default function AchievementGrid({ achievements }: Props) {
                 ? 'Keep building streaks and completing habits — your first badge is closer than you think.'
                 : 'You\'ve unlocked everything. Absolute legend.'
             }
-            accentColor="#EAB308"
+            accentColor="#b2b2b2"
             compact
           />
         </div>

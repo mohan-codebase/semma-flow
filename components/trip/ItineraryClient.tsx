@@ -149,7 +149,7 @@ export default function ItineraryClient({ days, userId, trip }: { days: TripItin
         </ol>
       )}
 
-      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? 'Edit day' : 'Add day'} size="md">
+      <Modal isOpen={formOpen} onClose={() => setFormOpen(false)} title={editing ? 'Edit day' : 'Add day'} size="md" closeOnOutsideClick={false}>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr', gap: 14 }}>
             <Field label="Day" error={errors.day}>

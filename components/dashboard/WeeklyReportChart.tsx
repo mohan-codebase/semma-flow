@@ -25,7 +25,7 @@ export interface WeeklyPoint {
 // Default accent (brand purple). A literal hex is required — CSS custom
 // properties don't resolve inside SVG presentation attributes (stroke /
 // stopColor). Per-habit charts pass their own hex via the `color` prop.
-const DEFAULT_ACCENT = '#7C3AED';
+const DEFAULT_ACCENT = '#555555';
 
 interface TooltipPayload {
   payload: WeeklyPoint;

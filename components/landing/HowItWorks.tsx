@@ -28,7 +28,7 @@ const STEPS = [
       "Open the dashboard, tap your habits done. The live indicator shows real-time sync across devices. Forgot yesterday? Use backfill logging.",
     accent: 'var(--indigo)',
     glow: 'var(--indigo-glow)',
-    border: 'rgba(139,127,232,0.35)',
+    border: 'rgba(137, 137, 137,0.35)',
     detail: [
       'One-tap check-in',
       'Backfill any past day',
@@ -43,7 +43,7 @@ const STEPS = [
       'The dashboard surfaces your strongest day of the week, momentum vs last week, streaks at risk, and your full 365-day heatmap.',
     accent: 'var(--cyan)',
     glow: 'var(--cyan-glow)',
-    border: 'rgba(91,199,218,0.35)',
+    border: 'rgba(177, 177, 177,0.35)',
     detail: [
       'Year-view heatmap',
       'Completion rate trends',

@@ -13,11 +13,11 @@ const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'S
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getColor(pct: number): string {
-  if (pct === 0) return 'rgba(255,255,255,0.04)';
-  if (pct < 25) return 'rgba(16, 185, 129, 0.2)';
-  if (pct < 50) return 'rgba(16, 185, 129, 0.4)';
-  if (pct < 75) return 'rgba(16, 185, 129, 0.7)';
-  return 'rgba(16, 185, 129, 1)';
+  if (pct === 0) return 'rgba(255, 255, 255,0.04)';
+  if (pct < 25) return 'rgba(145, 145, 145, 0.2)';
+  if (pct < 50) return 'rgba(145, 145, 145, 0.4)';
+  if (pct < 75) return 'rgba(145, 145, 145, 0.7)';
+  return 'rgba(145, 145, 145, 1)';
 }
 
 const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapProps) {
@@ -89,7 +89,7 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
 
   return (
     <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
-      <style>{`.hf-cal-cell { transition: all 0.2s ease; } .hf-cal-cell:hover { transform: scale(1.5); position: relative; z-index: 10; box-shadow: 0 2px 8px rgba(16,185,129,0.3); }`}</style>
+      <style>{`.hf-cal-cell { transition: all 0.2s ease; } .hf-cal-cell:hover { transform: scale(1.5); position: relative; z-index: 10; box-shadow: 0 2px 8px rgba(145, 145, 145,0.3); }`}</style>
       <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 8, minWidth: 'max-content' }}>
         {/* Month labels */}
         <div style={{ display: 'flex', paddingLeft: DAY_LABEL_WIDTH, gap: CELL_GAP }}>
@@ -154,7 +154,7 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
                     background: getColor(cell.percentage),
                     flexShrink: 0,
                     cursor: 'default',
-                    border: cell.percentage > 0 ? '1px solid rgba(16,185,129,0.2)' : 'none',
+                    border: cell.percentage > 0 ? '1px solid rgba(145, 145, 145,0.2)' : 'none',
                   }}
                 />
               );
@@ -173,7 +173,7 @@ const CalendarHeatmap = memo(function CalendarHeatmap({ data }: CalendarHeatmapP
                 height: CELL_SIZE,
                 borderRadius: 5,
                 background: getColor(pct),
-                border: pct > 0 ? '1px solid rgba(16,185,129,0.2)' : 'none',
+                border: pct > 0 ? '1px solid rgba(145, 145, 145,0.2)' : 'none',
               }}
             />
           ))}
