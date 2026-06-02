@@ -43,6 +43,7 @@ export const expenseSchema = z.object({
   split_between: z.array(traveler).min(1, 'Pick at least one person to split with').optional(),
   source_url: z.string().trim().url('Must be a valid URL').optional().or(z.literal('')),
   notes: safeText(500).optional().or(z.literal('')),
+  receipt_path: z.string().trim().optional().nullable(),
   expense_date: z.string().min(1, 'Date is required'),
 }).superRefine((v, ctx) => {
   const m = v.paid_by_amounts;

@@ -58,6 +58,7 @@ export interface TripExpense {
   settled: boolean;
   source_url: string | null;
   notes: string | null;
+  receipt_path: string | null;
   expense_date: string;
   created_at: string;
 }

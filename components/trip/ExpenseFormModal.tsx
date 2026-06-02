@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2, Paperclip, Trash2 } from 'lucide-react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
@@ -11,6 +12,7 @@ import { formatINR } from '@/lib/trip/format';
 import { expensePayers } from '@/lib/trip/settlement';
 import { tripMutate } from '@/lib/trip/client';
 import { EXPENSE_CATEGORIES, type TripExpense, type Trip } from '@/lib/trip/types';
+import { createClient } from '@/lib/supabase/client';
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -23,6 +25,7 @@ type FormState = {
   source_url: string;
   notes: string;
   expense_date: string;
+  receipt_path: string;
 };
 
 const empty = (): FormState => ({
@@ -32,6 +35,7 @@ const empty = (): FormState => ({
   source_url: '',
   notes: '',
   expense_date: todayISO(),
+  receipt_path: '',
 });
 
 export default function ExpenseFormModal({
@@ -58,6 +62,37 @@ export default function ExpenseFormModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingReceipt, setUploadingReceipt] = useState(false);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingReceipt(true);
+    const supabase = createClient();
+    try {
+      const safe = file.name.replace(/[^\w.\-]+/g, '_');
+      const path = `${trip.user_id}/receipts-${Date.now()}-${safe}`;
+      const { error: upErr } = await supabase.storage.from('trip-documents').upload(path, file, { upsert: false });
+      if (upErr) {
+        toast(`Upload failed: ${upErr.message}`, 'error');
+        return;
+      }
+      setForm((f) => ({ ...f, receipt_path: path }));
+      toast('Receipt uploaded successfully!', 'success');
+    } catch (err: any) {
+      toast(`Upload failed: ${err.message}`, 'error');
+    } finally {
+      setUploadingReceipt(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }
+
+  function handleRemoveReceipt() {
+    setForm((f) => ({ ...f, receipt_path: '' }));
+  }
+
   // Every expense is split equally among all current travelers of the trip.
   const splitBetween = allTravelers;
 
@@ -72,6 +107,7 @@ export default function ExpenseFormModal({
         source_url: expense.source_url ?? '',
         notes: expense.notes ?? '',
         expense_date: expense.expense_date.slice(0, 10),
+        receipt_path: expense.receipt_path ?? '',
       });
       const paid = expensePayers(expense);
       const savedPayers = Object.keys(paid).filter((t) => allTravelers.includes(t));
@@ -134,6 +170,7 @@ export default function ExpenseFormModal({
       paid_by_amounts,
       split_between: splitBetween,
       amount: form.amount === '' ? 0 : form.amount,
+      receipt_path: form.receipt_path || null,
     });
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
@@ -237,6 +274,42 @@ export default function ExpenseFormModal({
 
         <Field label="Notes (optional)" error={errors.notes}>
           <TextArea value={form.notes} onChange={set('notes')} placeholder="Anything to remember…" />
+        </Field>
+
+        <Field label="Receipt (optional)">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.png,.jpg,.jpeg,.webp,.heic"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          {form.receipt_path ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', borderRadius: 8 }}>
+              <Paperclip size={14} style={{ color: 'var(--accent-light)' }} />
+              <span style={{ fontSize: 13, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-primary)' }}>
+                {form.receipt_path.split('/').pop()?.replace(/^receipts-\d+-/, '')}
+              </span>
+              <button
+                type="button"
+                onClick={handleRemoveReceipt}
+                style={{ background: 'transparent', border: 'none', color: 'var(--danger)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 4 }}
+                title="Remove receipt"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              loading={uploadingReceipt}
+              icon={<Paperclip size={14} />}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploadingReceipt ? 'Uploading receipt…' : 'Upload receipt'}
+            </Button>
+          )}
         </Field>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 4 }}>

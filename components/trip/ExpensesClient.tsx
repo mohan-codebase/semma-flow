@@ -6,6 +6,7 @@ import {
   ExternalLink,
   FileSpreadsheet,
   FileText,
+  Paperclip,
   Plus,
   Receipt,
   Search,
@@ -345,6 +346,11 @@ export default function ExpensesClient({
                               <ExternalLink size={13} />
                             </a>
                           )}
+                          {e.receipt_path && (
+                            <span style={{ color: 'var(--accent-light)', display: 'flex' }} title="Receipt attached">
+                              <Paperclip size={13} />
+                            </span>
+                          )}
                         </div>
                         {e.notes && (
                           <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 240 }}>
@@ -410,6 +416,11 @@ export default function ExpensesClient({
                           <a href={e.source_url} target="_blank" rel="noreferrer" aria-label="Open source" onClick={(ev) => ev.stopPropagation()} style={{ color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center' }}>
                             <ExternalLink size={13} />
                           </a>
+                        )}
+                        {e.receipt_path && (
+                          <span style={{ color: 'var(--accent-light)', display: 'inline-flex', alignItems: 'center' }} title="Receipt attached">
+                            <Paperclip size={13} />
+                          </span>
                         )}
                       </div>
                       {e.notes && (

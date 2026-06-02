@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
       split_between: v.split_between && v.split_between.length > 0 ? v.split_between : null,
       source_url: v.source_url || null,
       notes: v.notes || null,
+      receipt_path: v.receipt_path || null,
       expense_date: v.expense_date,
     });
     if (error) return err(safeErrorMessage(error, 'Failed to add expense'), 500);

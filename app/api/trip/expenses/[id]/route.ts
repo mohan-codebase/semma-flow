@@ -41,6 +41,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         split_between: v.split_between && v.split_between.length > 0 ? v.split_between : null,
         source_url: v.source_url || null,
         notes: v.notes || null,
+        receipt_path: v.receipt_path || null,
         expense_date: v.expense_date,
       })
       .eq('id', id)
@@ -58,6 +59,17 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     const { id } = await params;
     const auth = await getAuth();
     if (!auth) return err('Unauthorized', 401);
+
+    const { data: exp } = await auth.supabase
+      .from('trip_expenses')
+      .select('receipt_path')
+      .eq('id', id)
+      .eq('user_id', auth.user.id)
+      .maybeSingle();
+
+    if (exp?.receipt_path) {
+      await auth.supabase.storage.from('trip-documents').remove([exp.receipt_path]);
+    }
 
     const { error } = await auth.supabase
       .from('trip_expenses')

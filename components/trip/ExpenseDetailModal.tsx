@@ -8,6 +8,7 @@ import CategoryBadge from '@/components/trip/CategoryBadge';
 import { formatDate, formatINR } from '@/lib/trip/format';
 import { expensePayers, expenseShares } from '@/lib/trip/settlement';
 import type { TripExpense, Trip } from '@/lib/trip/types';
+import { createClient } from '@/lib/supabase/client';
 
 
 
@@ -61,6 +62,17 @@ export default function ExpenseDetailModal({
     setBusy(false);
   }
 
+  async function handleViewReceipt() {
+    if (!e.receipt_path) return;
+    const supabase = createClient();
+    const { data, error } = await supabase.storage.from('trip-documents').createSignedUrl(e.receipt_path, 60);
+    if (error || !data) {
+      alert('Could not open receipt link. It may have been deleted.');
+      return;
+    }
+    window.open(data.signedUrl, '_blank');
+  }
+
   return (
     <Modal isOpen={Boolean(expense)} onClose={onClose} title="Expense details" size="md">
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -106,6 +118,32 @@ export default function ExpenseDetailModal({
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
               <span style={rowLabel}>Notes</span>
               <span style={{ ...rowValue, color: 'var(--text-muted)', maxWidth: '70%' }}>{e.notes}</span>
+            </div>
+          )}
+          {e.receipt_path && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+              <span style={rowLabel}>Receipt</span>
+              <span style={rowValue}>
+                <button
+                  onClick={handleViewReceipt}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--accent-light)',
+                    cursor: 'pointer',
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    padding: 0,
+                    textDecoration: 'underline',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                >
+                  <ExternalLink size={14} />
+                  View receipt
+                </button>
+              </span>
             </div>
           )}
         </div>
