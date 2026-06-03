@@ -11,7 +11,7 @@ export default async function TripLayout({ children }: { children: React.ReactNo
   const trips = await getTrips(ctx.userId);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', overflowX: 'hidden' }}>
+    <div className="trip-layout-root" style={{ minHeight: '100vh', background: 'var(--bg-primary)', overflowX: 'hidden' }}>
       <div className="trip-shell">
         <TripNav trips={trips} activeTrip={ctx.trip} />
         <main className="trip-main">

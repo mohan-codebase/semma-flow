@@ -108,7 +108,7 @@ export default function ExpenseDetailModal({
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <span style={rowLabel}>Status</span>
-            <span style={{ ...rowValue, fontWeight: !e.settled && shares.length > 0 ? 700 : 500, color: e.settled ? '#adadad' : 'var(--danger)' }}>
+            <span style={{ ...rowValue, fontWeight: !e.settled && shares.length > 0 ? 700 : 500, color: e.settled ? '#adadad' : 'var(--pending, #ff6b6b)' }}>
               {e.settled
                 ? 'Settled'
                 : `${shares.map((s) => `${s.name} ${formatINR(s.amount)}`).join(' · ')} pending`}

@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Plus } from 'lucide-react';
+import {
+  User, Plus, LayoutDashboard, BarChart3, Trophy, Sparkles,
+  CalendarCheck, Compass, Settings, Flame, CheckCircle2, TrendingUp,
+  Target, Sun, Moon, ArrowLeft,
+} from 'lucide-react';
 import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
 import DevicesModal from '@/components/settings/DevicesModal';
 import ToggleSwitch from '@/components/ui/ToggleSwitch';
@@ -35,10 +39,6 @@ const RED_SOFT = '#8e8e8e';
 const RED_LIGHT = 'rgba(104, 104, 104,0.12)';
 
 // Liquid glass helpers (inline style objects)
-const GLASS: React.CSSProperties = {
-  background: 'var(--glass-bg)',
-  boxShadow: 'var(--glass-shadow)',
-};
 const GLASS_SM: React.CSSProperties = {
   background: 'var(--glass-bg)',
   boxShadow: 'var(--glass-shadow-sm)',
@@ -77,15 +77,15 @@ function CircularProgress({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.35 }}
       style={{
-        marginTop: 24,
-        padding: '24px 20px 28px',
-        borderRadius: 24,
+        marginTop: 0,
+        padding: '20px',
+        borderRadius: 20,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: 0,
-        background: 'rgba(85, 85, 85,0.05)',
-        border: '1px solid rgba(85, 85, 85,0.10)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-default)',
       }}
     >
       {/* Header row */}
@@ -101,9 +101,9 @@ function CircularProgress({
         <div style={{
           padding: '6px 14px',
           borderRadius: 20,
-          background: 'rgba(85, 85, 85,0.10)',
+          background: 'var(--surface-tint)',
         }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{pct}%</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: TEXT_DARK }}>{pct}%</span>
         </div>
       </div>
 
@@ -1596,6 +1596,101 @@ function ProfileMenu({
   );
 }
 
+// ── Admin-dashboard building blocks ──────────────────────────────────────
+// KPI stat card — label + icon chip + big number. Pure monochrome (theme vars).
+function KpiCard({
+  icon, label, value, suffix, sub,
+}: {
+  icon: React.ReactNode; label: string; value: string | number; suffix?: string; sub?: string;
+}) {
+  return (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-default)',
+      borderRadius: 18,
+      padding: '18px 20px',
+      display: 'flex', flexDirection: 'column', gap: 16,
+      minWidth: 0,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {label}
+        </span>
+        <div style={{
+          width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+          background: 'var(--surface-tint)', border: '1px solid var(--border-subtle)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-primary)',
+        }}>
+          {icon}
+        </div>
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <p style={{ margin: 0, fontSize: 30, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+          {value}
+          {suffix && <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-dimmed)', marginLeft: 2 }}>{suffix}</span>}
+        </p>
+        {sub && (
+          <p style={{ margin: '7px 0 0', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {sub}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Generic widget card — titled panel that wraps charts / lists in the grid.
+function DashCard({
+  title, action, children, style,
+}: {
+  title?: string; action?: React.ReactNode; children: React.ReactNode; style?: React.CSSProperties;
+}) {
+  return (
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-default)',
+      borderRadius: 20,
+      padding: 20,
+      minWidth: 0,
+      ...style,
+    }}>
+      {title && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>{title}</h3>
+          {action}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+// Sidebar nav row — filled when active, hover tint otherwise.
+function NavItem({
+  icon, label, active = false, onClick,
+}: {
+  icon: React.ReactNode; label: string; active?: boolean; onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+        padding: '11px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
+        background: active ? 'var(--accent-primary)' : 'transparent',
+        color: active ? 'var(--accent-on-primary)' : 'var(--text-secondary)',
+        fontSize: 14, fontWeight: active ? 700 : 600, fontFamily: 'inherit', textAlign: 'left',
+        transition: 'background 0.15s ease, color 0.15s ease',
+      }}
+      onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'var(--surface-tint)'; }}
+      onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+    >
+      <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
+      {label}
+    </button>
+  );
+}
+
 export default function FitnessSummary({
   stats,
   habits,
@@ -1613,6 +1708,20 @@ export default function FitnessSummary({
   const [selectedDate, setSelectedDate] = useState<string>(todayString());
   const [dateEntries, setDateEntries] = useState<Record<string, boolean>>({});
   const [loadingDate, setLoadingDate] = useState(false);
+
+  // ── Theme (sidebar/topbar quick toggle) ──
+  // Reflect the theme actually applied to <html>; re-sync after the profile
+  // sheet closes since that sheet can also flip the theme.
+  const [isDark, setIsDark] = useState(true);
+  useEffect(() => { setIsDark(document.documentElement.dataset.theme !== 'light'); }, []);
+  useEffect(() => { if (!menuOpen) setIsDark(document.documentElement.dataset.theme !== 'light'); }, [menuOpen]);
+  const toggleTheme = () => {
+    const next = isDark ? 'light' : 'dark';
+    setIsDark(!isDark);
+    localStorage.setItem('semma_flow_theme', next);
+    document.documentElement.dataset.theme = next;
+    document.documentElement.style.colorScheme = next;
+  };
 
   const isViewingToday = selectedDate === todayString();
 
@@ -1742,302 +1851,336 @@ export default function FitnessSummary({
     <div style={{
       background: 'var(--bg-primary)',
       fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      paddingBottom: 32,
       overflowX: 'hidden',
       position: 'relative',
       minHeight: '100dvh',
     }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px' }}>
-
-        {/* ── Header ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{ paddingTop: 24, paddingBottom: 4 }}
-        >
-          {onBackToHub && (
-            <button
-              onClick={onBackToHub}
-              style={{
-                background: 'rgba(85, 85, 85, 0.08)',
-                border: '1px solid rgba(85, 85, 85, 0.20)',
-                borderRadius: 12,
-                color: 'var(--accent-light)',
-                padding: '6px 12px',
-                fontSize: 12.5,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                marginBottom: 16,
-                fontFamily: "'Outfit', sans-serif",
-                transition: 'all 0.15s ease',
-              }}
-            >
-              ← Back to App Hub
-            </button>
-          )}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.03em', lineHeight: 1.15 }}>
-              {greeting},<br />{displayName.split(' ')[0]} 👋
-            </h1>
-            <button
-              onClick={() => setMenuOpen(true)}
-              style={{
-                width: 44, height: 44, borderRadius: '50%',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', flexShrink: 0, marginTop: 4,
-              }}
-            >
-              <User size={19} color={TEXT_MUTED} />
-            </button>
+      {/* ───────────────── Desktop Sidebar (≥1024px) ───────────────── */}
+      <aside
+        className="hf-desktop-sidebar"
+        style={{
+          position: 'fixed', top: 0, left: 0, bottom: 0, width: 264, zIndex: 50,
+          flexDirection: 'column',
+          background: 'var(--bg-tertiary)',
+          borderRight: '1px solid var(--border-default)',
+          padding: '22px 16px 20px',
+          overflowY: 'auto',
+        }}
+      >
+        {/* Brand */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '2px 8px 22px' }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: 11, flexShrink: 0,
+            background: 'var(--accent-primary)', color: 'var(--accent-on-primary)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <CheckCircle2 size={21} strokeWidth={2.4} />
           </div>
-
-          {/* Date + Add */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 20 }}>
-            <p style={{ margin: 0, fontSize: 17, fontWeight: 700, color: TEXT_DARK }}>{dateStr}</p>
-            <button
-              onClick={() => setAddOpen(true)}
-              style={{
-                width: 38, height: 38, borderRadius: '50%',
-                background: 'var(--bg-secondary)',
-                border: '1.5px solid var(--border-default)',
-                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', flexShrink: 0,
-              }}
-            >
-              <Plus size={20} color={PURPLE} strokeWidth={2.5} />
-            </button>
+          <div style={{ minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>Semma Flow</p>
+            <p style={{ margin: '1px 0 0', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Habit Tracker</p>
           </div>
-        </motion.div>
-
-        {/* ── Week Date Strip ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.08 }}
-          style={{ marginTop: 22 }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {weekDates.map(({ date, dayNum, dayLabel, isToday, pct }) => {
-              const R = 19, CIRC = 2 * Math.PI * R;
-              const isSelected = date === selectedDate;
-              return (
-                <div
-                  key={date}
-                  onClick={() => selectDate(date)}
-                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-                >
-                  <span style={{ fontSize: 11, fontWeight: 600, color: isSelected ? PURPLE : TEXT_MUTED }}>
-                    {dayLabel}
-                  </span>
-                  <div style={{ position: 'relative', width: 42, height: 42 }}>
-                    {isToday ? (
-                      <>
-                        <svg width="42" height="42" style={{ position: 'absolute', inset: 0 }}>
-                          <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(85, 85, 85,0.15)" strokeWidth="2.5" />
-                          <circle cx="21" cy="21" r={R} fill="none" stroke={PURPLE_HEX}
-                            strokeWidth="2.5" strokeLinecap="round"
-                            strokeDasharray={CIRC}
-                            strokeDashoffset={CIRC * (1 - todayPct / 100)}
-                            transform="rotate(-90 21 21)"
-                            style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                          />
-                        </svg>
-                        <div style={{
-                          position: 'absolute', inset: 5, borderRadius: '50%',
-                          background: PURPLE, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                          <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{dayNum}</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div style={{
-                        width: 42, height: 42, borderRadius: '50%',
-                        background: isSelected
-                          ? PURPLE
-                          : pct > 0 ? 'var(--glass-bg-purple)' : 'var(--bg-secondary)',
-                        border: isSelected
-                          ? 'none'
-                          : `1px solid ${pct > 0 ? 'rgba(85, 85, 85,0.2)' : 'var(--border-subtle)'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'background 0.18s ease',
-                      }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: isSelected ? '#fff' : pct > 0 ? PURPLE : TEXT_MUTED }}>
-                          {dayNum}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* ── Weekly Report ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.12 }}
-          style={{ marginTop: 32 }}
-        >
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
-              Weekly report
-            </h2>
-            <span style={{ fontSize: 13, fontWeight: 700, color: PURPLE }}>{avgPct}% avg</span>
-          </div>
-          <div style={{ ...GLASS, borderRadius: 20, padding: '18px 12px 12px' }}>
-            <WeeklyReportChart
-              data={weekBars.map(({ date, dayLabel, dayNum, pct, isToday }) => ({ date, label: dayLabel, dayNum, pct, isToday }))}
-              avg={avgPct}
-            />
-          </div>
-        </motion.div>
-
-        {/* ── Consistency Score ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: 0.15 }}
-          style={{ marginTop: 32 }}
-        >
-          <h2 style={{ margin: '0 0 14px', fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
-            Consistency score
-          </h2>
-          <div style={{ ...GLASS, borderRadius: 20, padding: '20px 14px 14px' }}>
-            {/* Bar chart — fixed 88px track height, avg line overlaid */}
-            <div style={{ position: 'relative' }}>
-              {/* Bars row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 5 }}>
-                {weekBars.map(({ date, dayLabel, dayNum, pct, isToday }, i) => {
-                  const TRACK_H = 88;
-                  const barH = Math.max(pct > 0 ? 8 : 0, Math.round((pct / 100) * TRACK_H));
-                  return (
-                    <div key={date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-                      <div style={{
-                        width: '100%', height: TRACK_H, borderRadius: 10,
-                        background: 'rgba(85, 85, 85,0.10)',
-                        position: 'relative', overflow: 'hidden',
-                      }}>
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: barH }}
-                          transition={{ duration: 0.5, delay: 0.08 + i * 0.05, ease: 'easeOut' }}
-                          style={{
-                            position: 'absolute', bottom: 0, left: 0, right: 0,
-                            borderRadius: '8px 8px 0 0',
-                            background: isToday ? PURPLE_HEX : 'rgba(85, 85, 85,0.55)',
-                          }}
-                        />
-                      </div>
-                      {/* Label: day name + date number */}
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                        <span style={{ fontSize: 9, fontWeight: 500, color: isToday ? PURPLE : TEXT_MUTED }}>
-                          {dayLabel}
-                        </span>
-                        <span style={{ fontSize: 11, fontWeight: isToday ? 800 : 500, color: isToday ? PURPLE : TEXT_DARK }}>
-                          {dayNum}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Avg line — positioned absolutely over the bars (88px track, 8px gap, label row) */}
-              {avgPct > 0 && (
-                <div style={{
-                  position: 'absolute',
-                  left: 0, right: 0,
-                  top: 88 - Math.round((avgPct / 100) * 88),
-                  borderTop: '1.5px dashed rgba(85, 85, 85,0.40)',
-                  pointerEvents: 'none', zIndex: 2,
-                }}>
-                  <span style={{
-                    position: 'absolute', left: 0, top: -9,
-                    fontSize: 10, fontWeight: 700, color: TEXT_MUTED,
-                    background: 'var(--glass-bg)', padding: '1px 5px', borderRadius: 4,
-                  }}>
-                    Avg.{avgPct}%
-                  </span>
-                </div>
-              )}
-            </div>
-            {todayPct > 0 && (
-              <div style={{
-                marginTop: 14, paddingTop: 14,
-                borderTop: '1px solid var(--border-subtle)',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              }}>
-                <span style={{ fontSize: 13, color: TEXT_MUTED }}>Today&apos;s score</span>
-                <span style={{ fontSize: 15, fontWeight: 800, color: PURPLE }}>{todayPct}%</span>
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* ── Today's Habits ── */}
-        <div style={{ marginTop: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
-              {isViewingToday ? "Today's Habits" : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-            </h2>
-            <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? TEXT_MUTED : PURPLE }}>
-              {loadingDate ? 'Loading…' : `${completedCount}/${totalCount} done`}
-            </span>
-          </div>
-
-          {displayHabits.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              style={{
-                padding: '32px 20px',
-                ...GLASS_SM,
-                borderRadius: 18,
-                textAlign: 'center',
-              }}
-            >
-              <p style={{ margin: 0, fontSize: 15, color: TEXT_MUTED }}>No habits yet.</p>
-            </motion.div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {displayHabits.map((h, i) => (
-                <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} />
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* ── Bad Habits (avoidance tracking) ── */}
-        {displayBadHabits.length > 0 && (
-          <div style={{ marginTop: 28 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <DynamicIcon name="ban" size={18} color={RED} />
-                Bad Habits
-              </h2>
-              <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? TEXT_MUTED : RED_SOFT }}>
-                {loadingDate ? 'Loading…' : `${avoidedCount}/${displayBadHabits.length} avoided`}
-              </span>
+        {/* Nav */}
+        <p style={{ margin: '0 0 8px', padding: '0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dimmed)' }}>Menu</p>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <NavItem icon={<LayoutDashboard size={18} />} label="Overview" active onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
+          <NavItem icon={<BarChart3 size={18} />} label="Analytics" onClick={() => { window.location.href = '/dashboard/analytics'; }} />
+          <NavItem icon={<Trophy size={18} />} label="Achievements" onClick={() => { window.location.href = '/dashboard/achievements'; }} />
+          <NavItem icon={<Sparkles size={18} />} label="Your Coach" onClick={() => { window.location.href = '/dashboard/coach'; }} />
+          <NavItem icon={<CalendarCheck size={18} />} label="Year in Review" onClick={() => { window.location.href = '/dashboard/year-in-review'; }} />
+          <NavItem icon={<Compass size={18} />} label="Trip Planner" onClick={() => { window.location.href = '/trip'; }} />
+          <NavItem icon={<Settings size={18} />} label="Settings" onClick={() => { window.location.href = '/dashboard/settings'; }} />
+        </nav>
+
+        {/* Footer */}
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 18 }}>
+          <NavItem
+            icon={isDark ? <Sun size={18} /> : <Moon size={18} />}
+            label={isDark ? 'Light mode' : 'Dark mode'}
+            onClick={toggleTheme}
+          />
+          {onBackToHub && (
+            <NavItem icon={<ArrowLeft size={18} />} label="App Hub" onClick={onBackToHub} />
+          )}
+          <button
+            onClick={() => setMenuOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 11, width: '100%',
+              padding: '10px 12px', borderRadius: 14, marginTop: 6,
+              border: '1px solid var(--border-default)', background: 'var(--bg-card)',
+              cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+            }}
+          >
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+              background: 'var(--accent-primary)', color: 'var(--accent-on-primary)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 14, fontWeight: 800,
+            }}>{initials}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</p>
+              <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {displayBadHabits.map((h, i) => (
-                <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} bad />
-              ))}
+          </button>
+        </div>
+      </aside>
+
+      {/* ───────────────── Main ───────────────── */}
+      <div className="hf-dash-main">
+        <div style={{
+          maxWidth: 1280, margin: '0 auto',
+          padding: 'clamp(18px, 2.5vw, 32px) clamp(16px, 2.5vw, 32px) 72px',
+          display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 2vw, 22px)',
+        }}>
+          {/* ── Topbar ── */}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <p style={{ margin: 0, fontSize: 12.5, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.03em' }}>
+                {greeting}, {displayName.split(' ')[0]} 👋
+              </p>
+              <h1 style={{ margin: '3px 0 0', fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1.1, fontFamily: "'Outfit', sans-serif" }}>
+                Overview
+              </h1>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <button
+                onClick={() => setAddOpen(true)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  padding: '11px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
+                  background: 'var(--accent-primary)', color: 'var(--accent-on-primary)',
+                  fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+                }}
+              >
+                <Plus size={18} strokeWidth={2.6} />
+                <span className="hf-dash-btn-label">New Habit</span>
+              </button>
+              <button
+                onClick={() => setMenuOpen(true)}
+                aria-label="Open profile menu"
+                style={{
+                  width: 44, height: 44, borderRadius: '50%',
+                  background: 'var(--bg-secondary)', border: '1px solid var(--border-default)',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}
+              >
+                <User size={19} color="var(--text-muted)" />
+              </button>
+            </div>
+          </motion.div>
+
+          {/* ── Week day selector ── */}
+          <DashCard
+            title={isViewingToday ? 'Today' : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+            action={
+              !isViewingToday ? (
+                <button
+                  onClick={() => selectDate(todayString())}
+                  style={{ background: 'var(--surface-tint)', border: '1px solid var(--border-default)', borderRadius: 9, padding: '5px 12px', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', cursor: 'pointer', fontFamily: 'inherit' }}
+                >
+                  Jump to today
+                </button>
+              ) : (
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>{dateStr}</span>
+              )
+            }
+          >
+            <div className="hf-weekly-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 6 }}>
+              {weekDates.map(({ date, dayNum, dayLabel, isToday, pct }) => {
+                const R = 19, CIRC = 2 * Math.PI * R;
+                const isSelected = date === selectedDate;
+                return (
+                  <div
+                    key={date}
+                    onClick={() => selectDate(date)}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                  >
+                    <span style={{ fontSize: 11, fontWeight: 600, color: isSelected ? 'var(--accent-primary)' : 'var(--text-muted)' }}>
+                      {dayLabel}
+                    </span>
+                    <div style={{ position: 'relative', width: 42, height: 42 }}>
+                      {isToday ? (
+                        <>
+                          <svg width="42" height="42" style={{ position: 'absolute', inset: 0 }}>
+                            <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(127, 127, 127,0.20)" strokeWidth="2.5" />
+                            <circle cx="21" cy="21" r={R} fill="none" stroke={PURPLE_HEX}
+                              strokeWidth="2.5" strokeLinecap="round"
+                              strokeDasharray={CIRC}
+                              strokeDashoffset={CIRC * (1 - todayPct / 100)}
+                              transform="rotate(-90 21 21)"
+                              style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                            />
+                          </svg>
+                          <div style={{
+                            position: 'absolute', inset: 5, borderRadius: '50%',
+                            background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}>
+                            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-on-primary)' }}>{dayNum}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{
+                          width: 42, height: 42, borderRadius: '50%',
+                          background: isSelected ? 'var(--accent-primary)' : pct > 0 ? 'var(--surface-tint)' : 'transparent',
+                          border: isSelected ? 'none' : '1px solid var(--border-default)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          transition: 'background 0.18s ease',
+                        }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: isSelected ? 'var(--accent-on-primary)' : pct > 0 ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                            {dayNum}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </DashCard>
+
+          {/* ── KPI cards ── */}
+          <div className="hf-stats-grid">
+            <KpiCard icon={<Target size={17} />} label="Active Habits" value={totalCount} sub="being tracked" />
+            <KpiCard icon={<CheckCircle2 size={17} />} label={isViewingToday ? 'Completed Today' : 'Completed'} value={`${completedCount}/${totalCount}`} sub={`${todayPct}% complete`} />
+            <KpiCard icon={<Flame size={17} />} label="Best Streak" value={stats?.bestStreak ?? 0} suffix="d" sub={stats?.bestStreakHabitName || 'start a streak'} />
+            <KpiCard icon={<TrendingUp size={17} />} label="Weekly Avg" value={avgPct} suffix="%" sub="last 7 days" />
+          </div>
+
+          {/* ── 2-column widget grid ── */}
+          <div className="hf-dashboard-grid">
+            {/* LEFT */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 2vw, 22px)', minWidth: 0 }}>
+              <DashCard title="Weekly report" action={<span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{avgPct}% avg</span>}>
+                <WeeklyReportChart
+                  data={weekBars.map(({ date, dayLabel, dayNum, pct, isToday }) => ({ date, label: dayLabel, dayNum, pct, isToday }))}
+                  avg={avgPct}
+                />
+              </DashCard>
+
+              <DashCard
+                title={isViewingToday ? "Today's Habits" : new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                action={
+                  <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? 'var(--text-muted)' : 'var(--text-primary)' }}>
+                    {loadingDate ? 'Loading…' : `${completedCount}/${totalCount} done`}
+                  </span>
+                }
+              >
+                {displayHabits.length === 0 ? (
+                  <div style={{ padding: '28px 20px', textAlign: 'center', border: '1px dashed var(--border-default)', borderRadius: 14 }}>
+                    <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text-muted)' }}>No habits yet.</p>
+                    <button
+                      onClick={() => setAddOpen(true)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, border: 'none', background: 'var(--accent-primary)', color: 'var(--accent-on-primary)', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}
+                    >
+                      <Plus size={15} strokeWidth={2.6} /> Add your first habit
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {displayHabits.map((h, i) => (
+                      <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} />
+                    ))}
+                  </div>
+                )}
+              </DashCard>
+            </div>
+
+            {/* RIGHT */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(16px, 2vw, 22px)', minWidth: 0 }}>
+              <DashCard
+                title="Consistency score"
+                action={avgPct > 0 ? <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{avgPct}%</span> : null}
+              >
+                <div style={{ position: 'relative' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 5 }}>
+                    {weekBars.map(({ date, dayLabel, dayNum, pct, isToday }, i) => {
+                      const TRACK_H = 88;
+                      const barH = Math.max(pct > 0 ? 8 : 0, Math.round((pct / 100) * TRACK_H));
+                      return (
+                        <div key={date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+                          <div style={{
+                            width: '100%', height: TRACK_H, borderRadius: 10,
+                            background: 'var(--surface-tint)',
+                            position: 'relative', overflow: 'hidden',
+                          }}>
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: barH }}
+                              transition={{ duration: 0.5, delay: 0.08 + i * 0.05, ease: 'easeOut' }}
+                              style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                borderRadius: '8px 8px 0 0',
+                                background: isToday ? 'var(--accent-primary)' : 'var(--text-dimmed)',
+                              }}
+                            />
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                            <span style={{ fontSize: 9, fontWeight: 500, color: isToday ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                              {dayLabel}
+                            </span>
+                            <span style={{ fontSize: 11, fontWeight: isToday ? 800 : 500, color: isToday ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+                              {dayNum}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {avgPct > 0 && (
+                    <div style={{
+                      position: 'absolute', left: 0, right: 0,
+                      top: 88 - Math.round((avgPct / 100) * 88),
+                      borderTop: '1.5px dashed var(--border-medium)',
+                      pointerEvents: 'none', zIndex: 2,
+                    }}>
+                      <span style={{
+                        position: 'absolute', left: 0, top: -9,
+                        fontSize: 10, fontWeight: 700, color: 'var(--text-muted)',
+                        background: 'var(--bg-card)', padding: '1px 5px', borderRadius: 4,
+                      }}>
+                        Avg.{avgPct}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </DashCard>
+
+              {isViewingToday && <CircularProgress completed={completedCount} total={totalCount} />}
+
+              {displayBadHabits.length > 0 && (
+                <DashCard
+                  title="Bad Habits"
+                  action={
+                    <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? 'var(--text-muted)' : RED_SOFT }}>
+                      {loadingDate ? 'Loading…' : `${avoidedCount}/${displayBadHabits.length} avoided`}
+                    </span>
+                  }
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {displayBadHabits.map((h, i) => (
+                      <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} bad />
+                    ))}
+                  </div>
+                </DashCard>
+              )}
             </div>
           </div>
-        )}
-
-        {/* ── Today's Progress Ring ── */}
-        {isViewingToday && <CircularProgress completed={completedCount} total={totalCount} />}
-
+        </div>
       </div>
+
+      {/* Responsive: sidebar offset on desktop, hide button label on tiny phones */}
+      <style>{`
+        .hf-dash-main { margin-left: 0; }
+        @media (min-width: 1024px) { .hf-dash-main { margin-left: 264px; } }
+        @media (max-width: 479px) { .hf-dash-btn-label { display: none; } }
+      `}</style>
 
       {/* ── Habit Detail Sheet ── */}
       <AnimatePresence>

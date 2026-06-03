@@ -823,6 +823,14 @@ h1, h2, h3, h4, h5, h6 {
    viewport render as the same narrow mobile column.) */
 .trip-shell { width: 100%; max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; }
 .trip-main { padding: 16px 12px 48px; }
+
+/* Desktop sidebar offset for the Trip app — mirrors the habits dashboard.
+   The fixed .hf-desktop-sidebar lives in the left gutter; the mobile top bar
+   (hamburger) is hidden ≥1024px since the sidebar replaces it. */
+@media (min-width: 1024px) {
+  .trip-layout-root { padding-left: 264px; }
+  .trip-topbar { display: none !important; }
+}
 .trip-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
 .trip-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .trip-two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -950,6 +958,11 @@ h1, h2, h3, h4, h5, h6 {
   --accent-secondary:#000000; --accent-secondary-glow:transparent; --accent-warm:#000000;
   --gradient-card:var(--bg-secondary); --gradient-glow:none;
 }
+
+/* Pending / owed amounts keep a real red even in the monochrome theme
+   (declared after the B&W override so it isn't flattened to white/black). */
+:root { --pending: #ff6b6b; }
+[data-theme="light"] { --pending: #dc2626; }
 
 /* Enforcement — beats inline styles too */
 *, *::before, *::after {

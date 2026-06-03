@@ -16,10 +16,13 @@ export default function MobileDock() {
   // The dock ONLY shows when we have actively entered one of the apps:
   // - Habits dashboard (/dashboard when activeApp is 'habits')
   // - Trip dashboard (/trip)
-  // It is hidden on the Hub launcher (/dashboard when activeApp is null) and deep subpages.
-  const showDock = 
-    (pathname === '/dashboard' && activeApp === 'habits') || 
-    pathname === '/trip';
+  // Persistent across the entire app: every dashboard and trip page, including
+  // the Hub and all subpages (analytics, settings, achievements, trip subpages).
+  // Public pages (landing, login, signup, legal) are excluded — an app nav there
+  // would point logged-out visitors into authenticated routes.
+  const showDock =
+    pathname.startsWith('/dashboard') ||
+    pathname.startsWith('/trip');
 
   useEffect(() => {
     setIsMounted(true);
@@ -81,10 +84,11 @@ export default function MobileDock() {
     toast('Coming Soon - Finance & Savings Tracker service', 'info');
   };
 
-  // Determine active tab
-  const isHabitsActive = pathname === '/dashboard' && activeApp === 'habits';
+  // Determine active tab (path-based so subpages highlight the right tab)
+  const isCoachActive = pathname.startsWith('/dashboard/coach');
+  const isTripActive = pathname.startsWith('/trip');
+  const isHabitsActive = pathname.startsWith('/dashboard') && !isCoachActive && activeApp === 'habits';
   const isHubActive = pathname === '/dashboard' && activeApp === null;
-  const isTripActive = pathname === '/trip';
 
   // Active styling helper
   const tabStyle = (isActive: boolean): React.CSSProperties => ({
@@ -96,8 +100,8 @@ export default function MobileDock() {
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    background: isActive ? 'var(--accent-primary, #555555)' : 'transparent',
-    color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.45)',
+    background: isActive ? 'var(--accent-primary, #ffffff)' : 'transparent',
+    color: isActive ? 'var(--accent-on-primary, #000000)' : 'rgba(255, 255, 255, 0.45)',
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
     boxShadow: isActive ? '0 4px 12px rgba(85, 85, 85, 0.35)' : 'none',
     padding: 0,
@@ -143,7 +147,7 @@ export default function MobileDock() {
         type="button"
         title="AI Coach"
         onClick={navigateToCoach}
-        style={tabStyle(false)}
+        style={tabStyle(isCoachActive)}
       >
         <Presentation size={20} />
       </button>

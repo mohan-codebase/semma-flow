@@ -14,6 +14,9 @@ import {
   Settings2,
   ChevronRight,
   MoreHorizontal,
+  Wallet,
+  Coins,
+  Users,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
@@ -170,14 +173,29 @@ export default function TripDashboard({
     return { rows, total, max };
   }, [expenses]);
 
+  // KPI summary — budget vs. spend at a glance.
+  const spent = settlement.totalExpenses;
+  const budget = trip.total_budget || 0;
+  const remaining = budget - spent;
+  const pctOfBudget = budget > 0 ? Math.round((spent / budget) * 100) : 0;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* KPI row */}
+      <div className="trip-stats-grid">
+        <StatCard label="Total Budget" value={formatINR(budget)} sub="trip budget" icon={<Wallet size={16} />} />
+        <StatCard label="Total Spent" value={formatINR(spent)} sub={budget > 0 ? `${pctOfBudget}% of budget` : 'no budget set'} icon={<Receipt size={16} />} />
+        <StatCard label="Remaining" value={formatINR(remaining)} sub={remaining >= 0 ? 'left to spend' : 'over budget'} accent={remaining >= 0 ? 'green' : 'red'} icon={<Coins size={16} />} />
+        <StatCard label="Per Person" value={formatINR(settlement.sharePerPerson)} sub={`${trip.travelers.length} traveler${trip.travelers.length === 1 ? '' : 's'}`} icon={<Users size={16} />} />
+      </div>
+
       {/* Hero row */}
       <div className="trip-hero-grid">
         <Countdown startDate={trip.start_date} endDate={trip.end_date} tripName={trip.name} />
         <SettlementCard settlement={settlement} tripId={trip.id} settledPayments={settlements} />
       </div>
 
+      <div className="trip-two-grid">
       <Card>
         <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
           Spending by person
@@ -224,6 +242,7 @@ export default function TripDashboard({
           })}
         </div>
       </Card>
+      </div>
 
       {byCategory.rows.length > 0 && (
         <Card>

@@ -364,7 +364,7 @@ export default function ExpensesClient({
                       <td style={{ padding: cellPad, color: 'var(--text-secondary)' }}>
                         {payerLabel(e)}
                         {settleStatus(e) && (
-                          <span style={{ display: 'block', fontSize: 11.5, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#adadad' : 'var(--danger)' }}>
+                          <span style={{ display: 'block', fontSize: 11.5, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#adadad' : 'var(--pending, #ff6b6b)' }}>
                             {settleStatus(e)!.text}
                           </span>
                         )}
@@ -445,7 +445,7 @@ export default function ExpensesClient({
                       {settleStatus(e) && (
                         <>
                           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>•</span>
-                          <span style={{ fontSize: 12, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#adadad' : 'var(--danger)' }}>
+                          <span style={{ fontSize: 12, fontWeight: settleStatus(e)!.settled ? 500 : 600, color: settleStatus(e)!.settled ? '#adadad' : 'var(--pending, #ff6b6b)' }}>
                             {settleStatus(e)!.text}
                           </span>
                         </>
