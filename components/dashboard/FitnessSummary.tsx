@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Plus, LayoutDashboard, BarChart3, Trophy, Sparkles,
   CalendarCheck, Compass, Settings, Flame, CheckCircle2, TrendingUp,
-  Target, Sun, Moon, ArrowLeft,
+  Target, Sun, Moon, ArrowLeft, Wallet, Receipt, MapPin, ExternalLink,
+  Luggage, Coins, ChevronDown,
 } from 'lucide-react';
 import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
 import DevicesModal from '@/components/settings/DevicesModal';
@@ -14,6 +15,9 @@ import WeeklyReportChart from '@/components/dashboard/WeeklyReportChart';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
 import { todayString } from '@/lib/utils/dates';
+import type { Trip, TripExpense, TripSettlement } from '@/lib/trip/types';
+import { computeSettlement } from '@/lib/trip/settlement';
+import { formatINR, daysUntil } from '@/lib/trip/format';
 
 interface FitnessSummaryProps {
   stats: OverviewStats | null;
@@ -23,6 +27,9 @@ interface FitnessSummaryProps {
   initials?: string;
   email?: string;
   onBackToHub?: () => void;
+  activeTrip?: Trip | null;
+  tripExpenses?: TripExpense[];
+  tripSettlements?: TripSettlement[];
 }
 
 const PURPLE = 'var(--accent-primary)';
@@ -1691,6 +1698,98 @@ function NavItem({
   );
 }
 
+// Expandable white-button group with sub-items
+function NavGroup({
+  icon, label, expanded, onToggle, children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+      {/* White pill header button */}
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
+          background: '#ffffff',
+          color: '#1a1a1a',
+          fontSize: 13.5, fontWeight: 700, fontFamily: 'inherit', textAlign: 'left',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
+          transition: 'opacity 0.15s',
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.88'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+      >
+        <span style={{ display: 'flex', flexShrink: 0, color: '#1a1a1a' }}>{icon}</span>
+        <span style={{ flex: 1 }}>{label}</span>
+        <motion.span
+          animate={{ rotate: expanded ? 180 : 0 }}
+          transition={{ duration: 0.22 }}
+          style={{ display: 'flex', alignItems: 'center' }}
+        >
+          <ChevronDown size={15} color="#555" />
+        </motion.span>
+      </button>
+
+      {/* Sub-items with animated expand */}
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            key="sub"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{
+              display: 'flex', flexDirection: 'column', gap: 0,
+              paddingLeft: 14,
+              borderLeft: '2px solid rgba(255,255,255,0.12)',
+              marginLeft: 10,
+              marginTop: 2,
+              marginBottom: 4,
+            }}>
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Sub-item inside a NavGroup
+function SubNavItem({
+  icon, label, active = false, onClick,
+}: {
+  icon: React.ReactNode; label: string; active?: boolean; onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+        padding: '8px 10px', borderRadius: 10, border: 'none', cursor: 'pointer',
+        background: active ? 'rgba(255,255,255,0.10)' : 'transparent',
+        color: active ? 'var(--text-primary)' : 'var(--text-muted)',
+        fontSize: 13, fontWeight: active ? 600 : 400, fontFamily: 'inherit', textAlign: 'left',
+        transition: 'all 0.15s',
+      }}
+      onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = 'var(--text-primary)'; } }}
+      onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; } }}
+    >
+      <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
+      {label}
+    </button>
+  );
+}
+
 export default function FitnessSummary({
   stats,
   habits,
@@ -1699,6 +1798,9 @@ export default function FitnessSummary({
   initials = '?',
   email = '',
   onBackToHub,
+  activeTrip = null,
+  tripExpenses = [],
+  tripSettlements = [],
 }: FitnessSummaryProps) {
   const [localHabits, setLocalHabits] = useState<HabitWithEntry[]>(habits);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -1708,6 +1810,8 @@ export default function FitnessSummary({
   const [selectedDate, setSelectedDate] = useState<string>(todayString());
   const [dateEntries, setDateEntries] = useState<Record<string, boolean>>({});
   const [loadingDate, setLoadingDate] = useState(false);
+  const [habitNavOpen, setHabitNavOpen] = useState(true);
+  const [tripNavOpen, setTripNavOpen] = useState(false);
 
   // ── Theme (sidebar/topbar quick toggle) ──
   // Reflect the theme actually applied to <html>; re-sync after the profile
@@ -1855,80 +1959,10 @@ export default function FitnessSummary({
       position: 'relative',
       minHeight: '100dvh',
     }}>
-      {/* ───────────────── Desktop Sidebar (≥1024px) ───────────────── */}
-      <aside
-        className="hf-desktop-sidebar"
-        style={{
-          position: 'fixed', top: 0, left: 0, bottom: 0, width: 264, zIndex: 50,
-          flexDirection: 'column',
-          background: 'var(--bg-tertiary)',
-          borderRight: '1px solid var(--border-default)',
-          padding: '22px 16px 20px',
-          overflowY: 'auto',
-        }}
-      >
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '2px 8px 22px' }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 11, flexShrink: 0,
-            background: 'var(--accent-primary)', color: 'var(--accent-on-primary)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <CheckCircle2 size={21} strokeWidth={2.4} />
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>Productivity Master</p>
-            <p style={{ margin: '1px 0 0', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Habit Tracker</p>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <p style={{ margin: '0 0 8px', padding: '0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dimmed)' }}>Menu</p>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <NavItem icon={<LayoutDashboard size={18} />} label="Overview" active onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
-          <NavItem icon={<BarChart3 size={18} />} label="Analytics" onClick={() => { window.location.href = '/dashboard/analytics'; }} />
-          <NavItem icon={<Trophy size={18} />} label="Achievements" onClick={() => { window.location.href = '/dashboard/achievements'; }} />
-          <NavItem icon={<Sparkles size={18} />} label="Your Coach" onClick={() => { window.location.href = '/dashboard/coach'; }} />
-          <NavItem icon={<CalendarCheck size={18} />} label="Year in Review" onClick={() => { window.location.href = '/dashboard/year-in-review'; }} />
-          <NavItem icon={<Compass size={18} />} label="Trip Planner" onClick={() => { window.location.href = '/trip'; }} />
-          <NavItem icon={<Settings size={18} />} label="Settings" onClick={() => { window.location.href = '/dashboard/settings'; }} />
-        </nav>
-
-        {/* Footer */}
-        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 18 }}>
-          <NavItem
-            icon={isDark ? <Sun size={18} /> : <Moon size={18} />}
-            label={isDark ? 'Light mode' : 'Dark mode'}
-            onClick={toggleTheme}
-          />
-          {onBackToHub && (
-            <NavItem icon={<ArrowLeft size={18} />} label="App Hub" onClick={onBackToHub} />
-          )}
-          <button
-            onClick={() => setMenuOpen(true)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 11, width: '100%',
-              padding: '10px 12px', borderRadius: 14, marginTop: 6,
-              border: '1px solid var(--border-default)', background: 'var(--bg-card)',
-              cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-            }}
-          >
-            <div style={{
-              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-              background: 'var(--accent-primary)', color: 'var(--accent-on-primary)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, fontWeight: 800,
-            }}>{initials}</div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</p>
-              <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</p>
-            </div>
-          </button>
-        </div>
-      </aside>
+      {/* Desktop Sidebar is rendered by layout.tsx */}
 
       {/* ───────────────── Main ───────────────── */}
-      <div className="hf-dash-main">
+      <div>
         <div style={{
           maxWidth: 1280, margin: '0 auto',
           padding: 'clamp(18px, 2.5vw, 32px) clamp(16px, 2.5vw, 32px) 72px',
@@ -2172,13 +2206,221 @@ export default function FitnessSummary({
               )}
             </div>
           </div>
+
+          {/* ── Trip Planner Section ── */}
+          {activeTrip && (() => {
+            const settlement = computeSettlement(tripExpenses, activeTrip.travelers, tripSettlements);
+            const spent = settlement.totalExpenses;
+            const budget = activeTrip.total_budget || 0;
+            const remaining = budget - spent;
+            const pctOfBudget = budget > 0 ? Math.round((spent / budget) * 100) : 0;
+            const daysLeft = daysUntil(activeTrip.start_date);
+            const tripStarted = daysLeft <= 0;
+            const tripEnded = daysUntil(activeTrip.end_date) < 0;
+
+            // Top categories by spend
+            const byCategory = new Map<string, number>();
+            for (const e of tripExpenses) {
+              byCategory.set(e.category, (byCategory.get(e.category) ?? 0) + Number(e.amount));
+            }
+            const topCategories = [...byCategory.entries()]
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 5);
+            const maxCat = topCategories[0]?.[1] ?? 0;
+
+            return (
+              <div style={{ marginTop: 'clamp(16px, 2vw, 28px)' }}>
+                {/* Section header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 11,
+                      background: 'var(--surface-tint)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Compass size={18} color="var(--text-primary)" />
+                    </div>
+                    <div>
+                      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>
+                        {activeTrip.name}
+                      </h2>
+                      <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)' }}>
+                        {activeTrip.travelers.join(' · ')}
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/trip"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      padding: '9px 16px', borderRadius: 11,
+                      background: 'var(--surface-tint)',
+                      border: '1px solid var(--border-default)',
+                      color: 'var(--text-primary)', textDecoration: 'none',
+                      fontSize: 13, fontWeight: 700, fontFamily: 'inherit',
+                    }}
+                  >
+                    Full Planner <ExternalLink size={13} />
+                  </a>
+                </div>
+
+                {/* KPI cards */}
+                <div className="hf-stats-grid" style={{ marginBottom: 'clamp(12px, 1.5vw, 18px)' }}>
+                  <KpiCard
+                    icon={<Wallet size={17} />}
+                    label="Total Budget"
+                    value={formatINR(budget)}
+                    sub="trip budget"
+                  />
+                  <KpiCard
+                    icon={<Receipt size={17} />}
+                    label="Spent So Far"
+                    value={formatINR(spent)}
+                    sub={budget > 0 ? `${pctOfBudget}% used` : 'no budget set'}
+                  />
+                  <KpiCard
+                    icon={<Coins size={17} />}
+                    label="Remaining"
+                    value={formatINR(remaining)}
+                    sub={remaining >= 0 ? 'left to spend' : 'over budget'}
+                  />
+                  <KpiCard
+                    icon={<MapPin size={17} />}
+                    label={tripEnded ? 'Trip Ended' : tripStarted ? 'Day of Trip' : 'Days Until Trip'}
+                    value={tripEnded ? '✓' : Math.abs(daysLeft)}
+                    suffix={!tripEnded && Math.abs(daysLeft) !== 1 ? 'd' : ''}
+                    sub={tripEnded ? activeTrip.end_date.slice(0, 10) : tripStarted ? 'Ongoing now!' : `starts ${activeTrip.start_date.slice(0, 10)}`}
+                  />
+                </div>
+
+                {/* Budget + category grid */}
+                <div className="hf-dashboard-grid">
+                  {/* Budget utilization */}
+                  <DashCard title="Budget Utilization" action={<span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{pctOfBudget}%</span>}>
+                    <div style={{ marginBottom: 16 }}>
+                      <div style={{ height: 12, borderRadius: 999, background: 'var(--surface-tint)', overflow: 'hidden' }}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(100, pctOfBudget)}%` }}
+                          transition={{ duration: 0.8, ease: 'easeOut' }}
+                          style={{
+                            height: '100%', borderRadius: 999,
+                            background: pctOfBudget > 90
+                              ? 'linear-gradient(90deg, #888, #bbb)'
+                              : 'linear-gradient(90deg, var(--accent-primary), color-mix(in srgb, var(--accent-primary) 60%, #fff))',
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Spent: <strong style={{ color: 'var(--text-primary)' }}>{formatINR(spent)}</strong></span>
+                        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Budget: <strong style={{ color: 'var(--text-primary)' }}>{formatINR(budget)}</strong></span>
+                      </div>
+                    </div>
+                    {/* Per-person bars */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {activeTrip.travelers.map((t) => {
+                        const paid = settlement.payments[t] || 0;
+                        const pct = spent > 0 ? Math.round((paid / spent) * 100) : 0;
+                        return (
+                          <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', width: 80, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t}</span>
+                            <div style={{ flex: 1, height: 8, borderRadius: 999, background: 'var(--surface-tint)', overflow: 'hidden' }}>
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.7, ease: 'easeOut' }}
+                                style={{ height: '100%', borderRadius: 999, background: 'var(--accent-primary)' }}
+                              />
+                            </div>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', width: 72, textAlign: 'right', flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>{formatINR(paid)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </DashCard>
+
+                  {/* Category breakdown */}
+                  <DashCard title="Spending by Category" action={<span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{formatINR(spent)}</span>}>
+                    {topCategories.length === 0 ? (
+                      <div style={{ padding: '28px 16px', textAlign: 'center' }}>
+                        <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text-muted)' }}>No expenses yet.</p>
+                        <a href="/trip/expenses" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, background: 'var(--accent-primary)', color: 'var(--accent-on-primary)', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+                          <Plus size={14} /> Add Expense
+                        </a>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 13 }}>
+                        {topCategories.map(([category, amount]) => {
+                          const pct = maxCat > 0 ? (amount / maxCat) * 100 : 0;
+                          const shareOfTotal = spent > 0 ? Math.round((amount / spent) * 100) : 0;
+                          return (
+                            <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                              <div style={{ width: 96, display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                                <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--text-dimmed)', flexShrink: 0 }} />
+                                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{category}</span>
+                              </div>
+                              <div style={{ flex: 1, height: 10, borderRadius: 999, background: 'var(--surface-tint)', overflow: 'hidden' }}>
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                                  style={{ height: '100%', borderRadius: 999, background: 'var(--accent-primary)' }}
+                                />
+                              </div>
+                              <div style={{ width: 90, flexShrink: 0, textAlign: 'right' }}>
+                                <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>{formatINR(amount)}</span>
+                                <span style={{ marginLeft: 5, fontSize: 11, color: 'var(--text-muted)' }}>{shareOfTotal}%</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <a
+                          href="/trip/analytics"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: 'var(--accent-primary)', textDecoration: 'none', marginTop: 4 }}
+                        >
+                          View full analytics <ExternalLink size={12} />
+                        </a>
+                      </div>
+                    )}
+                  </DashCard>
+                </div>
+
+                {/* Quick links */}
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 'clamp(12px, 1.5vw, 18px)' }}>
+                  {[
+                    { href: '/trip/expenses', icon: <Receipt size={15} />, label: 'Expenses' },
+                    { href: '/trip/itinerary', icon: <CalendarCheck size={15} />, label: 'Itinerary' },
+                    { href: '/trip/packing', icon: <Luggage size={15} />, label: 'Packing' },
+                    { href: '/trip/bookings', icon: <Compass size={15} />, label: 'Bookings' },
+                  ].map(({ href, icon, label }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 7,
+                        padding: '10px 16px', borderRadius: 12,
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-default)',
+                        color: 'var(--text-secondary)', textDecoration: 'none',
+                        fontSize: 13, fontWeight: 600, fontFamily: 'inherit',
+                        transition: 'background 0.15s ease, color 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--surface-tint)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--bg-card)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'; }}
+                    >
+                      {icon} {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
         </div>
       </div>
 
-      {/* Responsive: sidebar offset on desktop, hide button label on tiny phones */}
+      {/* Responsive: hide button label on tiny phones */}
       <style>{`
-        .hf-dash-main { margin-left: 0; }
-        @media (min-width: 1024px) { .hf-dash-main { margin-left: 264px; } }
         @media (max-width: 479px) { .hf-dash-btn-label { display: none; } }
       `}</style>
 

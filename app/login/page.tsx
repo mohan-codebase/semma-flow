@@ -289,16 +289,31 @@ function Field({ label, type, value, onChange, placeholder, required, autoComple
   const [focus, setFocus] = useState(false);
   return (
     <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <span
-        style={{
-          fontSize: 11.5,
-          fontWeight: 500,
-          color: 'var(--text-secondary)',
-          letterSpacing: '-0.005em',
-        }}
-      >
-        {label}
-      </span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 500,
+            color: 'var(--text-secondary)',
+            letterSpacing: '-0.005em',
+          }}
+        >
+          {label}
+        </span>
+        {label === 'Password' && (
+          <Link
+            href="/forgot-password"
+            style={{
+              fontSize: 11.5,
+              fontWeight: 600,
+              color: 'var(--accent-primary)',
+              textDecoration: 'none',
+            }}
+          >
+            Forgot password?
+          </Link>
+        )}
+      </div>
       <div
         style={{
           display: 'flex',

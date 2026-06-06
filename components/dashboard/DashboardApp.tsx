@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckSquare, Compass, User, LogOut, Sun, Moon, ArrowRight, Lock, Unlock, Eye, EyeOff, ScanFace, Shield, Globe } from 'lucide-react';
+import { CheckSquare, Compass, User, LogOut, Sun, Moon, Lock, Unlock, Eye, EyeOff, Shield, Globe } from 'lucide-react';
 import DevicesModal from '@/components/settings/DevicesModal';
 import { useRouter } from 'next/navigation';
 import FitnessSummary from '@/components/dashboard/FitnessSummary';
 import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
 import type { HabitWithEntry } from '@/types/habit';
+import type { Trip, TripExpense, TripSettlement } from '@/lib/trip/types';
 
 interface DashboardAppProps {
   stats: OverviewStatsType | null;
@@ -22,6 +23,31 @@ interface DashboardAppProps {
   dayName: string;
   dateStr: string;
   activeTripName?: string;
+  activeTrip?: Trip | null;
+  tripExpenses?: TripExpense[];
+  tripSettlements?: TripSettlement[];
+}
+
+function FaceIdGlyph({ size = 68 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 72 72"
+      fill="none"
+      aria-hidden
+      style={{ display: 'block' }}
+    >
+      <path d="M20 8h-4a8 8 0 0 0-8 8v4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M52 8h4a8 8 0 0 1 8 8v4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M20 64h-4a8 8 0 0 1-8-8v-4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M52 64h4a8 8 0 0 0 8-8v-4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M26 28v-3" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M46 28v-3" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M36 25v16h-4" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M25 47c5.7 5 16.3 5 22 0" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+    </svg>
+  );
 }
 
 export default function DashboardApp({
@@ -37,9 +63,12 @@ export default function DashboardApp({
   dayName,
   dateStr,
   activeTripName,
+  activeTrip,
+  tripExpenses,
+  tripSettlements,
 }: DashboardAppProps) {
   const router = useRouter();
-  const [activeApp, setActiveApp] = useState<'habits' | null>(null);
+  const [activeApp, setActiveApp] = useState<'habits' | null>('habits');
   const [menuOpen, setMenuOpen] = useState(false);
   const [devicesOpen, setDevicesOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -98,9 +127,9 @@ export default function DashboardApp({
     const theme = localStorage.getItem('productivity_master_theme') || 'dark';
     setIsDark(theme === 'dark');
 
-    // One-time cleanup: older builds cached the raw passcode here. It is no
-    // longer read or written — the passcode lives (hashed) on the server.
+    // One-time cleanup: older builds cached the raw passcode here.
     localStorage.removeItem('semma_flow_habits_passcode');
+    localStorage.removeItem('productivity_master_active_app');
 
     // Does this device have a platform authenticator (Face ID / Touch ID)?
     if (typeof window !== 'undefined' && window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable) {
@@ -109,43 +138,11 @@ export default function DashboardApp({
         .catch(() => setBiometricSupported(false));
     }
 
-    // Clear active app on initial mount to ensure they always land on the Hub
-    habitsUnlockedRef.current = false;
-    localStorage.removeItem('productivity_master_active_app');
-    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
-
-    const handleEvent = () => {
-      const current = localStorage.getItem('productivity_master_active_app');
-      if (current === 'habits') {
-        if (habitsUnlockedRef.current) {
-          setActiveApp('habits');
-          setShowLockScreen(false);
-          return;
-        }
-        fetchLockStatus().then((status) => {
-          if (status.hasPasscode) {
-            setActiveApp(null);
-            setShowLockScreen(true);
-            setLockScreenMode('unlock');
-          } else {
-            setActiveApp('habits');
-          }
-        });
-      } else {
-        setActiveApp(null);
-        setShowLockScreen(false);
-      }
-    };
-
-    window.addEventListener('productivity-master:active-app-changed', handleEvent);
-
-    // Resolve lock status from the server
+    // Fetch lock status quietly to populate states without showing the lock screen on mount.
+    habitsUnlockedRef.current = true;
     fetchLockStatus();
-
-    return () => {
-      window.removeEventListener('productivity-master:active-app-changed', handleEvent);
-    };
   }, []);
+
 
   const handleSelectApp = async (app: 'habits' | 'trip') => {
     if (app === 'habits') {
@@ -411,15 +408,20 @@ export default function DashboardApp({
         initials={initials}
         email={email}
         onBackToHub={handleBackToHub}
+        activeTrip={activeTrip ?? null}
+        tripExpenses={tripExpenses ?? []}
+        tripSettlements={tripSettlements ?? []}
       />
     );
   }
 
   if (showLockScreen) {
+    const canUseFaceId = lockScreenMode === 'unlock' && hasBiometric && biometricSupported;
+
     return (
       <div
         style={{
-          background: 'var(--bg-primary)',
+          background: 'radial-gradient(circle at top, color-mix(in srgb, var(--text-primary) 8%, transparent), transparent 42%), var(--bg-primary)',
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           minHeight: '100dvh',
           display: 'flex',
@@ -431,49 +433,56 @@ export default function DashboardApp({
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            maxWidth: 400,
+            maxWidth: 390,
             width: '100%',
-            background: 'linear-gradient(135deg, color-mix(in srgb, var(--accent-primary) 8%, transparent) 0%, var(--bg-card) 100%)',
-            border: '1px solid color-mix(in srgb, var(--accent-primary) 25%, var(--border-default))',
-            borderRadius: 24,
-            padding: '36px 28px',
-            boxShadow: 'var(--glass-shadow), 0 10px 40px rgba(0, 0, 0,0.15)',
+            background: 'color-mix(in srgb, var(--bg-secondary) 94%, var(--text-primary) 6%)',
+            border: '1px solid color-mix(in srgb, var(--text-primary) 10%, transparent)',
+            borderRadius: 28,
+            padding: '34px 26px 24px',
+            boxShadow: '0 22px 70px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06)',
             textAlign: 'center',
             boxSizing: 'border-box',
           }}
         >
           <div
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: '50%',
-              background: 'rgba(85, 85, 85, 0.15)',
+              width: canUseFaceId ? 104 : 70,
+              height: canUseFaceId ? 104 : 70,
+              borderRadius: canUseFaceId ? 30 : '50%',
+              background: canUseFaceId
+                ? 'linear-gradient(180deg, color-mix(in srgb, var(--text-primary) 12%, transparent), color-mix(in srgb, var(--text-primary) 4%, transparent))'
+                : 'color-mix(in srgb, var(--text-primary) 9%, transparent)',
+              border: '1px solid color-mix(in srgb, var(--text-primary) 10%, transparent)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 20,
-              color: 'var(--accent-primary)',
+              marginBottom: 22,
+              color: 'var(--text-primary)',
+              boxShadow: canUseFaceId ? '0 14px 34px rgba(0, 0, 0, 0.18)' : 'none',
             }}
           >
-            {lockScreenMode === 'create' ? <Lock size={28} /> : <Unlock size={28} />}
+            {canUseFaceId ? <FaceIdGlyph size={70} /> : lockScreenMode === 'create' ? <Lock size={28} /> : <Unlock size={28} />}
           </div>
 
           <h2
             style={{
               margin: 0,
-              fontSize: 22,
-              fontWeight: 800,
+              fontSize: 24,
+              fontWeight: 760,
               color: 'var(--text-primary)',
-              fontFamily: "'Outfit', sans-serif",
+              letterSpacing: 0,
             }}
           >
-            {lockScreenMode === 'create' ? 'Set Habit Passcode' : 'Habits Locked'}
+            {lockScreenMode === 'create' ? 'Set Habit Passcode' : canUseFaceId ? 'Face ID' : 'Habits Locked'}
           </h2>
-          <p style={{ margin: '8px 0 24px', fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          <p style={{ margin: '8px 0 24px', fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
             {lockScreenMode === 'create'
-              ? 'Secure your habit tracking entries. Create a password to restrict access.'
-              : 'Habit Tracker is password protected. Enter your passcode to continue.'}
+              ? 'Create a passcode to protect your habit tracking entries.'
+              : canUseFaceId
+                ? 'Use Face ID to unlock Habit Tracker.'
+                : 'Enter your passcode to unlock Habit Tracker.'}
           </p>
 
           <form
@@ -483,7 +492,7 @@ export default function DashboardApp({
             }}
             style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
           >
-            {lockScreenMode === 'unlock' && hasBiometric && biometricSupported && (
+            {canUseFaceId && (
               <>
                 <button
                   type="button"
@@ -491,27 +500,29 @@ export default function DashboardApp({
                   onClick={handleBiometricUnlock}
                   style={{
                     width: '100%',
-                    padding: '13px 0',
-                    borderRadius: 14,
-                    border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, var(--border-default))',
-                    background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
-                    color: 'var(--accent-primary)',
+                    padding: '14px 0',
+                    borderRadius: 16,
+                    border: 'none',
+                    background: 'var(--text-primary)',
+                    color: 'var(--bg-primary)',
                     fontSize: 15,
-                    fontWeight: 700,
+                    fontWeight: 760,
                     cursor: biometricBusy ? 'wait' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 8,
-                    transition: 'all 0.15s ease',
+                    gap: 9,
+                    boxShadow: '0 10px 24px rgba(0, 0, 0, 0.18)',
+                    transition: 'transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease',
+                    opacity: biometricBusy ? 0.72 : 1,
                   }}
                 >
-                  <ScanFace size={18} />
-                  {biometricBusy ? 'Waiting…' : 'Unlock with Face ID'}
+                  <FaceIdGlyph size={22} />
+                  {biometricBusy ? 'Looking for Face ID...' : 'Use Face ID'}
                 </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>or enter passcode</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>Passcode</span>
                   <span style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }} />
                 </div>
               </>
@@ -529,11 +540,11 @@ export default function DashboardApp({
                 style={{
                   width: '100%',
                   boxSizing: 'border-box',
-                  background: 'var(--input-bg)',
-                  border: '1.5px solid var(--input-border)',
-                  borderRadius: 12,
-                  padding: '12px 42px 12px 14px',
-                  fontSize: 15,
+                  background: 'color-mix(in srgb, var(--text-primary) 6%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--text-primary) 11%, transparent)',
+                  borderRadius: 16,
+                  padding: '13px 42px 13px 14px',
+                  fontSize: 16,
                   color: 'var(--text-primary)',
                   outline: 'none',
                   textAlign: 'center',
@@ -541,8 +552,8 @@ export default function DashboardApp({
                   fontWeight: 600,
                   transition: 'all 0.15s ease',
                 }}
-                onFocus={(e) => (e.target.style.borderColor = 'var(--accent-primary)')}
-                onBlur={(e) => (e.target.style.borderColor = 'var(--input-border)')}
+                onFocus={(e) => (e.target.style.borderColor = 'color-mix(in srgb, var(--text-primary) 26%, transparent)')}
+                onBlur={(e) => (e.target.style.borderColor = 'color-mix(in srgb, var(--text-primary) 11%, transparent)')}
               />
               <button
                 type="button"
@@ -577,11 +588,11 @@ export default function DashboardApp({
                 style={{
                   width: '100%',
                   boxSizing: 'border-box',
-                  background: 'var(--input-bg)',
-                  border: '1.5px solid var(--input-border)',
-                  borderRadius: 12,
-                  padding: '12px 14px',
-                  fontSize: 15,
+                  background: 'color-mix(in srgb, var(--text-primary) 6%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--text-primary) 11%, transparent)',
+                  borderRadius: 16,
+                  padding: '13px 14px',
+                  fontSize: 16,
                   color: 'var(--text-primary)',
                   outline: 'none',
                   textAlign: 'center',
@@ -589,8 +600,8 @@ export default function DashboardApp({
                   fontWeight: 600,
                   transition: 'all 0.15s ease',
                 }}
-                onFocus={(e) => (e.target.style.borderColor = 'var(--accent-primary)')}
-                onBlur={(e) => (e.target.style.borderColor = 'var(--input-border)')}
+                onFocus={(e) => (e.target.style.borderColor = 'color-mix(in srgb, var(--text-primary) 26%, transparent)')}
+                onBlur={(e) => (e.target.style.borderColor = 'color-mix(in srgb, var(--text-primary) 11%, transparent)')}
               />
             )}
 
@@ -606,18 +617,19 @@ export default function DashboardApp({
                 style={{
                   width: '100%',
                   padding: '13px 0',
-                  borderRadius: 14,
+                  borderRadius: 16,
                   border: 'none',
-                  background: 'var(--accent-primary)',
-                  color: 'var(--accent-on-primary)',
+                  background: canUseFaceId
+                    ? 'color-mix(in srgb, var(--text-primary) 8%, transparent)'
+                    : 'var(--text-primary)',
+                  color: canUseFaceId ? 'var(--text-primary)' : 'var(--bg-primary)',
                   fontSize: 15,
-                  fontWeight: 700,
+                  fontWeight: 760,
                   cursor: 'pointer',
-                  boxShadow: '0 4px 14px rgba(85, 85, 85, 0.2)',
                   transition: 'all 0.15s ease',
                 }}
               >
-                {lockScreenMode === 'create' ? 'Save & Unlock' : 'Unlock App'}
+                {lockScreenMode === 'create' ? 'Save and Unlock' : canUseFaceId ? 'Unlock with Passcode' : 'Unlock'}
               </button>
 
               <button
@@ -631,8 +643,8 @@ export default function DashboardApp({
                 style={{
                   width: '100%',
                   padding: '12px 0',
-                  borderRadius: 14,
-                  border: '1px solid var(--border-default)',
+                  borderRadius: 16,
+                  border: '1px solid color-mix(in srgb, var(--text-primary) 9%, transparent)',
                   background: 'transparent',
                   color: 'var(--text-secondary)',
                   fontSize: 14,
@@ -650,474 +662,21 @@ export default function DashboardApp({
     );
   }
 
-  const TEXT_DARK = 'var(--text-primary)';
-  const TEXT_MUTED = 'var(--text-muted)';
 
   return (
-    <div
-      style={{
-        background: 'var(--bg-primary)',
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        minHeight: '100dvh',
-        paddingBottom: 48,
-        position: 'relative',
-        overflowX: 'hidden',
-      }}
-    >
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
-        {/* Header */}
-        <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: 36,
-            paddingBottom: 24,
-            borderBottom: '1px solid var(--border-subtle)',
-            marginBottom: 40,
-          }}
-        >
-          <div>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: TEXT_MUTED, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              App Hub
-            </p>
-            <h1
-              style={{
-                margin: '4px 0 0',
-                fontSize: 28,
-                fontWeight: 800,
-                color: TEXT_DARK,
-                letterSpacing: '-0.02em',
-                fontFamily: "'Outfit', sans-serif",
-              }}
-            >
-              {greeting}, {formattedName.split(' ')[0]} 👋
-            </h1>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: TEXT_MUTED,
-                transition: 'all 0.15s ease',
-              }}
-            >
-              {isDark ? <Sun size={19} /> : <Moon size={19} />}
-            </button>
-
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Open profile menu"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-              }}
-            >
-              <User size={19} color={TEXT_MUTED} />
-            </button>
-          </div>
-        </header>
-
-        {/* Dropdown Menu */}
-        <AnimatePresence>
-          {menuOpen && (
-            <>
-              <div
-                onClick={() => setMenuOpen(false)}
-                style={{ position: 'fixed', inset: 0, zIndex: 100 }}
-              />
-              <motion.div
-                initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                style={{
-                  position: 'absolute',
-                  top: 90,
-                  right: 24,
-                  zIndex: 101,
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-default)',
-                  borderRadius: 16,
-                  padding: 16,
-                  width: 240,
-                  boxShadow: '0 10px 25px rgba(0, 0, 0,0.3)',
-                }}
-              >
-                <div style={{ paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid var(--border-subtle)' }}>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: TEXT_DARK }}>{formattedName}</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: TEXT_MUTED, overflow: 'hidden', textOverflow: 'ellipsis' }}>{email}</p>
-                </div>
-                {hasBiometric ? (
-                  <button
-                    onClick={handleDisableBiometric}
-                    disabled={biometricBusy}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: 10,
-                      border: '1px solid var(--border-default)',
-                      background: 'var(--bg-tertiary)',
-                      color: 'var(--text-primary)',
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: biometricBusy ? 'wait' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      marginBottom: 10,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <ScanFace size={14} />
-                    Disable Face ID
-                  </button>
-                ) : hasPasscode && biometricSupported ? (
-                  <button
-                    onClick={handleEnrollBiometric}
-                    disabled={biometricBusy}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: 10,
-                      border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, var(--border-default))',
-                      background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)',
-                      color: 'var(--accent-primary)',
-                      fontSize: 13,
-                      fontWeight: 700,
-                      cursor: biometricBusy ? 'wait' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      marginBottom: 10,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    <ScanFace size={14} />
-                    {biometricBusy ? 'Setting up…' : 'Enable Face ID'}
-                  </button>
-                ) : null}
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setDevicesOpen(true);
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 10,
-                    border: '1px solid var(--border-default)',
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    marginBottom: 10,
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <Shield size={14} />
-                  Devices & Sessions
-                </button>
-                <button
-                  onClick={handleResetPasscode}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 10,
-                    border: '1px solid var(--border-default)',
-                    background: 'var(--bg-tertiary)',
-                    color: 'var(--text-primary)',
-                    fontSize: 13,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    marginBottom: 10,
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <Lock size={14} />
-                  Reset Habit Lock
-                </button>
-                <button
-                  onClick={handleSignOut}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: 10,
-                    border: 'none',
-                    background: 'rgba(104, 104, 104, 0.08)',
-                    color: '#6a6a6a',
-                    fontSize: 13.5,
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <LogOut size={15} />
-                  Sign Out
-                </button>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-
-        {/* Apps Grid */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: 24,
-            marginTop: 20,
-          }}
-        >
-          {/* Card 1: Habit Tracker */}
-          <motion.div
-            whileHover={{ y: -6, scale: 1.015 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-            onClick={() => { if (!passcodeChecking) handleSelectApp('habits'); }}
-            style={{
-              background: 'var(--bg-card)',
-              border: '6px solid var(--bg-card)',
-              borderRadius: 28,
-              cursor: passcodeChecking ? 'wait' : 'pointer',
-              opacity: passcodeChecking ? 0.7 : 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 380,
-              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05)',
-              position: 'relative',
-              overflow: 'hidden',
-              padding: 24,
-            }}
-          >
-            {/* Full-bleed Cover Image */}
-            <img
-              src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&auto=format&fit=crop&q=80"
-              alt="Habit Tracker Cover"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                zIndex: 0,
-              }}
-            />
-
-            {/* Dark Gradient Overlay */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, rgba(0, 0, 0,0.1) 0%, rgba(0, 0, 0,0.3) 40%, rgba(0, 0, 0,0.6) 70%, rgba(0, 0, 0,0.92) 100%)',
-                zIndex: 1,
-              }}
-            />
-
-            {/* Top Icon Badge (Glassmorphic) */}
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0, 0, 0,0.1)',
-                zIndex: 2,
-              }}
-            >
-              <CheckSquare size={20} color="#ffffff" />
-            </div>
-
-            {/* Bottom Content Area */}
-            <div style={{ zIndex: 2, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#ffffff', fontFamily: "'Outfit', sans-serif", textShadow: '0 2px 4px rgba(0, 0, 0,0.5)' }}>
-                  Habit Tracker
-                </h2>
-                <p style={{ margin: '6px 0 0', fontSize: 13.5, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.45, textShadow: '0 1px 2px rgba(0, 0, 0,0.4)' }}>
-                  Build healthy routines, track streaks, and view charts to stay consistent with your habits.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 2px rgba(0, 0, 0,0.4)' }}>
-                <CheckSquare size={14} color="rgba(255, 255, 255, 0.7)" style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0,0.2))' }} />
-                {stats && stats.todayTotal > 0 ? (
-                  <span>
-                    {stats.todayCompleted}/{stats.todayTotal}
-                  </span>
-                ) : (
-                  <span>Active</span>
-                )}
-              </div>
-
-              <div
-                style={{
-                  width: '100%',
-                  height: 42,
-                  borderRadius: 21,
-                  background: '#ffffff',
-                  color: '#000000',
-                  fontSize: 13.5,
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
-                }}
-              >
-                Open Habits +
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Card 2: Trip Planner */}
-          <motion.div
-            whileHover={{ y: -6, scale: 1.015 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 22 }}
-            onClick={() => handleSelectApp('trip')}
-            style={{
-              background: 'var(--bg-card)',
-              border: '6px solid var(--bg-card)',
-              borderRadius: 28,
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: 380,
-              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.05)',
-              position: 'relative',
-              overflow: 'hidden',
-              padding: 24,
-            }}
-          >
-            {/* Full-bleed Cover Image */}
-            <img
-              src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&auto=format&fit=crop&q=80"
-              alt="Trip Planner Cover"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                zIndex: 0,
-              }}
-            />
-
-            {/* Dark Gradient Overlay */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, rgba(0, 0, 0,0.1) 0%, rgba(0, 0, 0,0.3) 40%, rgba(0, 0, 0,0.6) 70%, rgba(0, 0, 0,0.92) 100%)',
-                zIndex: 1,
-              }}
-            />
-
-            {/* Top Icon Badge (Glassmorphic) */}
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.2)',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
-                border: '1px solid rgba(255, 255, 255, 0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0, 0, 0,0.1)',
-                zIndex: 2,
-              }}
-            >
-              <Compass size={20} color="#ffffff" />
-            </div>
-
-            {/* Bottom Content Area */}
-            <div style={{ zIndex: 2, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#ffffff', fontFamily: "'Outfit', sans-serif", textShadow: '0 2px 4px rgba(0, 0, 0,0.5)' }}>
-                  Trip Planner
-                </h2>
-                <p style={{ margin: '6px 0 0', fontSize: 13.5, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.45, textShadow: '0 1px 2px rgba(0, 0, 0,0.4)' }}>
-                  Plan itineraries, track travel expenses, log bookings, and settle payments with friends.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, color: 'rgba(255, 255, 255, 0.95)', textShadow: '0 1px 2px rgba(0, 0, 0,0.4)' }}>
-                <Globe size={14} color="rgba(255, 255, 255, 0.7)" style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0,0.2))' }} />
-                {activeTripName ? (
-                  <span>{activeTripName}</span>
-                ) : (
-                  <span>Explore</span>
-                )}
-              </div>
-
-              <div
-                style={{
-                  width: '100%',
-                  height: 42,
-                  borderRadius: 21,
-                  background: '#ffffff',
-                  color: '#000000',
-                  fontSize: 13.5,
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
-                }}
-              >
-                Open Trips +
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
+    <>
+      <FitnessSummary
+        stats={stats}
+        habits={habits}
+        weekData={weekData}
+        displayName={formattedName}
+        initials={initials}
+        email={email}
+        activeTrip={activeTrip ?? null}
+        tripExpenses={tripExpenses ?? []}
+        tripSettlements={tripSettlements ?? []}
+      />
       <DevicesModal isOpen={devicesOpen} onClose={() => setDevicesOpen(false)} />
-    </div>
+    </>
   );
 }

@@ -5,7 +5,8 @@ import type { OverviewStats as OverviewStatsType } from '@/types/analytics';
 import type { HabitWithEntry } from '@/types/habit';
 import type { HabitEntry } from '@/types/entry';
 import DashboardApp from '@/components/dashboard/DashboardApp';
-import { ensureTrip } from '@/lib/trip/server';
+import { ensureTrip, getExpenses, getSettlements } from '@/lib/trip/server';
+import type { Trip, TripExpense, TripSettlement } from '@/lib/trip/types';
 
 export default async function DashboardPage() {
   const supabase = await createServerClient();
@@ -41,6 +42,10 @@ export default async function DashboardPage() {
   let weekEntriesRaw: WeekEntry[] = [];
   let activeTripName = '';
 
+  let activeTrip: Trip | null = null;
+  let tripExpenses: TripExpense[] = [];
+  let tripSettlements: TripSettlement[] = [];
+
   if (userId) {
     const [habitsRes, todayRes, weekRes, tripCtx] = await Promise.all([
       supabase
@@ -66,6 +71,15 @@ export default async function DashboardPage() {
     todayEntriesRaw = (todayRes.data ?? []) as HabitEntry[];
     weekEntriesRaw = (weekRes.data ?? []) as WeekEntry[];
     activeTripName = tripCtx?.trip?.name ?? '';
+    activeTrip = tripCtx?.trip ?? null;
+
+    // Fetch trip expenses + settlements in parallel (non-blocking for habits)
+    if (activeTrip) {
+      [tripExpenses, tripSettlements] = await Promise.all([
+        getExpenses(activeTrip.id),
+        getSettlements(activeTrip.id),
+      ]);
+    }
   }
 
   // Build today's habit list with entry state attached
@@ -181,6 +195,9 @@ export default async function DashboardPage() {
       dayName={dayName}
       dateStr={dateStr}
       activeTripName={activeTripName}
+      activeTrip={activeTrip}
+      tripExpenses={tripExpenses}
+      tripSettlements={tripSettlements}
     />
   );
 }

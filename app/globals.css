@@ -831,6 +831,12 @@ h1, h2, h3, h4, h5, h6 {
   .trip-layout-root { padding-left: 264px; }
   .trip-topbar { display: none !important; }
 }
+
+/* Habit Tracker dashboard layout offset */
+.hf-dash-main { margin-left: 0; }
+@media (min-width: 1024px) {
+  .hf-dash-main { margin-left: 264px; }
+}
 .trip-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
 .trip-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .trip-two-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }

@@ -22,6 +22,7 @@ import {
   Moon,
   Sun,
   Shield,
+  CheckCircle2,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import DevicesModal from '@/components/settings/DevicesModal';
@@ -181,128 +182,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
 
   return (
     <>
-      {/* ───────── Desktop Sidebar (≥1024px) — mirrors the habits dashboard ───────── */}
-      <aside
-        className="hf-desktop-sidebar"
-        style={{
-          position: 'fixed', top: 0, left: 0, bottom: 0, width: 264, zIndex: 45,
-          flexDirection: 'column',
-          background: 'var(--bg-tertiary)',
-          borderRight: '1px solid var(--border-default)',
-          padding: '22px 16px 20px',
-          overflowY: 'auto',
-        }}
-      >
-        {/* Brand */}
-        <Link href="/trip" style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '2px 8px 16px', textDecoration: 'none' }}>
-          <div style={{ width: 38, height: 38, borderRadius: 11, flexShrink: 0, background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Mountain size={19} color="var(--accent-on-primary)" />
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {activeTrip?.name ?? 'Trip Planner'}
-            </p>
-            <p style={{ margin: '1px 0 0', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {activeTrip?.travelers?.join(' & ') ?? 'Travelers'}
-            </p>
-          </div>
-        </Link>
-
-        {/* Search */}
-        <button
-          onClick={() => setPalette(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 10, width: '100%',
-            padding: '9px 12px', borderRadius: 11, marginBottom: 14,
-            border: '1px solid var(--border-default)', background: 'var(--bg-card)',
-            color: 'var(--text-muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: 13, fontWeight: 600,
-          }}
-        >
-          <Search size={16} />
-          <span style={{ flex: 1, textAlign: 'left' }}>Search</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dimmed)' }}>⌘K</span>
-        </button>
-
-        {/* Nav */}
-        <p style={{ margin: '0 0 8px', padding: '0 12px', fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dimmed)' }}>Menu</p>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {NAV.map(({ href, label, icon: Icon }) => {
-            const active = isActive(pathname, href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '11px 14px', borderRadius: 12, textDecoration: 'none',
-                  background: active ? 'var(--accent-primary)' : 'transparent',
-                  color: active ? 'var(--accent-on-primary)' : 'var(--text-secondary)',
-                  fontSize: 14, fontWeight: active ? 700 : 600,
-                  transition: 'background 0.15s ease, color 0.15s ease',
-                }}
-                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = 'var(--surface-tint)'; }}
-                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-              >
-                <Icon size={18} style={{ flexShrink: 0 }} />
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Footer */}
-        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 18 }}>
-          <button
-            onClick={toggle}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '11px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'transparent', color: 'var(--text-secondary)',
-              fontSize: 14, fontWeight: 600, fontFamily: 'inherit', textAlign: 'left',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--surface-tint)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-          >
-            <span style={{ display: 'flex', flexShrink: 0 }}>{isDark ? <Sun size={18} /> : <Moon size={18} />}</span>
-            {isDark ? 'Light mode' : 'Dark mode'}
-          </button>
-
-          <button
-            onClick={() => router.push('/dashboard')}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12, width: '100%',
-              padding: '11px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-              background: 'transparent', color: 'var(--text-secondary)',
-              fontSize: 14, fontWeight: 600, fontFamily: 'inherit', textAlign: 'left',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--surface-tint)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-          >
-            <Repeat size={18} style={{ flexShrink: 0 }} />
-            Habit Tracker
-          </button>
-
-          {user && (
-            <button
-              onClick={() => setOpen(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 11, width: '100%',
-                padding: '10px 12px', borderRadius: 14, marginTop: 6,
-                border: '1px solid var(--border-default)', background: 'var(--bg-card)',
-                cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
-              }}
-            >
-              <div style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, background: 'var(--accent-primary)', color: 'var(--accent-on-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800 }}>
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</p>
-                <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
-              </div>
-            </button>
-          )}
-        </div>
-      </aside>
+      {/* Desktop Sidebar is rendered by layout.tsx */}
 
       <header
         className="trip-topbar"
@@ -321,7 +201,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
       >
         {/* Left: Brand logo & titles */}
         <Link
-          href="/trip"
+          href="/dashboard"
           style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, textDecoration: 'none' }}
         >
           <div
@@ -336,7 +216,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
               flexShrink: 0,
             }}
           >
-            <Mountain size={18} color="var(--accent-on-primary)" />
+            <CheckCircle2 size={20} strokeWidth={2.4} color="var(--accent-on-primary)" />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
             <span
@@ -347,20 +227,21 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                 color: 'var(--text-primary)',
               }}
             >
-              {activeTrip?.name ?? 'Trip Planner'}
+              Productivity Master
             </span>
             <span
               style={{
                 fontSize: 11,
                 color: 'var(--text-muted)',
-                fontWeight: 500,
+                fontWeight: 600,
                 marginTop: 1,
               }}
             >
-              {activeTrip?.travelers?.join(' & ') ?? 'Travelers'}
+              Habit Tracker
             </span>
           </div>
         </Link>
+
 
         {/* Right: Hamburger button to open mobile-like menu */}
         <button
