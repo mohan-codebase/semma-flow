@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
       try {
         await sendPushNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_key } },
-          { title: 'Semma Flow Reminder', body, url: '/dashboard', tag: 'semma-flow-reminder' }
+          { title: 'Productivity Master Reminder', body, url: '/dashboard', tag: 'productivity-master-reminder' }
         );
         sent++;
       } catch (e: unknown) {

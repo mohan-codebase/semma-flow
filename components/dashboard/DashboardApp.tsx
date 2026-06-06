@@ -95,7 +95,7 @@ export default function DashboardApp({
 
   useEffect(() => {
     setIsMounted(true);
-    const theme = localStorage.getItem('semma_flow_theme') || 'dark';
+    const theme = localStorage.getItem('productivity_master_theme') || 'dark';
     setIsDark(theme === 'dark');
 
     // One-time cleanup: older builds cached the raw passcode here. It is no
@@ -111,11 +111,11 @@ export default function DashboardApp({
 
     // Clear active app on initial mount to ensure they always land on the Hub
     habitsUnlockedRef.current = false;
-    localStorage.removeItem('semma_flow_active_app');
-    window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+    localStorage.removeItem('productivity_master_active_app');
+    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
 
     const handleEvent = () => {
-      const current = localStorage.getItem('semma_flow_active_app');
+      const current = localStorage.getItem('productivity_master_active_app');
       if (current === 'habits') {
         if (habitsUnlockedRef.current) {
           setActiveApp('habits');
@@ -137,13 +137,13 @@ export default function DashboardApp({
       }
     };
 
-    window.addEventListener('semma-flow:active-app-changed', handleEvent);
+    window.addEventListener('productivity-master:active-app-changed', handleEvent);
 
     // Resolve lock status from the server
     fetchLockStatus();
 
     return () => {
-      window.removeEventListener('semma-flow:active-app-changed', handleEvent);
+      window.removeEventListener('productivity-master:active-app-changed', handleEvent);
     };
   }, []);
 
@@ -200,13 +200,13 @@ export default function DashboardApp({
       }
       setHasPasscode(true);
       habitsUnlockedRef.current = true;
-      localStorage.setItem('semma_flow_active_app', 'habits');
+      localStorage.setItem('productivity_master_active_app', 'habits');
       setActiveApp('habits');
       setShowLockScreen(false);
       setPasscode('');
       setConfirmPasscode('');
       setPasscodeError(null);
-      window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+      window.dispatchEvent(new Event('productivity-master:active-app-changed'));
     } else {
       // Verify against the server-side hash — the code is never stored locally.
       try {
@@ -218,12 +218,12 @@ export default function DashboardApp({
         const json = await res.json();
         if (res.ok && json?.data?.verified) {
           habitsUnlockedRef.current = true;
-          localStorage.setItem('semma_flow_active_app', 'habits');
+          localStorage.setItem('productivity_master_active_app', 'habits');
           setActiveApp('habits');
           setShowLockScreen(false);
           setPasscode('');
           setPasscodeError(null);
-          window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+          window.dispatchEvent(new Event('productivity-master:active-app-changed'));
         } else if (res.ok) {
           setPasscodeError('Incorrect passcode. Please try again.');
         } else {
@@ -237,10 +237,10 @@ export default function DashboardApp({
 
   const handleBackToHub = () => {
     habitsUnlockedRef.current = false;
-    localStorage.removeItem('semma_flow_active_app');
+    localStorage.removeItem('productivity_master_active_app');
     setActiveApp(null);
     setShowLockScreen(false);
-    window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
   };
 
   const handleResetPasscode = async () => {
@@ -277,13 +277,13 @@ export default function DashboardApp({
     }
 
     habitsUnlockedRef.current = false;
-    localStorage.removeItem('semma_flow_active_app');
+    localStorage.removeItem('productivity_master_active_app');
     setHasPasscode(false);
     setHasBiometric(false);
     setActiveApp(null);
     setShowLockScreen(false);
     setMenuOpen(false);
-    window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
     alert('Habit lock has been successfully removed.');
   };
 
@@ -343,12 +343,12 @@ export default function DashboardApp({
       const verJson = await verRes.json();
       if (verRes.ok && verJson?.data?.verified) {
         habitsUnlockedRef.current = true;
-        localStorage.setItem('semma_flow_active_app', 'habits');
+        localStorage.setItem('productivity_master_active_app', 'habits');
         setActiveApp('habits');
         setShowLockScreen(false);
         setPasscode('');
         setPasscodeError(null);
-        window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+        window.dispatchEvent(new Event('productivity-master:active-app-changed'));
       } else {
         setPasscodeError('Face ID failed. Try your passcode.');
       }
@@ -384,7 +384,7 @@ export default function DashboardApp({
   const toggleTheme = () => {
     const next = isDark ? 'light' : 'dark';
     setIsDark(!isDark);
-    localStorage.setItem('semma_flow_theme', next);
+    localStorage.setItem('productivity_master_theme', next);
     document.documentElement.dataset.theme = next;
     document.documentElement.style.colorScheme = next;
   };

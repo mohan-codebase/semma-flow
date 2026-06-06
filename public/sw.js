@@ -1,77 +1,40 @@
 /**
- * Semma Flow Service Worker
- * Handles: Web Push notifications + basic offline shell caching
+ * Productivity Master Service Worker
+ * Handles: Web Push notifications.
+ *
+ * NOTE: This worker deliberately has NO `fetch` handler. An earlier version
+ * intercepted same-origin GETs for an "offline shell", but that broke the
+ * Next.js App Router: it corrupted RSC payloads (so client-side tab navigation
+ * fell back to hard reloads) and truncated streamed SSR documents on larger
+ * pages (e.g. /trip/expenses rendered blank). For an auth-gated, network-bound
+ * app the offline shell added little value and lots of breakage, so navigation
+ * and document requests are now left entirely to the browser. Push remains.
  */
 
-const CACHE_NAME = 'semma-flow-v1';
+const CACHE_NAME = 'productivity-master-v3';
 
-// Cache the app shell so the install prompt works
-const SHELL_URLS = [
-  '/',
-  '/dashboard',
-  '/manifest.json',
-];
-
-// ── Install: pre-cache shell ──────────────────────────────────────────────
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      // Use cache-then-network for shell; ignore individual failures
-      Promise.allSettled(SHELL_URLS.map((url) => cache.add(url)))
-    )
-  );
+// ── Install: activate immediately ─────────────────────────────────────────
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-// ── Activate: delete old caches ───────────────────────────────────────────
+// ── Activate: drop any caches left by older versions, take control ────────
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((k) => k !== CACHE_NAME)
-          .map((k) => caches.delete(k))
-      )
-    )
+    caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k))))
   );
   self.clients.claim();
-});
-
-// ── Fetch: network-first, fall back to cache ──────────────────────────────
-self.addEventListener('fetch', (event) => {
-  // Only intercept same-origin GET requests (skip API calls, supabase, etc.)
-  const url = new URL(event.request.url);
-  if (
-    event.request.method !== 'GET' ||
-    url.origin !== self.location.origin ||
-    url.pathname.startsWith('/api/')
-  ) {
-    return;
-  }
-
-  event.respondWith(
-    fetch(event.request)
-      .then((res) => {
-        // Clone and store successful navigation responses
-        if (res.ok && event.request.mode === 'navigate') {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
-        }
-        return res;
-      })
-      .catch(() => caches.match(event.request))
-  );
 });
 
 // ── Push: show notification ───────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'Semma Flow',
+    title: 'Productivity Master',
     body: "Time to check in on today's habits! 🔥",
     icon: '/icons/icon-192.png',
     badge: '/icons/icon-192.png',
     url: '/dashboard',
-    tag: 'semma-flow-reminder',
+    tag: 'productivity-master-reminder',
   };
 
   try {

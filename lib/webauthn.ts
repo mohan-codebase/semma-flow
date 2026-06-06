@@ -2,7 +2,7 @@ import 'server-only';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
-export const RP_NAME = 'Semma Flow';
+export const RP_NAME = 'Productivity Master';
 export const REG_CHALLENGE_COOKIE = 'wa_reg_chal';
 export const AUTH_CHALLENGE_COOKIE = 'wa_auth_chal';
 const CHALLENGE_TTL = 300; // seconds — a ceremony is short-lived

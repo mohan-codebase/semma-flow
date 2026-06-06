@@ -310,7 +310,7 @@ export default function Hero() {
               margin: '0 0 36px',
               maxWidth: 520,
             }}>
-              Semma Flow is the performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, achievements — everything in one place.
+              Productivity Master is the performance-grade habit tracker for builders, athletes, and lifelong learners. Streaks, analytics, achievements — everything in one place.
             </motion.p>
 
             {/* CTA buttons */}

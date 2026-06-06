@@ -13,7 +13,7 @@ const CONTROL_CHARS = new RegExp(
   'g',
 );
 
-// Mirror the sanitisation used across Semma Flow's validations: strip HTML tags
+// Mirror the sanitisation used across Productivity Master's validations: strip HTML tags
 // and control chars, collapse whitespace, before length checks.
 function sanitizeText(input: string): string {
   return input

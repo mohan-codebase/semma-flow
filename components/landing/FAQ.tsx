@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react';
 
 const FAQS = [
   {
-    q: 'Is Semma Flow really free?',
+    q: 'Is Productivity Master really free?',
     a: 'Yes. The free plan gives you up to 5 habits with 30-day history, basic streak tracking, and the full dashboard experience — forever. No credit card required.',
   },
   {
@@ -18,12 +18,12 @@ const FAQS = [
     a: 'Your streak resets, but your history and total completions remain intact. On the Elite plan, you get Streak Freeze tokens (4/month) that protect a streak through one missed day.',
   },
   {
-    q: 'Does Semma Flow send reminders?',
+    q: 'Does Productivity Master send reminders?',
     a: 'You can set a reminder time per habit. Push notification delivery is coming soon — we\'re finalising the implementation. Email digests are planned for Pro.',
   },
   {
     q: 'Can I use it on my phone?',
-    a: 'Semma Flow is fully responsive and works great on any mobile browser. A PWA install ("Add to Home Screen") is also coming soon so you can launch it like a native app.',
+    a: 'Productivity Master is fully responsive and works great on any mobile browser. A PWA install ("Add to Home Screen") is also coming soon so you can launch it like a native app.',
   },
   {
     q: 'How is my data stored?',
@@ -31,7 +31,7 @@ const FAQS = [
   },
   {
     q: 'Can I track habits I don\'t do every day?',
-    a: 'Absolutely. You can set habits to specific days of the week (e.g. "Mon, Wed, Fri"), or X times per week/month. Semma Flow adapts to your actual lifestyle.',
+    a: 'Absolutely. You can set habits to specific days of the week (e.g. "Mon, Wed, Fri"), or X times per week/month. Productivity Master adapts to your actual lifestyle.',
   },
   {
     q: 'Is there a team or family plan?',

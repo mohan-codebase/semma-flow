@@ -1325,7 +1325,7 @@ function ProfileMenu({
   const toggleTheme = () => {
     const next = isDark ? 'light' : 'dark';
     setIsDark(!isDark);
-    localStorage.setItem('semma_flow_theme', next);
+    localStorage.setItem('productivity_master_theme', next);
     document.documentElement.dataset.theme = next;
     document.documentElement.style.colorScheme = next;
   };
@@ -1718,7 +1718,7 @@ export default function FitnessSummary({
   const toggleTheme = () => {
     const next = isDark ? 'light' : 'dark';
     setIsDark(!isDark);
-    localStorage.setItem('semma_flow_theme', next);
+    localStorage.setItem('productivity_master_theme', next);
     document.documentElement.dataset.theme = next;
     document.documentElement.style.colorScheme = next;
   };
@@ -1877,7 +1877,7 @@ export default function FitnessSummary({
             <CheckCircle2 size={21} strokeWidth={2.4} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>Semma Flow</p>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', fontFamily: "'Outfit', sans-serif" }}>Productivity Master</p>
             <p style={{ margin: '1px 0 0', fontSize: 11, color: 'var(--text-muted)', fontWeight: 600 }}>Habit Tracker</p>
           </div>
         </div>

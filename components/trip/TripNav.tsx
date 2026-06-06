@@ -383,7 +383,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
         </button>
       </header>
 
-      {/* Mobile Bottom Sheet (matching Semma Flow profile bottom-sheet layout) */}
+      {/* Mobile Bottom Sheet (matching Productivity Master profile bottom-sheet layout) */}
       <AnimatePresence>
         {open && (
           <>
@@ -816,7 +816,7 @@ export default function TripNav({ trips = [], activeTrip }: TripNavProps) {
                 </div>
 
                 <p style={{ paddingTop: 32, textAlign: 'center', fontSize: 11, color: TEXT_MUTED, margin: 0 }}>
-                  Semma Flow · Trip Planner · v1.0
+                  Productivity Master · Trip Planner · v1.0
                 </p>
 
               </div>

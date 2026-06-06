@@ -1,6 +1,6 @@
 {
-  "name": "Semma Flow",
-  "short_name": "Semma Flow",
+  "name": "Productivity Master",
+  "short_name": "Productivity Master",
   "description": "Premium habit tracker for routines, streaks, and self-growth.",
   "start_url": "/dashboard",
   "display": "standalone",

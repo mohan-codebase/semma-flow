@@ -68,7 +68,7 @@ export default function Navbar() {
             fontFamily: "'Outfit', sans-serif",
             letterSpacing: '-0.02em',
           }}>
-            Semma Flow
+            Productivity Master
           </span>
         </Link>
 

@@ -11,7 +11,7 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-const STORAGE_KEY = 'semma_flow_theme';
+const STORAGE_KEY = 'productivity_master_theme';
 
 function readAppliedTheme(): Theme {
   if (typeof document === 'undefined') return 'dark';

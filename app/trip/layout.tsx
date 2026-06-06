@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { ensureTrip, getTrips } from '@/lib/trip/server';
 import TripNav from '@/components/trip/TripNav';
 
-export const metadata = { title: 'Trip Planner — Semma Flow' };
+export const metadata = { title: 'Trip Planner — Productivity Master' };
 
 export default async function TripLayout({ children }: { children: React.ReactNode }) {
   const ctx = await ensureTrip();

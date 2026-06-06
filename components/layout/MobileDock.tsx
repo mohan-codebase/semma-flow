@@ -28,7 +28,7 @@ export default function MobileDock() {
     setIsMounted(true);
     
     const syncState = () => {
-      const saved = localStorage.getItem('semma_flow_active_app');
+      const saved = localStorage.getItem('productivity_master_active_app');
       setActiveApp(saved === 'habits' ? 'habits' : null);
     };
 
@@ -36,9 +36,9 @@ export default function MobileDock() {
     syncState();
 
     // Listen for custom event from DashboardApp or other components
-    window.addEventListener('semma-flow:active-app-changed', syncState);
+    window.addEventListener('productivity-master:active-app-changed', syncState);
     return () => {
-      window.removeEventListener('semma-flow:active-app-changed', syncState);
+      window.removeEventListener('productivity-master:active-app-changed', syncState);
     };
   }, []);
 
@@ -57,16 +57,16 @@ export default function MobileDock() {
   if (!isMounted || !showDock) return null;
 
   const navigateToHabits = () => {
-    localStorage.setItem('semma_flow_active_app', 'habits');
-    window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+    localStorage.setItem('productivity_master_active_app', 'habits');
+    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
     if (pathname !== '/dashboard') {
       router.push('/dashboard');
     }
   };
 
   const navigateToHub = () => {
-    localStorage.removeItem('semma_flow_active_app');
-    window.dispatchEvent(new Event('semma-flow:active-app-changed'));
+    localStorage.removeItem('productivity_master_active_app');
+    window.dispatchEvent(new Event('productivity-master:active-app-changed'));
     if (pathname !== '/dashboard') {
       router.push('/dashboard');
     }

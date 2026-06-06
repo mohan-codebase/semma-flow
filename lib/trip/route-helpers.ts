@@ -3,7 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 // Shared helpers for /api/trip/* routes — same { data, error } envelope used
-// across Semma Flow's API.
+// across Productivity Master's API.
 export function ok<T>(data: T, status = 200) {
   return NextResponse.json({ data, error: null }, { status });
 }

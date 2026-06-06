@@ -88,7 +88,7 @@ function SignupContent() {
               letterSpacing: '-0.03em',
             }}
           >
-            Semma Flow
+            Productivity Master
           </span>
         </div>
 

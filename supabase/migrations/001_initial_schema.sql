@@ -1,5 +1,5 @@
 -- ============================================================
--- Semma Flow — Initial Schema
+-- Productivity Master — Initial Schema
 -- ============================================================
 
 -- Profiles (extends Supabase auth.users)

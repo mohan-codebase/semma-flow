@@ -20,7 +20,7 @@ interface Result {
   stayActive: () => void;
 }
 
-const ACTIVITY_KEY = 'semma_flow_last_activity';
+const ACTIVITY_KEY = 'productivity_master_last_activity';
 // Passive UI signals that count as "the user is here". Kept short on purpose.
 const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll', 'wheel', 'mousemove'] as const;
 // Ignore repeat activity within this window so a moving mouse doesn't re-arm

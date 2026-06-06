@@ -1,4 +1,4 @@
-// Domain types for the Trip Planner (merged into Semma Flow).
+// Domain types for the Trip Planner (merged into Productivity Master).
 // Tables are prefixed `trip_` and scoped to the signed-in user (user_id).
 
 export type Traveler = string;

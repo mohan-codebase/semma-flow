@@ -36,7 +36,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
   }, [supabase]);
 
   const handleAddHabit = () => {
-    window.dispatchEvent(new Event('semma-flow:open-add'));
+    window.dispatchEvent(new Event('productivity-master:open-add'));
     onTabChange?.('habits');
   };
 
@@ -126,7 +126,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
                       fontFamily: "'Outfit', sans-serif",
                     }}
                   >
-                    Semma Flow
+                    Productivity Master
                   </span>
                 </div>
                 <button
@@ -335,7 +335,7 @@ export default function Topbar({ activeTab = 'home', onTabChange }: TopbarProps)
                 letterSpacing: '-0.4px',
               }}
             >
-              Semma Flow
+              Productivity Master
             </span>
             <span
               style={{

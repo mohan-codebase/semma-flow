@@ -59,8 +59,15 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: false,
   },
 
-  // Enable Next.js 16 server component output cache (use cache directive + cacheLife/cacheTag)
-  cacheComponents: true,
+  // Next.js 16 Cache Components — disabled. The app's routes do request-time
+  // dynamic IO (Supabase auth / cookies in layouts and pages) without wrapping
+  // it in Suspense / `'use cache'`, which Cache Components requires. With it on,
+  // dynamic routes (e.g. every /trip and /dashboard subpage) got stuck in a
+  // ~1Hz client re-mount loop: pages rendered blank and tab navigation never
+  // committed ("tabs not going in"). No route uses the `'use cache'` directive,
+  // so enabling it bought nothing. Re-enable only after adding Suspense
+  // boundaries around the dynamic auth reads.
+  // cacheComponents: true,
 
   // Hide the on-screen dev indicator (the floating "Cache disabled" pill) — it's
   // fixed-positioned and overlaps page content on small viewports. Build/runtime
