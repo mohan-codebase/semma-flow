@@ -74,7 +74,7 @@ export default function RootLayout({
         <script
           // Prevent flash of wrong theme — runs before paint.
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='productivity_master_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
+            __html: `(function(){try{var k='productivity_master_theme';var s=localStorage.getItem(k);var t=(s==='light'||s==='dark')?s:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;var la=localStorage.getItem('productivity_master_light_accent')||'#7C3AED';var da=localStorage.getItem('productivity_master_dark_accent')||'#7C3AED';document.documentElement.style.setProperty('--accent-primary',t==='light'?la:da);}catch(e){}})();`,
           }}
         />
       </head>

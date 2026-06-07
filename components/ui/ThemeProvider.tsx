@@ -8,6 +8,10 @@ interface ThemeContextValue {
   theme: Theme;
   setTheme: (t: Theme) => void;
   toggle: () => void;
+  lightAccent: string;
+  darkAccent: string;
+  setLightAccent: (c: string) => void;
+  setDarkAccent: (c: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -33,12 +37,24 @@ function applyTheme(theme: Theme) {
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('dark');
+  const [lightAccent, setLightAccentState] = useState('#7C3AED');
+  const [darkAccent, setDarkAccentState] = useState('#7C3AED');
 
   useEffect(() => {
     // Sync React state to the theme the pre-paint script already applied,
     // rather than re-deriving it. No applyTheme() call needed — the DOM is
     // already correct, so this only catches the toggle's state up to it.
     setThemeState(readAppliedTheme());
+
+    // Read and sync custom accents from localStorage safely
+    try {
+      const la = localStorage.getItem('productivity_master_light_accent');
+      if (la) setLightAccentState(la);
+      const da = localStorage.getItem('productivity_master_dark_accent');
+      if (da) setDarkAccentState(da);
+    } catch (e) {
+      /* ignore */
+    }
 
     // Follow the OS appearance live. An actual OS change always wins and also
     // clears any manual pin — so the toggle overrides the theme until the next
@@ -54,6 +70,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener('change', onSystemChange);
   }, []);
 
+  // Sync active accent color to the document root element
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const activeAccent = theme === 'light' ? lightAccent : darkAccent;
+    document.documentElement.style.setProperty('--accent-primary', activeAccent);
+  }, [theme, lightAccent, darkAccent]);
+
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
     applyTheme(t);
@@ -68,8 +91,34 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   }, [theme, setTheme]);
 
+  const setLightAccent = useCallback((color: string) => {
+    setLightAccentState(color);
+    try {
+      window.localStorage.setItem('productivity_master_light_accent', color);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setDarkAccent = useCallback((color: string) => {
+    setDarkAccentState(color);
+    try {
+      window.localStorage.setItem('productivity_master_dark_accent', color);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggle }}>
+    <ThemeContext.Provider value={{
+      theme,
+      setTheme,
+      toggle,
+      lightAccent,
+      darkAccent,
+      setLightAccent,
+      setDarkAccent,
+    }}>
       {children}
     </ThemeContext.Provider>
   );

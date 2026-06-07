@@ -470,13 +470,14 @@ export default function Sidebar({ activeTrip: initialActiveTrip = null }: Sideba
           </button>
 
           {user && (
-            <button
-              onClick={() => setMenuOpen(true)}
+            <Link
+              href="/dashboard/settings"
               style={{
                 display: 'flex', alignItems: 'center', gap: 11, width: '100%',
                 padding: '10px 12px', borderRadius: 14, marginTop: 6,
                 border: '1px solid var(--border-default)', background: 'var(--bg-card)',
                 cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                textDecoration: 'none',
               }}
             >
               <div style={{
@@ -489,7 +490,7 @@ export default function Sidebar({ activeTrip: initialActiveTrip = null }: Sideba
                 <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</p>
                 <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
               </div>
-            </button>
+            </Link>
           )}
         </div>
       </aside>
@@ -718,13 +719,15 @@ export default function Sidebar({ activeTrip: initialActiveTrip = null }: Sideba
                 </button>
 
                 {user && (
-                  <button
-                    onClick={() => { setMenuOpen(true); setMobileOpen(false); }}
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setMobileOpen(false)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 11, width: '100%',
                       padding: '10px 12px', borderRadius: 14, marginTop: 6,
                       border: '1px solid var(--border-default)', background: 'var(--bg-card)',
                       cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+                      textDecoration: 'none',
                     }}
                   >
                     <div style={{
@@ -737,7 +740,7 @@ export default function Sidebar({ activeTrip: initialActiveTrip = null }: Sideba
                       <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{displayName}</p>
                       <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
                     </div>
-                  </button>
+                  </Link>
                 )}
               </div>
             </motion.div>
@@ -906,267 +909,6 @@ export default function Sidebar({ activeTrip: initialActiveTrip = null }: Sideba
       
       <DevicesModal isOpen={devicesOpen} onClose={() => setDevicesOpen(false)} />
 
-      <AnimatePresence>
-        {menuOpen && (
-          <ProfileMenu
-            key="profile-menu"
-            displayName={displayName}
-            initials={initials}
-            email={user?.email ?? ''}
-            onClose={() => setMenuOpen(false)}
-            onShowDevices={() => {
-              setMenuOpen(false);
-              setDevicesOpen(true);
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
-function ProfileMenu({
-  displayName, initials, email, onClose, onShowDevices,
-}: {
-  displayName: string; initials: string; email: string;
-  onClose: () => void; onShowDevices: () => void;
-}) {
-  const [signingOut, setSigningOut] = useState(false);
-  const { theme, toggle } = useTheme();
-  const isDark = theme === 'dark';
-
-  const handleSignOut = async () => {
-    setSigningOut(true);
-    try {
-      const { createClient } = await import('@/lib/supabase/client');
-      await createClient().auth.signOut();
-      window.location.href = '/';
-    } catch { setSigningOut(false); }
-  };
-
-  const menuItems: { icon: string; label: string; sub: string; href?: string; onClick?: () => void }[] = [
-    { icon: 'mountain', label: 'Trip Planner', sub: 'Expenses & settlement', href: '/trip' },
-    { icon: 'zap', label: 'Your Coach', sub: 'Weekly AI insights', href: '/dashboard/coach' },
-    { icon: 'calendar-check', label: 'Year in Review', sub: 'Highlights & PDF export', href: '/dashboard/year-in-review' },
-    { icon: 'shield', label: 'Security & Devices', sub: 'Manage login sessions', onClick: onShowDevices },
-    { icon: 'bell', label: 'Notifications', sub: 'Reminders & alerts' },
-    { icon: 'help-circle', label: 'Help & Feedback', sub: 'Support & suggestions' },
-  ];
-
-  return (
-    <>
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 399, background: 'rgba(0, 0, 0,0.45)' }}
-      />
-
-      {/* Sheet — slides up from bottom */}
-      <motion.div
-        initial={{ y: '100%' }}
-        animate={{ y: 0 }}
-        exit={{ y: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 280 }}
-        style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 400,
-          maxHeight: '93dvh',
-          background: 'var(--bg-primary)',
-          borderRadius: '24px 24px 0 0',
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          overflowY: 'auto',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        }}
-      >
-        {/* Inner centred column */}
-        <div style={{ maxWidth: 480, margin: '0 auto', padding: '0 20px 48px', display: 'flex', flexDirection: 'column' }}>
-
-          {/* Drag handle */}
-          <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 14, paddingBottom: 4 }}>
-            <div style={{ width: 40, height: 4, borderRadius: 'var(--r-pill)', background: isDark ? 'rgba(255, 255, 255,0.18)' : 'rgba(85, 85, 85,0.18)' }} />
-          </div>
-
-          {/* Drag handle */}
-          {/* Top bar */}
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 8 }}
-          >
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: isDark ? 'rgba(255, 255, 255,0.60)' : 'rgba(50, 50, 50,0.70)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              Profile
-            </p>
-            <button onClick={onClose} style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: isDark ? 'rgba(255, 255, 255,0.10)' : 'rgba(85, 85, 85,0.08)',
-              border: 'none',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-            }}>
-              <X size={18} color={isDark ? '#fff' : '#1f1f1f'} />
-            </button>
-          </motion.div>
-
-          {/* User Profile Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, type: 'spring', damping: 28, stiffness: 280 }}
-            style={{
-              marginTop: 16,
-              background: isDark
-                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.10) 0%, rgba(255, 255, 255,0.04) 100%)'
-                : 'linear-gradient(155deg, rgba(255, 255, 255,0.82) 0%, rgba(255, 255, 255,0.55) 100%)',
-              borderRadius: 28,
-              padding: '28px 24px 24px',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-              <div style={{
-                width: 68, height: 68, borderRadius: '50%',
-                background: `linear-gradient(135deg, var(--accent-primary) 0%, #727272 100%)`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 26, fontWeight: 800, color: '#fff', flexShrink: 0,
-              }}>
-                {initials}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {displayName}
-                </p>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {email}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Menu Items List */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.16, type: 'spring', damping: 28, stiffness: 280 }}
-            style={{
-              marginTop: 20,
-              background: isDark
-                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.08) 0%, rgba(255, 255, 255,0.02) 100%)'
-                : 'linear-gradient(155deg, rgba(255, 255, 255,0.80) 0%, rgba(255, 255, 255,0.40) 100%)',
-              borderRadius: 24, overflow: 'hidden',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
-            {menuItems.map((item, idx) => {
-              const Icon = (() => {
-                switch (item.icon) {
-                  case 'mountain': return Mountain;
-                  case 'zap': return Sparkles;
-                  case 'calendar-check': return CalendarCheck;
-                  case 'shield': return Shield;
-                  case 'bell': return CalendarCheck; // dummy or check
-                  default: return HelpCircle;
-                }
-              })();
-
-              const content = (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px', cursor: 'pointer', width: '100%' }}>
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 12,
-                    background: 'var(--surface-tint)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <Icon size={18} color="var(--accent-primary)" />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>{item.label}</p>
-                    <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>{item.sub}</p>
-                  </div>
-                </div>
-              );
-
-              return (
-                <div key={item.label}>
-                  {idx > 0 && <div style={{ height: 1, background: 'var(--border-subtle)', marginLeft: 74 }} />}
-                  {item.href ? (
-                    <Link href={item.href} onClick={onClose} style={{ textDecoration: 'none', display: 'block' }}>
-                      {content}
-                    </Link>
-                  ) : (
-                    <div onClick={() => { item.onClick?.(); if (item.onClick) onClose(); }} style={{ display: 'block' }}>
-                      {content}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </motion.div>
-
-          {/* Theme switcher row */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, type: 'spring', damping: 28, stiffness: 280 }}
-            style={{
-              marginTop: 16,
-              background: isDark
-                ? 'linear-gradient(155deg, rgba(255, 255, 255,0.08) 0%, rgba(255, 255, 255,0.02) 100%)'
-                : 'linear-gradient(155deg, rgba(255, 255, 255,0.80) 0%, rgba(255, 255, 255,0.40) 100%)',
-              borderRadius: 24, padding: '16px 20px',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {isDark ? <Moon size={18} color="var(--text-muted)" /> : <Sun size={18} color="var(--text-muted)" />}
-              </div>
-              <div>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{isDark ? 'Dark Mode' : 'Light Mode'}</p>
-                <p style={{ margin: '1px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>Premium theme</p>
-              </div>
-            </div>
-            <button
-              onClick={toggle}
-              style={{
-                width: 44, height: 26, borderRadius: 13, border: 'none', cursor: 'pointer',
-                background: isDark ? 'var(--accent-primary)' : 'var(--border-medium)',
-                position: 'relative', transition: 'background 0.2s', padding: 0,
-              }}
-            >
-              <div style={{
-                width: 20, height: 20, borderRadius: '50%', background: '#fff',
-                position: 'absolute', top: 3, left: isDark ? 21 : 3,
-                transition: 'left 0.2s',
-              }} />
-            </button>
-          </motion.div>
-
-          {/* Sign Out Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.22, type: 'spring', damping: 28, stiffness: 280 }}
-            style={{ marginTop: 24 }}
-          >
-            <button
-              disabled={signingOut}
-              onClick={handleSignOut}
-              style={{
-                width: '100%', padding: '15px 0', borderRadius: 20, border: 'none',
-                background: 'var(--text-primary)', color: 'var(--bg-primary)',
-                fontSize: 15, fontWeight: 700, cursor: signingOut ? 'wait' : 'pointer',
-                transition: 'opacity 0.15s',
-              }}
-            >
-              {signingOut ? 'Signing out...' : 'Sign Out'}
-            </button>
-          </motion.div>
-        </div>
-      </motion.div>
     </>
   );
 }

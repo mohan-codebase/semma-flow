@@ -101,18 +101,18 @@
   --bg-glass-strong: rgba(10, 10, 18, 0.94);
   --bg-overlay:      rgba(5, 5, 15, 0.80);
 
-  /* Accent — purple */
+  /* Accent — dynamic color mix */
   --accent-primary:    #7C3AED;
-  --accent-hover:      #6D28D9;
-  --accent-light:      #A78BFA;
+  --accent-hover:      color-mix(in srgb, var(--accent-primary) 85%, #000);
+  --accent-light:      color-mix(in srgb, var(--accent-primary) 70%, #fff);
   --accent-on-primary: #FFFFFF;
-  --accent-glow:       rgba(124, 58, 237, 0.12);
-  --accent-glow-md:    rgba(124, 58, 237, 0.20);
-  --accent-glow-lg:    rgba(124, 58, 237, 0.32);
+  --accent-glow:       color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  --accent-glow-md:    color-mix(in srgb, var(--accent-primary) 20%, transparent);
+  --accent-glow-lg:    color-mix(in srgb, var(--accent-primary) 32%, transparent);
 
   /* Categorical accents */
   --indigo:      #A78BFA;
-  --indigo-dim:  #7C3AED;
+  --indigo-dim:  var(--accent-primary);
   --indigo-glow: rgba(167, 139, 250, 0.14);
 
   --pink:        #F472B6;
@@ -185,23 +185,23 @@
 
   /* Dashboard surface tokens */
   --surface-card:       rgba(22, 20, 42, 0.60);
-  --surface-tint:       rgba(124, 58, 237, 0.14);
-  --surface-tint-mid:   rgba(124, 58, 237, 0.28);
-  --habit-card:         rgba(124, 58, 237, 0.10);
-  --habit-card-done:    rgba(124, 58, 237, 0.22);
-  --drag-handle:        rgba(124, 58, 237, 0.30);
+  --surface-tint:       color-mix(in srgb, var(--accent-primary) 14%, transparent);
+  --surface-tint-mid:   color-mix(in srgb, var(--accent-primary) 28%, transparent);
+  --habit-card:         color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  --habit-card-done:    color-mix(in srgb, var(--accent-primary) 22%, transparent);
+  --drag-handle:        color-mix(in srgb, var(--accent-primary) 30%, transparent);
   --divider:            rgba(255, 255, 255, 0.07);
   --input-bg:           rgba(255, 255, 255, 0.05);
-  --input-border:       rgba(124, 58, 237, 0.30);
+  --input-border:       color-mix(in srgb, var(--accent-primary) 30%, transparent);
 
   /* ── Card tokens (formerly liquid glass) ── */
   --glass-bg:           var(--bg-secondary);
-  --glass-bg-purple:    rgba(124, 58, 237, 0.10);
+  --glass-bg-purple:    color-mix(in srgb, var(--accent-primary) 10%, transparent);
   --glass-bg-sheet:     var(--bg-secondary);
   --glass-blur:         none;
   --glass-shadow:       0 1px 3px rgba(0,0,0,0.20), 0 0 0 1px var(--border-subtle);
   --glass-shadow-sm:    0 1px 2px rgba(0,0,0,0.15), 0 0 0 1px var(--border-subtle);
-  --glass-shadow-purple:0 2px 8px rgba(124,58,237,0.15), 0 0 0 1px rgba(124,58,237,0.20);
+  --glass-shadow-purple:0 2px 8px color-mix(in srgb, var(--accent-primary) 15%, transparent), 0 0 0 1px color-mix(in srgb, var(--accent-primary) 20%, transparent);
   --glass-border:       none;
 
   /* Legacy aliases */
@@ -225,16 +225,16 @@
   --bg-overlay:      rgba(30, 10, 60, 0.45);
 
   --accent-primary:    #7C3AED;
-  --accent-hover:      #6D28D9;
-  --accent-light:      #A78BFA;
+  --accent-hover:      color-mix(in srgb, var(--accent-primary) 85%, #000);
+  --accent-light:      color-mix(in srgb, var(--accent-primary) 70%, #fff);
   --accent-on-primary: #FFFFFF;
-  --accent-glow:       rgba(124, 58, 237, 0.08);
-  --accent-glow-md:    rgba(124, 58, 237, 0.14);
-  --accent-glow-lg:    rgba(124, 58, 237, 0.24);
+  --accent-glow:       color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  --accent-glow-md:    color-mix(in srgb, var(--accent-primary) 14%, transparent);
+  --accent-glow-lg:    color-mix(in srgb, var(--accent-primary) 24%, transparent);
 
-  --indigo:      #7C3AED;
-  --indigo-dim:  #6D28D9;
-  --indigo-glow: rgba(124, 58, 237, 0.10);
+  --indigo:      var(--accent-primary);
+  --indigo-dim:  color-mix(in srgb, var(--accent-primary) 85%, #000);
+  --indigo-glow: color-mix(in srgb, var(--accent-primary) 10%, transparent);
 
   --pink:        #DB2777;
   --pink-glow:   rgba(219, 39, 119, 0.10);
@@ -253,39 +253,39 @@
   --text-muted:     #7C7AAA;
   --text-dimmed:    #B5B3D0;
 
-  --border-subtle:  rgba(124, 58, 237, 0.08);
-  --border-default: rgba(124, 58, 237, 0.14);
-  --border-medium:  rgba(124, 58, 237, 0.22);
+  --border-subtle:  color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  --border-default: color-mix(in srgb, var(--accent-primary) 14%, transparent);
+  --border-medium:  color-mix(in srgb, var(--accent-primary) 22%, transparent);
   --border-accent:  color-mix(in srgb, var(--accent-primary) 34%, transparent);
   --border-active:  color-mix(in srgb, var(--accent-primary) 55%, transparent);
 
-  --shadow-xs:     0 1px 3px rgba(124, 58, 237, 0.06);
-  --shadow-sm:     0 2px 8px rgba(124, 58, 237, 0.08);
-  --shadow-md:     0 4px 16px rgba(124, 58, 237, 0.10);
-  --shadow-lg:     0 8px 32px rgba(124, 58, 237, 0.12);
-  --shadow-accent: 0 4px 20px rgba(124, 58, 237, 0.25);
+  --shadow-xs:     0 1px 3px color-mix(in srgb, var(--accent-primary) 6%, transparent);
+  --shadow-sm:     0 2px 8px color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  --shadow-md:     0 4px 16px color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  --shadow-lg:     0 8px 32px color-mix(in srgb, var(--accent-primary) 12%, transparent);
+  --shadow-accent: 0 4px 20px color-mix(in srgb, var(--accent-primary) 25%, transparent);
 
   --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.80);
 
   /* Dashboard surface tokens — light */
   --surface-card:       rgba(255, 255, 255, 0.70);
-  --surface-tint:       #EDE9FE;
-  --surface-tint-mid:   #DDD6FE;
-  --habit-card:         #EDE9FE;
-  --habit-card-done:    #DDD6FE;
-  --drag-handle:        #C4B5FD;
-  --divider:            rgba(124, 58, 237, 0.08);
+  --surface-tint:       color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  --surface-tint-mid:   color-mix(in srgb, var(--accent-primary) 20%, transparent);
+  --habit-card:         color-mix(in srgb, var(--accent-primary) 8%, transparent);
+  --habit-card-done:    color-mix(in srgb, var(--accent-primary) 18%, transparent);
+  --drag-handle:        color-mix(in srgb, var(--accent-primary) 28%, transparent);
+  --divider:            color-mix(in srgb, var(--accent-primary) 8%, transparent);
   --input-bg:           rgba(255, 255, 255, 0.85);
-  --input-border:       #DDD6FE;
+  --input-border:       color-mix(in srgb, var(--accent-primary) 20%, transparent);
 
   /* ── Card tokens — light ── */
   --glass-bg:           var(--bg-secondary);
-  --glass-bg-purple:    rgba(124, 58, 237, 0.06);
+  --glass-bg-purple:    color-mix(in srgb, var(--accent-primary) 6%, transparent);
   --glass-bg-sheet:     var(--bg-secondary);
   --glass-blur:         none;
   --glass-shadow:       0 1px 3px rgba(100,80,200,0.10), 0 0 0 1px var(--border-subtle);
   --glass-shadow-sm:    0 1px 2px rgba(100,80,200,0.08), 0 0 0 1px var(--border-subtle);
-  --glass-shadow-purple:0 2px 8px rgba(124,58,237,0.12), 0 0 0 1px rgba(124,58,237,0.16);
+  --glass-shadow-purple:0 2px 8px color-mix(in srgb, var(--accent-primary) 12%, transparent), 0 0 0 1px color-mix(in srgb, var(--accent-primary) 16%, transparent);
   --glass-border:       none;
 }
 
