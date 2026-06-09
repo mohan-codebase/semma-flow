@@ -17,6 +17,14 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = 'productivity_master_theme';
 
+function hexToRgbComponents(hex: string): string {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3
+    ? clean.split('').map((c) => c + c).join('')
+    : clean;
+  return `${parseInt(full.slice(0, 2), 16)}, ${parseInt(full.slice(2, 4), 16)}, ${parseInt(full.slice(4, 6), 16)}`;
+}
+
 function readAppliedTheme(): Theme {
   if (typeof document === 'undefined') return 'dark';
   // The pre-paint script in layout.tsx has already resolved and applied the
@@ -75,6 +83,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (typeof document === 'undefined') return;
     const activeAccent = theme === 'light' ? lightAccent : darkAccent;
     document.documentElement.style.setProperty('--accent-primary', activeAccent);
+    document.documentElement.style.setProperty('--accent-primary-rgb', hexToRgbComponents(activeAccent));
   }, [theme, lightAccent, darkAccent]);
 
   const setTheme = useCallback((t: Theme) => {
@@ -128,4 +137,11 @@ export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) throw new Error('useTheme must be used within <ThemeProvider>.');
   return ctx;
+}
+
+/** Returns the resolved hex for the current theme's accent color. Use this
+ *  anywhere you need a literal hex (SVG presentation attributes, rgba()). */
+export function useAccentColor(): string {
+  const { theme, lightAccent, darkAccent } = useTheme();
+  return theme === 'light' ? lightAccent : darkAccent;
 }

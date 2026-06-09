@@ -7,12 +7,13 @@ import {
   User, Plus, LayoutDashboard, BarChart3, Trophy, Sparkles,
   CalendarCheck, Compass, Settings, Flame, CheckCircle2, TrendingUp,
   Target, Sun, Moon, ArrowLeft, Wallet, Receipt, MapPin, ExternalLink,
-  Luggage, Coins, ChevronDown,
+  Luggage, Coins, ChevronDown, Ban,
 } from 'lucide-react';
 import { DynamicIcon, HABIT_ICON_NAMES } from '@/lib/icons';
 import DevicesModal from '@/components/settings/DevicesModal';
 import ToggleSwitch from '@/components/ui/ToggleSwitch';
 import WeeklyReportChart from '@/components/dashboard/WeeklyReportChart';
+import { useAccentColor } from '@/components/ui/ThemeProvider';
 import type { OverviewStats } from '@/types/analytics';
 import type { HabitWithEntry, Habit } from '@/types/habit';
 import { todayString } from '@/lib/utils/dates';
@@ -39,12 +40,12 @@ const PURPLE_MID = 'var(--surface-tint-mid)';
 const TEXT_DARK = 'var(--text-primary)';
 const TEXT_MUTED = 'var(--text-muted)';
 // Raw hex needed only for SVG attributes and rgba() calls
-const PURPLE_HEX = '#555555';
+const PURPLE_HEX = '#7C3AED';
 
 // Bad-habit theming — red accents, kept consistent with HabitCard/HabitList
-const RED = '#6a6a6a';
-const RED_SOFT = '#8e8e8e';
-const RED_LIGHT = 'rgba(104, 104, 104,0.12)';
+const RED = '#F87171';
+const RED_SOFT = '#FCA5A5';
+const RED_LIGHT = 'rgba(248, 113, 113, 0.12)';
 
 // Liquid glass helpers (inline style objects)
 const GLASS_SM: React.CSSProperties = {
@@ -75,6 +76,7 @@ function CircularProgress({
   completed: number;
   total: number;
 }) {
+  const accentHex = useAccentColor();
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   const offset = CIRCUMFERENCE * (1 - pct / 100);
   const size = (RADIUS + STROKE) * 2;
@@ -124,7 +126,7 @@ function CircularProgress({
             cy={size / 2}
             r={RADIUS}
             fill="none"
-            stroke="rgba(85, 85, 85,0.10)"
+            style={{ stroke: `color-mix(in srgb, ${accentHex} 22%, transparent)` }}
             strokeWidth={STROKE}
           />
           {/* Progress arc */}
@@ -133,7 +135,7 @@ function CircularProgress({
             cy={size / 2}
             r={RADIUS}
             fill="none"
-            stroke={PURPLE_HEX}
+            stroke={accentHex}
             strokeWidth={STROKE}
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
@@ -174,8 +176,8 @@ function CircularProgress({
                 width: 12,
                 height: 12,
                 borderRadius: '50%',
-                background: i < completed ? PURPLE_HEX : 'transparent',
-                border: `2px solid ${i < completed ? PURPLE_HEX : 'rgba(85, 85, 85,0.25)'}`,
+                background: i < completed ? accentHex : 'transparent',
+                border: `2px solid ${i < completed ? accentHex : `color-mix(in srgb, ${accentHex} 30%, transparent)`}`,
               }}
             />
           ))}
@@ -210,7 +212,8 @@ function HabitRow({
   const icon = habit.icon ?? (bad ? 'ban' : 'circle-check');
 
   // For bad habits, checking the row off means the user *avoided* it today.
-  const accent = bad ? RED : (habit.color || PURPLE);
+  // All regular habits use the system theme accent — no per-habit color.
+  const accent = bad ? RED : PURPLE;
   const accentLight = bad ? RED_LIGHT : `color-mix(in srgb, ${accent} 14%, transparent)`;
 
   const subtitle = bad
@@ -232,7 +235,7 @@ function HabitRow({
         gap: 14,
         padding: '14px 16px',
         ...(done && !bad ? GLASS_PURPLE : GLASS_SM),
-        ...(bad ? { border: `1px solid ${done ? 'rgba(104, 104, 104,0.35)' : 'rgba(104, 104, 104,0.18)'}` } : null),
+        ...(bad ? { border: `1px solid ${done ? 'rgba(248, 113, 113, 0.35)' : 'rgba(248, 113, 113, 0.18)'}` } : null),
         borderRadius: 18,
         cursor: 'pointer',
         width: '100%',
@@ -293,7 +296,7 @@ function HabitRow({
           height: 30,
           borderRadius: '50%',
           background: done ? accent : 'transparent',
-          border: `2px solid ${done ? accent : 'var(--drag-handle)'}`,
+          border: `2px solid ${done ? accent : `color-mix(in srgb, ${accent} 45%, transparent)`}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -350,11 +353,10 @@ function HabitDetailSheet({
   onUpdate: (updated: Partial<HabitWithEntry> & { id: string }) => void;
   onDelete: (id: string) => void;
 }) {
-  // ── Theme the whole sheet with this habit's chosen color ──
-  // These locals deliberately shadow the module-level purple tokens, so every
-  // accent below (stat numbers, calendar, nav, month bar, chart) follows the
-  // habit's color. Falls back to brand purple when a habit has none.
-  const PURPLE = habit.color || '#555555';
+  // ── Theme the whole sheet with the system accent color ──
+  // All habit sheets use the live theme accent — no per-habit overrides.
+  const sheetAccentHex = useAccentColor();
+  const PURPLE = sheetAccentHex;
   const PURPLE_HEX = PURPLE;
   const PURPLE_LIGHT = `color-mix(in srgb, ${PURPLE} 14%, transparent)`;
   const PURPLE_MID = `color-mix(in srgb, ${PURPLE} 24%, transparent)`;
@@ -366,7 +368,7 @@ function HabitDetailSheet({
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editIcon, setEditIcon] = useState(habit.icon ?? 'circle-check');
-  const [editColor, setEditColor] = useState(habit.color || '#555555');
+  const [editColor, setEditColor] = useState(sheetAccentHex);
   const [editNotes, setEditNotes] = useState(habit.description ?? '');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -541,12 +543,12 @@ function HabitDetailSheet({
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 0, marginBottom: 22 }}>
             <div style={{
               width: 54, height: 54, borderRadius: 16,
-              background: `color-mix(in srgb, ${habit.color || PURPLE} 14%, transparent)`,
+              background: PURPLE_LIGHT,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0, overflow: 'hidden',
               boxShadow: 'none',
             }}>
-              <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={habit.color || PURPLE} />
+              <DynamicIcon name={editMode ? editIcon : (habit.icon ?? 'circle-check')} size={26} color={PURPLE} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               {editMode ? (
@@ -635,7 +637,7 @@ function HabitDetailSheet({
                       background: PURPLE_LIGHT,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer',
-                      boxShadow: active ? `0 2px 10px rgba(85, 85, 85,0.2)` : 'none',
+                      boxShadow: active ? `0 2px 10px ${PURPLE_LIGHT}` : 'none',
                       transition: 'all 0.15s', transform: active ? 'scale(1.1)' : 'scale(1)',
                     }}>
                       <DynamicIcon name={ic} size={20} color={active ? PURPLE : TEXT_MUTED} />
@@ -802,7 +804,7 @@ function HabitDetailSheet({
                               borderRadius: 8,
                               background: bg,
                               border: cell.isToday ? `2px solid ${PURPLE}` : '2px solid transparent',
-                              boxShadow: cell.completed ? '0 2px 6px rgba(85, 85, 85,0.28)' : 'none',
+                              boxShadow: cell.completed ? `0 2px 6px ${PURPLE_MID}` : 'none',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: 11,
                               fontWeight: cell.isToday ? 800 : 500,
@@ -926,14 +928,14 @@ const HABIT_ICONS = HABIT_ICON_NAMES;
 // Premium jewel-tone palette — tuned to read well on both the light
 // (purple-tinted) and dark surfaces. First entry is the brand violet (default).
 const HABIT_COLORS = [
-  '#555555', // amethyst (brand)
-  '#535353', // indigo
-  '#606060', // sapphire
-  '#767676', // teal
-  '#747474', // emerald
-  '#8e8e8e', // gold
-  '#4a4a4a', // rose
-  '#535353', // fuchsia
+  '#7C3AED', // amethyst (brand)
+  '#4F46E5', // indigo
+  '#2563EB', // sapphire
+  '#0891B2', // teal
+  '#059669', // emerald
+  '#D97706', // gold
+  '#DB2777', // rose
+  '#E11D48', // fuchsia
 ];
 const DAY_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -1021,12 +1023,14 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   return <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{children}</p>;
 }
 
-function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; onClose: () => void }) {
+function AddHabitSheet({ onSuccess, onClose, initialBad = false }: { onSuccess: (h: Habit) => void; onClose: () => void; initialBad?: boolean }) {
+  const accentHex = useAccentColor();
+  const [isBadHabit, setIsBadHabit] = useState(initialBad);
   const [name, setName] = useState('');
   const [notes, setNotes] = useState('');
-  const [icon, setIcon] = useState('circle-check');
+  const [icon, setIcon] = useState(initialBad ? 'ban' : 'circle-check');
   const [showAllIcons, setShowAllIcons] = useState(false);
-  const [color, setColor] = useState('#555555');
+  const [color, setColor] = useState(() => initialBad ? RED : accentHex);
   const [freqType, setFreqType] = useState<FreqType>('daily');
   const [days, setDays] = useState<number[]>([]);
   const [perWeek, setPerWeek] = useState(3);
@@ -1056,7 +1060,7 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
         target_type: targetType,
         target_value: targetType === 'duration' ? duration : 1,
         target_unit: targetType === 'duration' ? 'min' : null,
-        is_bad_habit: false,
+        is_bad_habit: isBadHabit,
       };
       if (notes.trim()) body.description = notes.trim();
 
@@ -1119,16 +1123,56 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
           }}
         >
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 0, marginBottom: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 0, marginBottom: 16 }}>
             <div>
-              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>New Habit</h2>
-              <p style={{ margin: '2px 0 0', fontSize: 13, color: TEXT_MUTED }}>Build a streak that sticks</p>
+              <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: TEXT_DARK, letterSpacing: '-0.02em' }}>
+                {isBadHabit ? 'Track Bad Habit' : 'New Habit'}
+              </h2>
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: TEXT_MUTED }}>
+                {isBadHabit ? 'Check off days you successfully avoided it' : 'Build a streak that sticks'}
+              </p>
             </div>
             <button onClick={onClose} style={{
               width: 34, height: 34, borderRadius: '50%', background: PURPLE_MID,
               border: 'none', cursor: 'pointer', color: PURPLE, fontWeight: 700, fontSize: 20,
               display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>×</button>
+          </div>
+
+          {/* Good / Bad toggle */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+            <button
+              type="button"
+              onClick={() => { setIsBadHabit(false); if (isBadHabit) { setIcon('circle-check'); setColor(accentHex); } }}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 14, border: 'none',
+                background: !isBadHabit ? accentHex : 'var(--bg-elevated)',
+                color: !isBadHabit ? '#fff' : TEXT_MUTED,
+                fontSize: 13, fontWeight: !isBadHabit ? 700 : 500,
+                cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: !isBadHabit ? `0 2px 12px color-mix(in srgb, ${accentHex} 35%, transparent)` : 'none',
+              }}
+            >
+              <CheckCircle2 size={15} />
+              Good Habit
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsBadHabit(true); if (!isBadHabit) { setIcon('ban'); setColor(RED); } }}
+              style={{
+                flex: 1, padding: '10px 0', borderRadius: 14, border: 'none',
+                background: isBadHabit ? RED : 'var(--bg-elevated)',
+                color: isBadHabit ? '#fff' : TEXT_MUTED,
+                fontSize: 13, fontWeight: isBadHabit ? 700 : 500,
+                cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                boxShadow: isBadHabit ? '0 2px 12px rgba(248,113,113,0.35)' : 'none',
+              }}
+            >
+              <Ban size={15} />
+              Bad Habit
+            </button>
           </div>
 
           {/* ── Name ── */}
@@ -1217,11 +1261,11 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
                   return (
                     <button key={idx} onClick={() => toggleDay(idx)} style={{
                       width: 38, height: 38, borderRadius: '50%', border: 'none',
-                      background: active ? color : '#f4f4f4',
+                      background: active ? color : 'var(--bg-elevated)',
                       color: active ? '#fff' : TEXT_MUTED,
                       fontSize: 13, fontWeight: active ? 700 : 500, cursor: 'pointer',
                       transition: 'all 0.15s',
-                      boxShadow: active ? `0 2px 8px rgba(85, 85, 85,0.3)` : 'none',
+                      boxShadow: active ? `0 2px 8px color-mix(in srgb, ${color} 30%, transparent)` : 'none',
                     }}>{label}</button>
                   );
                 })}
@@ -1257,11 +1301,11 @@ function AddHabitSheet({ onSuccess, onClose }: { onSuccess: (h: Habit) => void; 
               {(['boolean', 'duration'] as TargetType[]).map((t) => (
                 <button key={t} onClick={() => setTargetType(t)} style={{
                   flex: 1, padding: '10px 0', borderRadius: 12, border: 'none',
-                  background: targetType === t ? color : '#f4f4f4',
+                  background: targetType === t ? color : 'var(--bg-elevated)',
                   color: targetType === t ? '#fff' : TEXT_MUTED,
                   fontSize: 13, fontWeight: targetType === t ? 700 : 500,
                   cursor: 'pointer', transition: 'all 0.15s',
-                  boxShadow: targetType === t ? `0 2px 10px rgba(85, 85, 85,0.25)` : 'none',
+                  boxShadow: targetType === t ? `0 2px 10px color-mix(in srgb, ${color} 25%, transparent)` : 'none',
                 }}>
                   {t === 'boolean' ? 'Check-off' : 'Duration'}
                 </button>
@@ -1445,7 +1489,7 @@ function NavGroup({
           transition={{ duration: 0.22 }}
           style={{ display: 'flex', alignItems: 'center' }}
         >
-          <ChevronDown size={15} color="#555" />
+          <ChevronDown size={15} color="var(--text-muted)" />
         </motion.span>
       </button>
 
@@ -1515,9 +1559,11 @@ export default function FitnessSummary({
   tripExpenses = [],
   tripSettlements = [],
 }: FitnessSummaryProps) {
+  const accentHex = useAccentColor();
   const [localHabits, setLocalHabits] = useState<HabitWithEntry[]>(habits);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [addBadDefault, setAddBadDefault] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [devicesOpen, setDevicesOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(todayString());
@@ -1756,8 +1802,8 @@ export default function FitnessSummary({
                       {isToday ? (
                         <>
                           <svg width="42" height="42" style={{ position: 'absolute', inset: 0 }}>
-                            <circle cx="21" cy="21" r={R} fill="none" stroke="rgba(127, 127, 127,0.20)" strokeWidth="2.5" />
-                            <circle cx="21" cy="21" r={R} fill="none" stroke={PURPLE_HEX}
+                            <circle cx="21" cy="21" r={R} fill="none" style={{ stroke: `color-mix(in srgb, ${accentHex} 22%, transparent)` }} strokeWidth="2.5" />
+                            <circle cx="21" cy="21" r={R} fill="none" stroke={accentHex}
                               strokeWidth="2.5" strokeLinecap="round"
                               strokeDasharray={CIRC}
                               strokeDashoffset={CIRC * (1 - todayPct / 100)}
@@ -1864,7 +1910,9 @@ export default function FitnessSummary({
                               style={{
                                 position: 'absolute', bottom: 0, left: 0, right: 0,
                                 borderRadius: '8px 8px 0 0',
-                                background: isToday ? 'var(--accent-primary)' : 'var(--text-dimmed)',
+                                background: isToday
+                                  ? 'var(--accent-primary)'
+                                  : 'color-mix(in srgb, var(--accent-primary) 52%, transparent)',
                               }}
                             />
                           </div>
@@ -1901,22 +1949,62 @@ export default function FitnessSummary({
 
               {isViewingToday && <CircularProgress completed={completedCount} total={totalCount} />}
 
-              {displayBadHabits.length > 0 && (
-                <DashCard
-                  title="Bad Habits"
-                  action={
+              <DashCard
+                title="Bad Habits"
+                action={
+                  displayBadHabits.length > 0 ? (
                     <span style={{ fontSize: 13, fontWeight: 600, color: loadingDate ? 'var(--text-muted)' : RED_SOFT }}>
                       {loadingDate ? 'Loading…' : `${avoidedCount}/${displayBadHabits.length} avoided`}
                     </span>
-                  }
-                >
+                  ) : (
+                    <button
+                      onClick={() => { setAddBadDefault(true); setAddOpen(true); }}
+                      style={{
+                        padding: '5px 12px', borderRadius: 10, border: 'none',
+                        background: RED_LIGHT, color: RED_SOFT,
+                        fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 5,
+                      }}
+                    >
+                      <Plus size={13} /> Add
+                    </button>
+                  )
+                }
+              >
+                {displayBadHabits.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '20px 12px 8px' }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: '50%', background: RED_LIGHT,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      margin: '0 auto 12px',
+                    }}>
+                      <Ban size={22} color={RED_SOFT} />
+                    </div>
+                    <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: TEXT_DARK }}>No bad habits tracked</p>
+                    <p style={{ margin: '0 0 16px', fontSize: 12, color: TEXT_MUTED, lineHeight: 1.4 }}>
+                      Add habits you want to break — check off each day you resist them
+                    </p>
+                    <button
+                      onClick={() => { setAddBadDefault(true); setAddOpen(true); }}
+                      style={{
+                        padding: '9px 20px', borderRadius: 12, border: 'none',
+                        background: RED, color: '#fff',
+                        fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        boxShadow: '0 2px 10px rgba(248,113,113,0.35)',
+                      }}
+                    >
+                      <Plus size={14} /> Track a bad habit
+                    </button>
+                  </div>
+                ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {displayBadHabits.map((h, i) => (
                       <HabitRow key={h.id} habit={h} index={i} onToggle={handleToggle} onOpen={setSelectedId} bad />
                     ))}
                   </div>
-                </DashCard>
-              )}
+                )}
+              </DashCard>
             </div>
           </div>
 
@@ -1950,8 +2038,9 @@ export default function FitnessSummary({
         {addOpen && (
           <AddHabitSheet
             key="add-sheet"
+            initialBad={addBadDefault}
             onSuccess={handleAddSuccess}
-            onClose={() => setAddOpen(false)}
+            onClose={() => { setAddOpen(false); setAddBadDefault(false); }}
           />
         )}
       </AnimatePresence>

@@ -12,6 +12,16 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { WeekdayPattern } from '@/types/analytics';
+import { useAccentColor } from '@/components/ui/ThemeProvider';
+
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace('#', '');
+  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 interface Props {
   data: WeekdayPattern[];
@@ -46,6 +56,7 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
 }
 
 const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
+  const accentHex = useAccentColor();
   if (!data || data.length === 0) {
     return (
       <div style={{ color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', padding: '24px 0' }}>
@@ -81,7 +92,7 @@ const WeekdayPatterns = memo(function WeekdayPatterns({ data }: Props) {
             return (
               <Cell
                 key={index}
-                fill={`rgba(var(--accent-primary-rgb),${opacity})`}
+                fill={hexToRgba(accentHex, opacity)}
               />
             );
           })}

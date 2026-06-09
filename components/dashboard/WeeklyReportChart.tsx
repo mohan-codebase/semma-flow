@@ -9,8 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
   ReferenceLine,
-  ResponsiveContainer,
 } from 'recharts';
+import { useAccentColor } from '@/components/ui/ThemeProvider';
 
 const CHART_HEIGHT = 200;
 
@@ -21,11 +21,6 @@ export interface WeeklyPoint {
   pct: number;     // completion percentage 0–100
   isToday: boolean;
 }
-
-// Default accent (brand purple). A literal hex is required — CSS custom
-// properties don't resolve inside SVG presentation attributes (stroke /
-// stopColor). Per-habit charts pass their own hex via the `color` prop.
-const DEFAULT_ACCENT = '#555555';
 
 interface TooltipPayload {
   payload: WeeklyPoint;
@@ -53,18 +48,27 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: Toolti
   );
 }
 
-/* Weekly report — 7-day completion trend as a smooth area chart, with the
-   week's average drawn as a reference line. */
-const WeeklyReportChart = memo(function WeeklyReportChart({ data, avg, color = DEFAULT_ACCENT }: { data: WeeklyPoint[]; avg: number; color?: string }) {
-  // Unique gradient id per color so multiple charts (dashboard + open habit
-  // sheet) don't share/override one another's fill definition.
-  const gradientId = `weeklyReportGradient-${color.replace('#', '')}`;
+/* Weekly report — 7-day completion trend as a smooth area chart.
+   `color` prop accepts a hex string for per-habit charts; falls back to the
+   live theme accent so accent-color changes are reflected immediately. */
+const WeeklyReportChart = memo(function WeeklyReportChart({
+  data,
+  avg,
+  color,
+}: {
+  data: WeeklyPoint[];
+  avg: number;
+  color?: string;
+}) {
+  const accentHex = useAccentColor();
+  // Use caller-supplied hex only when it's a real hex value; CSS vars and
+  // undefined both fall back to the live accent from context.
+  const c = (color && /^#[0-9A-Fa-f]{3,8}$/.test(color)) ? color : accentHex;
+  const gradientId = `weeklyReportGradient-${c.replace('#', '')}`;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
 
-  // Measure the actual pixel width dynamically to avoid Recharts ResponsiveContainer
-  // measurement bugs inside animating or flex container layouts.
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -81,11 +85,11 @@ const WeeklyReportChart = memo(function WeeklyReportChart({ data, avg, color = D
         <AreaChart width={width} height={CHART_HEIGHT} data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.35} />
-              <stop offset="95%" stopColor={color} stopOpacity={0.02} />
+              <stop offset="5%" stopColor={c} stopOpacity={0.35} />
+              <stop offset="95%" stopColor={c} stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="4 4" stroke={color} strokeOpacity={0.14} vertical={false} />
+          <CartesianGrid strokeDasharray="4 4" stroke={c} strokeOpacity={0.14} vertical={false} />
           <XAxis
             dataKey="label"
             tick={{ fill: 'var(--text-muted)', fontSize: 12, fontWeight: 500 }}
@@ -102,11 +106,11 @@ const WeeklyReportChart = memo(function WeeklyReportChart({ data, avg, color = D
             tickLine={false}
             width={46}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: color, strokeOpacity: 0.35, strokeWidth: 2 }} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: c, strokeOpacity: 0.35, strokeWidth: 2 }} />
           {avg > 0 && (
             <ReferenceLine
               y={avg}
-              stroke={color}
+              stroke={c}
               strokeOpacity={0.45}
               strokeDasharray="5 4"
               label={{ value: `avg ${avg}%`, position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}
@@ -115,12 +119,12 @@ const WeeklyReportChart = memo(function WeeklyReportChart({ data, avg, color = D
           <Area
             type="monotone"
             dataKey="pct"
-            stroke={color}
+            stroke={c}
             strokeWidth={3}
             strokeLinecap="round"
             fill={`url(#${gradientId})`}
-            dot={{ r: 3, fill: color, strokeWidth: 0 }}
-            activeDot={{ r: 6, fill: color, stroke: 'var(--bg-primary)', strokeWidth: 3 }}
+            dot={{ r: 3, fill: c, strokeWidth: 0 }}
+            activeDot={{ r: 6, fill: c, stroke: 'var(--bg-primary)', strokeWidth: 3 }}
           />
         </AreaChart>
       ) : null}
